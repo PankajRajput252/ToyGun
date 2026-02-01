@@ -57,14 +57,14 @@ const AppHeader: React.FC = () => {
             {/* NAV LINKS (Desktop) */}
             <nav className="hidden lg:flex items-center gap-8 ml-100 pl-12">
               <Link
-                to="/containerShipment/buy"
+                to="/containerShipment/dashboard"
                 className="text-white text-sm font-medium hover:text-blue-400 transition"
               >
                 Home
               </Link>
 
               <Link
-                to="/containerShipment/rent"
+                to="/containerShipment/buy"
                 className="text-white text-sm font-medium hover:text-blue-400 transition"
               >
                 Buy
