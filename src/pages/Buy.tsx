@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import PageMeta from "../components/common/PageMeta";
 import ComponentCard from "../components/common/ComponentCard";
@@ -6,7 +6,7 @@ import Button from "../components/ui/button/Button";
 import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
-import { EyeCloseIcon, EyeIcon, InfoIcon } from "../icons";
+import { InfoIcon } from "../icons";
 import {
   Table,
   TableBody,
@@ -15,233 +15,215 @@ import {
   TableRow,
 } from "../components/ui/table";
 
+/* =======================
+   Backend Entity Mapping
+======================= */
 interface Container {
-  containerPkId:number;
+  containerPkId: number;
   containerType: string;
   ownershipType: string;
-  priceUsd: string;
-  priceInr: string;
-  min_shares: string;
-  contract_months: string;
-  roiPercentage: string
+  priceUsd: number;
+  priceInr: number;
+  min_shares: number;
+  contract_months: number;
+  roiPercentage: number;
 }
 
 export default function Buy() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
   const [isAddMode, setIsAddMode] = useState(false);
-  const [transactionPassword, setTransactionPassword] = useState("");
-  const [otp, setOtp] = useState("");
+  const [containers, setContainers] = useState<Container[]>([]);
 
-  // Mock data for wallet addresses table
-  const walletAddresses: Container[] = [
-    // Empty for now as shown in the image
-  ];
+  /* Buy Form State */
+  const [formData, setFormData] = useState({
+    containerType: "",
+    ownershipType: "",
+    priceUsd: "",
+    priceInr: "",
+    shares: "",
+  });
+
+  /* =======================
+     Fetch Containers (API)
+  ======================= */
+  useEffect(() => {
+    // TODO: replace with API call
+    setContainers([
+      {
+        containerPkId: 1,
+        containerType: "20FT",
+        ownershipType: "SINGLE",
+        priceUsd: 5000,
+        priceInr: 420000,
+        min_shares: 1,
+        contract_months: 12,
+        roiPercentage: 8,
+      },
+    ]);
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Wallet form submitted", {
-      walletAddress,
-      transactionPassword,
-      otp,
-    });
+
+    const payload = {
+      containerType: formData.containerType,
+      ownershipType: formData.ownershipType,
+      priceUsd: Number(formData.priceUsd),
+      priceInr: Number(formData.priceInr),
+      shares: Number(formData.shares),
+    };
+
+    console.log("BUY CONTAINER PAYLOAD", payload);
+    // TODO: POST to backend
   };
-
-
 
   return (
     <>
-      <PageMeta
-        title="Buy Container"
-        description="Manage your  Container Here"
-      />
-       <div className=" mt-4">
-      <PageBreadcrumb pageTitle="Buy Container"  />
+      <PageMeta title="Buy Container" description="Manage Containers" />
+
+      <div className="mt-4">
+        <PageBreadcrumb pageTitle="Buy Container" />
       </div>
 
       <div className="flex justify-end mb-4">
         <Button
           onClick={() => setIsAddMode(!isAddMode)}
-          className={`px-6 py-2 ${isAddMode
+          className={`px-6 py-2 ${
+            isAddMode
               ? "bg-gray-500 hover:bg-gray-600"
               : "bg-orange-500 hover:bg-orange-600"
-            } text-white`}
+          } text-white`}
         >
-          {isAddMode ? "View All Containers" : "Add / Buy Container"}
+          {isAddMode ? "View Containers" : "Buy Container"}
         </Button>
       </div>
 
-
-
-      <div className="space-y-6">
-        {/* Gentle Reminder Section */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0">
-              <InfoIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
-                Gentle Reminder
-              </h3>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                Shipping containers power 90% of global trade, moving goods worth $24 trillion annually. By owning containers, you tap into the world’s biggest business—world trade. It’s the backbone of the global economy, and now you can be part of it.
-              </p>
-            </div>
-          </div>
+      {/* Reminder */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex gap-3">
+          <InfoIcon className="w-5 h-5 text-blue-600" />
+          <p className="text-sm text-blue-700">
+            Containers power 90% of global trade. Own containers and earn
+            consistent ROI from world trade logistics.
+          </p>
         </div>
+      </div>
 
-        {/* Add New Wallet Address Form */}
-        {isAddMode && (
-        <ComponentCard title="Buy  New Container to Receive Profits">
+      {/* =======================
+           BUY FORM
+      ======================= */}
+      {isAddMode && (
+        <ComponentCard title="Buy New Container">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Select Wallet */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="wallet-select">Select Container-Type</Label>
+                <Label>Container Type</Label>
                 <Select
                   options={[
-                    { value: "USDT.BEP20", label: "USDT.BEP20" }
+                    { value: "20FT", label: "20 FT" },
+                    { value: "40FT", label: "40 FT" },
                   ]}
-                  defaultValue="USDT.BEP20"
-                  onChange={() => { }} // No-op since it's disabled
-                  className="dark:bg-dark-900"
+                  onChange={(v) =>
+                    setFormData({ ...formData, containerType: v })
+                  }
                 />
               </div>
+
               <div>
-                <Label htmlFor="wallet-select">Select Ownership-Type</Label>
+                <Label>Ownership Type</Label>
                 <Select
                   options={[
-                    { value: "USDT.BEP20", label: "USDT.BEP20" }
+                    { value: "SINGLE", label: "Single" },
+                    { value: "SHARED", label: "Shared" },
                   ]}
-                  defaultValue="USDT.BEP20"
-                  onChange={() => { }} // No-op since it's disabled
-                  className="dark:bg-dark-900"
+                  onChange={(v) =>
+                    setFormData({ ...formData, ownershipType: v })
+                  }
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Transaction Password */}
+            <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="transaction-password">Price USD</Label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    id="transaction-password"
-                    placeholder="Enter Transaction Password"
-                    value={transactionPassword}
-                    onChange={(e) => setTransactionPassword(e.target.value)}
-                    className="dark:bg-dark-900 pr-10"
-                  />
-
-                </div>
+                <Label>Price (USD)</Label>
+                <Input
+                  name="priceUsd"
+                  type="number"
+                  value={formData.priceUsd}
+                  onChange={handleChange}
+                />
               </div>
 
-              {/* One Time Password */}
               <div>
-                <Label htmlFor="otp">Price INR</Label>
-                <div className="flex space-x-2">
-                  <div className="flex-1">
-                    <Input
-                      type="text"
-                      id="otp"
-                      placeholder="Enter One Time Password"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      className="dark:bg-dark-900"
-                    />
-                  </div>
-                </div>
+                <Label>Price (INR)</Label>
+                <Input
+                  name="priceInr"
+                  type="number"
+                  value={formData.priceInr}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Transaction Password */}
-              <div>
-                <Label htmlFor="transaction-password">Number of Shares</Label>
-                <div className="relative">
-                  <Input
-                    type={"number"}
-                    id="transaction-password"
-                    placeholder="Enter Transaction Password"
-                    value={transactionPassword}
-                    onChange={(e) => setTransactionPassword(e.target.value)}
-                    className="dark:bg-dark-900 pr-10"
-                  />
-
-                </div>
-              </div>
-
-              {/* One Time Password */}
-              <div>
-                <Label htmlFor="otp">One Time Password</Label>
-                <div className="flex space-x-2">
-                  <div className="flex-1">
-                    <Input
-                      type="text"
-                      id="otp"
-                      placeholder="Enter One Time Password"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      className="dark:bg-dark-900"
-                    />
-                  </div>
-                </div>
-              </div>
+            <div>
+              <Label>Number of Shares</Label>
+              <Input
+                name="shares"
+                type="number"
+                value={formData.shares}
+                onChange={handleChange}
+              />
             </div>
 
-            {/* Submit Button */}
             <div className="flex justify-end">
-              <Button
-                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3"
-              >
-                Submit
+              <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3">
+                Buy Container
               </Button>
             </div>
           </form>
         </ComponentCard>
-        )}
+      )}
 
-        {/* Wallet Addresses Table */}
-        {!isAddMode && (
-        <ComponentCard title="Container Details">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-gray-200 dark:border-gray-700">
-                  <TableCell className="font-medium text-gray-900 dark:text-gray-100">#</TableCell>
-                  <TableCell className="font-medium text-gray-900 dark:text-gray-100">Container Type</TableCell>
-                  <TableCell className="font-medium text-gray-900 dark:text-gray-100">Ownership Type</TableCell>
+      {/* =======================
+           CONTAINER TABLE
+      ======================= */}
+      {!isAddMode && (
+        <ComponentCard title="Available Containers">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Ownership</TableCell>
+                <TableCell>USD</TableCell>
+                <TableCell>ROI %</TableCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {containers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6">
+                    No Containers Found
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {walletAddresses.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      No Container found
-                    </TableCell>
+              ) : (
+                containers.map((c) => (
+                  <TableRow key={c.containerPkId}>
+                    <TableCell>{c.containerPkId}</TableCell>
+                    <TableCell>{c.containerType}</TableCell>
+                    <TableCell>{c.ownershipType}</TableCell>
+                    <TableCell>${c.priceUsd}</TableCell>
+                    <TableCell>{c.roiPercentage}%</TableCell>
                   </TableRow>
-                ) : (
-                  walletAddresses.map((wallet) => (
-                    <TableRow key={wallet.containerPkId} className="border-b border-gray-200 dark:border-gray-700">
-                      <TableCell className="text-gray-900 dark:text-gray-100">{wallet.containerPkId}</TableCell>
-                      <TableCell className="text-gray-900 dark:text-gray-100">{wallet.containerType}</TableCell>
-                      <TableCell className="text-gray-900 dark:text-gray-100 font-mono text-sm">
-                        {wallet.ownershipType}
-                      </TableCell>
-                     
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </ComponentCard>
-        )}
-      </div>
-      
+      )}
     </>
   );
 }
