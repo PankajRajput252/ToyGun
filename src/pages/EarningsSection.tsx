@@ -1,31 +1,68 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import containerImg from "../components/images/RentContainer.png"; // your image
 
+const START = 2000;
+const END = 3800;
+const DURATION = 3000;
 
 export default function EarningsSection() {
   const [amount, setAmount] = useState(2000);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    let start = 2000;
-    const end = 3800;
-    const duration = 200; // ms
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          animateCount();
+        } else {
+          // Reset when leaving viewport
+          setAmount(START);
+          if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+          }
+        }
+      },
+      {
+        threshold: 0.4, // 👈 triggers when 40% visible
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const animateCount = () => {
     const startTime = performance.now();
 
     const animate = (time: number) => {
-      const progress = Math.min((time - startTime) / duration, 1);
-      const value = Math.floor(start + (end - start) * progress);
+      const progress = Math.min((time - startTime) / DURATION, 1);
+
+      // ease-out animation (smooth premium feel)
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+      const value = Math.floor(
+        START + (END - START) * easedProgress
+      );
+
       setAmount(value);
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationRef.current = requestAnimationFrame(animate);
       }
     };
 
-    requestAnimationFrame(animate);
-  }, []);
+    animationRef.current = requestAnimationFrame(animate);
+  };
 
   return (
-    <section className="w-full bg-white py-28">
+    <section
+      ref={sectionRef}
+      className="w-full bg-white py-28"
+    >
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
 
         {/* LEFT CONTENT */}
