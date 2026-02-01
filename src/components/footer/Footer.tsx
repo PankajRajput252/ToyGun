@@ -1,6 +1,6 @@
 import React from "react";
 import "../footer/Footer.css";
-import containerLogo from  "../images/ContainerLog.png"
+import containerLogo from "../images/ContainerLog.png"
 
 const Footer: React.FC = () => {
   return (
@@ -8,17 +8,17 @@ const Footer: React.FC = () => {
       {/* Top Section */}
       <div className="footer-top">
         {/* Logo */}
-        <img
-          src={containerLogo}
-          alt="Buy To Let"
-          className="footer-logo"
-        />
+        <div className="footer-brand">
+          <img
+            src={containerLogo}
+            alt="Buy To Let"
+            className="footer-logo"
+          />
 
-        {/* Tagline */}
-        <p className="footer-tagline">
-          Buy-To-Let is a fully owned subsidiary of Foundation Capital Limited.
-        </p>
-
+          <p className="footer-tagline">
+            Buy-To-Let is a fully owned subsidiary of Foundation Capital Limited.
+          </p>
+        </div>
         {/* Social Icons */}
         <div className="footer-social">
           <a href="#" aria-label="Telegram" className="telegram">

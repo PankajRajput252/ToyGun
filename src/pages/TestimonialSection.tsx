@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-
+import client1 from "../components/images/client-1.jpg"
+import client2 from "../components/images/client-2.jpg"
+import client3 from "../components/images/client-1 (1).jpg"
+import client4 from "../components/images/client-4.jpg"
+import client5 from "../components/images/client-5.jpg"
 interface Testimonial {
   id: number;
   name: string;
@@ -15,7 +19,7 @@ const testimonials: Testimonial[] = [
     name: "Linda W",
     role: "CEO",
     country: "United Kingdom",
-    image: "/images/testimonials/linda.jpg",
+    image: client3,
     quote:
       "I invested through Buy-To-Let for years, made great returns, and then sold my containers back to the company as per my contract and used the funds to buy a house.",
   },
@@ -24,24 +28,32 @@ const testimonials: Testimonial[] = [
     name: "James K",
     role: "Investor",
     country: "UAE",
-    image: "/images/testimonials/user2.jpg",
-    quote: "A very smooth investment experience with consistent monthly returns.",
+    image: client2,
+    quote: "“I’m getting pretty good income from my container investments, which makes a real difference every month.”",
   },
   {
     id: 3,
     name: "Sarah M",
     role: "Entrepreneur",
     country: "Singapore",
-    image: "/images/testimonials/user3.jpg",
-    quote: "Transparent process and excellent customer support.",
+    image: client1,
+    quote: "“I was only invested in the stock market before finding Buy-To-Let. I’ve been dependent on the performance of my stocks which is stressful and a full-time worry. I’ve migrated 60% of my portfolio into containers with Buy-To-Let, which has given me access to an excellent second income that I receive on the 28th of every month without worry.”",
   },
   {
     id: 4,
     name: "Michael T",
     role: "Consultant",
     country: "Germany",
-    image: "/images/testimonials/user4.jpg",
-    quote: "Buyback option gave me complete peace of mind.",
+    image: client4,
+    quote: "“Owning and leasing containers is reliable. I get paid on time every month. It makes me over 30% a year on average and my containers are insured which means my investment capital is therefore insured against loss. It’s very reassuring.”",
+  },
+  {
+    id: 5,
+    name: "Michael T",
+    role: "Consultant",
+    country: "Germany",
+    image: client5,
+    quote: "“My daughter introduced me to Buy-To-Let. I get paid by bank transfer every month, and I’m making a lot more from renting my containers than from my property investments. Just what I want at my age. Very satisfied.”",
   },
 ];
 

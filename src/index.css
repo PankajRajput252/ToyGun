@@ -171,6 +171,19 @@
 .jvectormap-zoomout {
   @apply !hidden;
 }
+@keyframes verticalMarquee {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-vertical-marquee {
+  animation: verticalMarquee 14s linear infinite;
+}
+
 
 .stocks-slider-outer .swiper-button-next:after,
 .stocks-slider-outer .swiper-button-prev:after {
