@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 // import { Link } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
-import NotificationDropdown from "../components/header/NotificationDropdown";
 import UserDropdown from "../components/header/UserDropdown";
 import navbarLogo from "../components/images/navbar-Log-1.png";
 const AppHeader: React.FC = () => {
