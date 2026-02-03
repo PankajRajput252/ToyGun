@@ -11,18 +11,14 @@ import Avatars from "./pages/UiElements/Avatars";
 import Buttons from "./pages/UiElements/Buttons";
 import LineChart from "./pages/Charts/LineChart";
 import BarChart from "./pages/Charts/BarChart";
-import Calendar from "./pages/Calendar";
 import BasicTables from "./pages/Tables/BasicTables";
 import FormElements from "./pages/Forms/FormElements";
-import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Buy from "./pages/Buy";
 import UserWallet from "./pages/UserWallet";
 import WithdrawFund from "./pages/WithdrawFund";
-import IncomeSummary from "./pages/IncomeSummary";
-import AccountStatement from "./pages/AccountStatement";
 import Support from "./pages/Support";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
@@ -33,10 +29,10 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminUsers from "./pages/Admin/AdminUsers";
 import AdminDeposits from "./pages/Admin/AdminDeposits";
 import AdminWalletTransactions from "./pages/Admin/AdminWalletTransactions";
-import AuthTest from "./pages/AuthTest";
 import ManageSubscription from "./pages/Admin/ManageSubscription";
 import ManagerWithdrawal from "./pages/Admin/ManageWithdrawal";
-import Deposit from "./pages/Deposit";
+import Sell from "./pages/SellContainer"
+import RentContainer from "./pages/RentContainer";
 
 export default function App() {
   return (
@@ -60,7 +56,8 @@ export default function App() {
             {/* Others Page */}
             <Route path="profile" element={<UserProfiles />} />
             <Route path="buy" element={<Buy/>} />
-            <Route path="rent" element={<UserWallet />} />
+            <Route path="sell" element={<Sell/>} />
+            <Route path="rent" element={<RentContainer/>}/>
            
             <Route path="withdrawFund" element={<WithdrawFund />} />
             <Route path="support" element={<Support />} />

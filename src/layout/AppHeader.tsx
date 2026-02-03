@@ -70,10 +70,17 @@ const AppHeader: React.FC = () => {
               </Link>
 
               <Link
-                to="/rent"
+                to="/containerShipment/rent"
                 className="text-white text-sm font-medium hover:text-blue-400 transition"
               >
                 Rent
+              </Link>
+
+                <Link
+                to="/containerShipment/sell"
+                className="text-white text-sm font-medium hover:text-blue-400 transition"
+              >
+                Sell
               </Link>
             </nav>
           </div>
