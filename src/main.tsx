@@ -15,7 +15,7 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <AppWrapper>
           <App />
-          <Footer/>
+          {/* <Footer/> */}
         </AppWrapper>
       </AuthProvider>
     </ThemeProvider>

@@ -7,82 +7,146 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../components/ui/table";
 
 /* =======================
-   Backend Entity Mapping
+   Container Entity
 ======================= */
 interface Container {
-  containerPkId: number;
-  containerType: string;
-  ownershipType: string;
+  containerType: "20FT" | "40FT";
+  ownershipType: "SINGLE" | "SHARED";
   priceUsd: number;
   priceInr: number;
-  min_shares: number;
-  contract_months: number;
-  roiPercentage: number;
+  minShares: number;
+  roi: number;
 }
+
+/* =======================
+   Static Master Data
+   (Later replace with API)
+======================= */
+// const CONTAINERS: Container[] = [
+//   // 20 FT
+//   { containerType: "20FT", ownershipType: "SINGLE", priceUsd: 3000, priceInr: 276000, minShares: 1, roi: 3.5 },
+//   { containerType: "20FT", ownershipType: "SHARED", priceUsd: 0, priceInr: 27600, minShares: 10, roi: 3 },
+
+//   // 40 FT
+//   { containerType: "40FT", ownershipType: "SINGLE", priceUsd: 4300, priceInr: 395600, minShares: 1, roi: 4.5 },
+//   { containerType: "40FT", ownershipType: "SHARED", priceUsd: 0, priceInr: 36800, minShares: 10, roi: 4 },
+// ];
+const CONTAINERS: Container[] = [
+  { containerType: "20FT", ownershipType: "SINGLE", priceUsd: 3000, priceInr: 276000, minShares: 1, roi: 3.5 },
+
+  { containerType: "20FT", ownershipType: "SHARED", priceUsd: 300, priceInr: 27600, minShares: 10, roi: 3 },
+
+  { containerType: "40FT", ownershipType: "SINGLE", priceUsd: 4300, priceInr: 395600, minShares: 1, roi: 4.5 },
+
+  { containerType: "40FT", ownershipType: "SHARED", priceUsd: 400, priceInr: 36800, minShares: 10, roi: 4 },
+];
+
 
 export default function Buy() {
   const [isAddMode, setIsAddMode] = useState(false);
-  const [containers, setContainers] = useState<Container[]>([]);
 
-  /* Buy Form State */
-  const [formData, setFormData] = useState({
-    containerType: "",
-    ownershipType: "",
-    priceUsd: "",
-    priceInr: "",
-    shares: "",
+  const [form, setForm] = useState({
+    containerType: "" as "20FT" | "40FT" | "",
+    ownershipType: "" as "SINGLE" | "SHARED" | "",
+    shares: 0,
+    priceUsd: 0,
+    priceInr: 0,
+    roi: 0,
+    minShares: 0,
   });
 
   /* =======================
-     Fetch Containers (API)
+     Price Auto Calculation
   ======================= */
-  useEffect(() => {
-    // TODO: replace with API call
-    setContainers([
-      {
-        containerPkId: 1,
-        containerType: "20FT",
-        ownershipType: "SINGLE",
-        priceUsd: 5000,
-        priceInr: 420000,
-        min_shares: 1,
-        contract_months: 12,
-        roiPercentage: 8,
-      },
-    ]);
-  }, []);
+  // useEffect(() => {
+  //   if (!form.containerType || !form.ownershipType) return;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  //   const config = CONTAINERS.find(
+  //     c =>
+  //       c.containerType === form.containerType &&
+  //       c.ownershipType === form.ownershipType
+  //   );
+
+  //   if (!config) return;
+
+  //   if (form.ownershipType === "SINGLE") {
+  //     setForm(prev => ({
+  //       ...prev,
+  //       priceUsd: config.priceUsd,
+  //       priceInr: config.priceInr,
+  //       shares: 1,
+  //       minShares: 1,
+  //       roi: config.roi,
+  //     }));
+  //   } else {
+  //     const shares = form.shares >= config.minShares ? form.shares : config.minShares;
+
+  //     setForm(prev => ({
+  //       ...prev,
+  //       priceUsd: 0,
+  //       priceInr: shares * config.priceInr,
+  //       shares,
+  //       minShares: config.minShares,
+  //       roi: config.roi,
+  //     }));
+  //   }
+  // }, [form.containerType, form.ownershipType, form.shares]);
+useEffect(() => {
+  if (!form.containerType || !form.ownershipType) return;
+
+  const config = CONTAINERS.find(
+    c =>
+      c.containerType === form.containerType &&
+      c.ownershipType === form.ownershipType
+  );
+
+  if (!config) return;
+
+  if (form.ownershipType === "SINGLE") {
+    setForm(prev => ({
+      ...prev,
+      priceUsd: config.priceUsd,
+      priceInr: config.priceInr,
+      shares: 1,
+      minShares: 1,
+      roi: config.roi,
+    }));
+  } else {
+    const shares =
+      form.shares >= config.minShares ? form.shares : config.minShares;
+
+    setForm(prev => ({
+      ...prev,
+      shares,
+      minShares: config.minShares,
+      priceUsd: shares * config.priceUsd,
+      priceInr: shares * config.priceInr,
+      roi: config.roi,
+    }));
+  }
+}, [form.containerType, form.ownershipType, form.shares]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const payload = {
-      containerType: formData.containerType,
-      ownershipType: formData.ownershipType,
-      priceUsd: Number(formData.priceUsd),
-      priceInr: Number(formData.priceInr),
-      shares: Number(formData.shares),
+      containerType: form.containerType,
+      ownershipType: form.ownershipType,
+      shares: form.shares,
+      priceUsd: form.priceUsd,
+      priceInr: form.priceInr,
+      roi: form.roi,
     };
 
-    console.log("BUY CONTAINER PAYLOAD", payload);
+    console.log("BUY PAYLOAD 👉", payload);
     // TODO: POST to backend
   };
 
   return (
     <>
-      <PageMeta title="Buy Container" description="Manage Containers" />
+      <PageMeta title="Buy Container" description="Buy Shipping Containers" />
 
       <div className="mt-4">
         <PageBreadcrumb pageTitle="Buy Container" />
@@ -91,33 +155,24 @@ export default function Buy() {
       <div className="flex justify-end mb-4">
         <Button
           onClick={() => setIsAddMode(!isAddMode)}
-          className={`px-6 py-2 ${
-            isAddMode
-              ? "bg-gray-500 hover:bg-gray-600"
-              : "bg-orange-500 hover:bg-orange-600"
-          } text-white`}
+          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
         >
           {isAddMode ? "View Containers" : "Buy Container"}
         </Button>
       </div>
 
       {/* Reminder */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <div className="flex gap-3">
-          <InfoIcon className="w-5 h-5 text-blue-600" />
-          <p className="text-sm text-blue-700">
-            Containers power 90% of global trade. Own containers and earn
-            consistent ROI from world trade logistics.
-          </p>
-        </div>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex gap-3">
+        <InfoIcon className="w-5 h-5 text-blue-600" />
+        <p className="text-sm text-blue-700">
+          Minimum contract period: <b>15 months</b>. ROI credited monthly until container is sold.
+        </p>
       </div>
 
-      {/* =======================
-           BUY FORM
-      ======================= */}
       {isAddMode && (
-        <ComponentCard title="Buy New Container">
+        <ComponentCard title="Buy Container">
           <form onSubmit={handleSubmit} className="space-y-6">
+
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <Label>Container Type</Label>
@@ -126,9 +181,7 @@ export default function Buy() {
                     { value: "20FT", label: "20 FT" },
                     { value: "40FT", label: "40 FT" },
                   ]}
-                  onChange={(v) =>
-                    setFormData({ ...formData, containerType: v })
-                  }
+                  onChange={v => setForm({ ...form, containerType: v as any })}
                 />
               </div>
 
@@ -136,92 +189,53 @@ export default function Buy() {
                 <Label>Ownership Type</Label>
                 <Select
                   options={[
-                    { value: "SINGLE", label: "Single" },
+                    { value: "SINGLE", label: "Single Owner" },
                     { value: "SHARED", label: "Shared" },
                   ]}
-                  onChange={(v) =>
-                    setFormData({ ...formData, ownershipType: v })
-                  }
+                  onChange={v => setForm({ ...form, ownershipType: v as any })}
                 />
               </div>
             </div>
+
+            {form.ownershipType === "SHARED" && (
+              <div>
+                <Label>
+                  Number of Shares (Min {form.minShares})
+                </Label>
+                <Input
+                  type="number"
+                  min={form.minShares}
+                  value={form.shares}
+                  onChange={e =>
+                    setForm({ ...form, shares: Number(e.target.value) })
+                  }
+                />
+              </div>
+            )}
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <Label>Price (USD)</Label>
-                <Input
-                  name="priceUsd"
-                  type="number"
-                  value={formData.priceUsd}
-                  onChange={handleChange}
-                />
+                <Input value={form.priceUsd} disabled />
               </div>
 
               <div>
                 <Label>Price (INR)</Label>
-                <Input
-                  name="priceInr"
-                  type="number"
-                  value={formData.priceInr}
-                  onChange={handleChange}
-                />
+                <Input value={form.priceInr} disabled />
               </div>
             </div>
 
-            <div>
-              <Label>Number of Shares</Label>
-              <Input
-                name="shares"
-                type="number"
-                value={formData.shares}
-                onChange={handleChange}
-              />
+            <div className="bg-gray-50 rounded-lg p-4 text-sm">
+              <p><b>Monthly ROI:</b> {form.roi}%</p>
+              <p><b>Minimum Contract:</b> 15 Months</p>
             </div>
 
             <div className="flex justify-end">
               <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3">
-                Buy Container
+                Proceed to Pay
               </Button>
             </div>
           </form>
-        </ComponentCard>
-      )}
-
-      {/* =======================
-           CONTAINER TABLE
-      ======================= */}
-      {!isAddMode && (
-        <ComponentCard title="Available Containers">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableCell>#</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Ownership</TableCell>
-                <TableCell>USD</TableCell>
-                <TableCell>ROI %</TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {containers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-6">
-                    No Containers Found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                containers.map((c) => (
-                  <TableRow key={c.containerPkId}>
-                    <TableCell>{c.containerPkId}</TableCell>
-                    <TableCell>{c.containerType}</TableCell>
-                    <TableCell>{c.ownershipType}</TableCell>
-                    <TableCell>${c.priceUsd}</TableCell>
-                    <TableCell>{c.roiPercentage}%</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
         </ComponentCard>
       )}
     </>

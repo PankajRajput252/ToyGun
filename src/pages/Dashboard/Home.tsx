@@ -12,6 +12,7 @@ import EarningsSection from "../EarningsSection";
 import BuyToLetDelivers from "../BuyToLetDelivers";
 import WhyInvestInContainers from "../WhyInvestInContainers";
 import ContactCTASection from "../ContactCTASection";
+import Footer from "../../components/footer/Footer";
 
 interface WalletData {
   mineWallet: number;
@@ -152,6 +153,7 @@ export default function Home() {
             <TestimonialSection />
             <BuyToLetDelivers />
             <ContactCTASection />
+             <Footer/>
             {/* Wallet Section Header */}
             {/* <div className="col-span-12 mb-6">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
