@@ -123,24 +123,7 @@ export default function Home() {
           // alt="Container"
           className="w-[108%] max-w-none h-[85vh] object-cover rounded-b-2xl shadow-2xl"
         />
-        {/* <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-b-2xl shadow-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Welcome to StyloCoin</h1>
-              <p className="text-blue-100 dark:text-blue-200">Your Crypto Investment Dashboard</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-blue-200 dark:text-blue-300">Total Portfolio Value</p>
-              <p className="text-2xl font-bold text-white">
-                ${totalProfile.toFixed(2)}
-              </p>
-            </div>
-          </div>
-        </div> */}
-        {/* <EarningsSection/>
-        <WorldTradeSection/>
-        <InvestmentSteps />
-        <TestimonialSection/> */}
+       
 
         {/* Scrollable Main Content */}
         <main >

@@ -1135,3 +1135,61 @@ export const depositApi = {
     apiCall<any>('/api/deposit/create', 'POST', data)
       .then(response => response),
 };
+
+interface Container {
+  containerType: string;
+  ownershipType: string;
+  status:string;
+  userFkId:string;
+  shares:number;
+  roiPercentage:number |null;
+  currency:string;
+  investedAmount:number |null
+}
+export interface ContainerResponse {
+  containerType: string;
+  ownershipType: string;
+  status:string;
+  userFkId:string;
+  shares:number;
+  roiPercentage:number |null;
+  currency:string;
+  investedAmount:number |null,
+  investmentPkId:number
+}
+
+// buy
+export const buyContainer = {
+  getAll: (
+    page: number = 0,
+    size: number = 25,
+    filterBy: string = 'ACTIVE',
+    userNodeId?: string | null
+  ): Promise<{ content: ContainerResponse[]; totalElements: number; count?: number }> =>
+    apiCall<any>(
+      `/api/container/getInvestment?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+    ).then((response) => ({
+      content: response.data || [],
+      totalElements: response.count || 0,
+      count: response.count,
+    })),
+ 
+  add: (data: Container): Promise<Container> =>
+    apiCall<any>(`/api/container/addInvestment`, 'POST', data).then(
+      (response) => response.data?.[0] || response
+    ),
+ 
+  update: (id: number, data: Partial<DepositFundItem>): Promise<DepositFundItem> =>
+    apiCall<any>(`/api/individual/updateDepositFund/${id}`, 'PUT', data).then(
+      (response) => response.data?.[0] || response
+    ),
+ 
+  delete: (id: number): Promise<void> =>
+    apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
+ 
+  // Confirm deposit (admin only)
+  confirmDeposit: (depositId: number): Promise<DepositFundItem> =>
+    apiCall<any>(`/api/admin/confirmDeposit/${depositId}`, 'POST').then(
+      (response) => response.data?.[0] || response
+    ),
+};
