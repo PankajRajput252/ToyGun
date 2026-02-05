@@ -7,7 +7,7 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
-import api,{buyContainer,ContainerResponse} from "../services/api";
+import api, { buyContainer, ContainerResponse } from "../services/api";
 import {
   Table,
   TableBody,
@@ -28,8 +28,8 @@ interface Container {
   minShares: number;
   roi: number;
 }
-    
-  
+
+
 const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
 const userNodeId = user?.nodeId;
 /* =======================
@@ -58,8 +58,12 @@ const CONTAINERS: Container[] = [
 
 export default function Buy() {
   const [isAddMode, setIsAddMode] = useState(false);
-   const [isLoading, setIsLoading] = useState<boolean>(false);
-   const [containerData, setContainerData] = useState<ContainerResponse[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [containerData, setContainerData] = useState<ContainerResponse[]>([]);
+  const [receiptFiles, setReceiptFiles] = useState<{
+    [investmentPkId: number]: File | null;
+  }>({});
+
 
   const [form, setForm] = useState({
     containerType: "" as "20FT" | "40FT" | "",
@@ -71,6 +75,44 @@ export default function Buy() {
     minShares: 0,
     currency: ''
   });
+  const handleFileChange = (
+    investmentPkId: number,
+    file: File | null
+  ) => {
+    if (!file) return;
+
+    setReceiptFiles(prev => ({
+      ...prev,
+      [investmentPkId]: file,
+    }));
+  };
+
+
+  const handleUploadReceipt = async (investmentPkId: number) => {
+    const file = receiptFiles[investmentPkId];
+
+    if (!file) {
+      alert("Please select a receipt first");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("receipt", file);
+    formData.append("investmentPkId", String(investmentPkId));
+
+    try {
+      // 🔁 replace with your real API
+      await fetch("/api/upload-receipt", {
+        method: "POST",
+        body: formData,
+      });
+
+      alert("Receipt uploaded successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed");
+    }
+  };
 
   /* =======================
      Price Auto Calculation
@@ -142,7 +184,7 @@ export default function Buy() {
       }));
     }
   }, [form.containerType, form.ownershipType, form.shares]);
-  const handleSubmit =  async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     console.log("Pankaj")
     e.preventDefault();
     let investedAmount: number | null = null;
@@ -169,29 +211,29 @@ export default function Buy() {
 
     console.log("BUY PAYLOAD 👉", payload);
     // TODO: POST to backend
-       const depositResponse = await buyContainer.add(payload);
-          console.log("investment value--->",depositResponse)
+    const depositResponse = await buyContainer.add(payload);
+    console.log("investment value--->", depositResponse)
 
   };
 
-  
-    const fetchContainerData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await buyContainer.getAll(1, 25, 'ACTIVE',userNodeId);
-        setContainerData(response.content);
-      } catch (error) {
-        console.error('Error fetching income types:', error);
-      
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    useEffect(() => {
-      fetchContainerData();
-    }, []);
-  
+
+  const fetchContainerData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await buyContainer.getAll(1, 25, 'ACTIVE', userNodeId);
+      setContainerData(response.content);
+    } catch (error) {
+      console.error('Error fetching income types:', error);
+
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchContainerData();
+  }, []);
+
 
   return (
     <>
@@ -311,7 +353,7 @@ export default function Buy() {
           </form>
         </ComponentCard>
       )}
-       {!isAddMode && (
+      {!isAddMode && (
         <ComponentCard title="Available Containers">
           <Table>
             <TableHeader>
@@ -321,8 +363,8 @@ export default function Buy() {
                 <TableCell>Ownership</TableCell>
                 <TableCell>USD</TableCell>
                 <TableCell>ROI %</TableCell>
-                 <TableCell>STATUS</TableCell>
-                  <TableCell>UPLOAD RECEIPT</TableCell>
+                <TableCell>STATUS</TableCell>
+                <TableCell>UPLOAD RECEIPT</TableCell>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -340,8 +382,39 @@ export default function Buy() {
                     <TableCell>{c.ownershipType}</TableCell>
                     <TableCell>${c.investedAmount}</TableCell>
                     <TableCell>{c.roiPercentage}%</TableCell>
-                     <TableCell>{c.status}</TableCell>
-                    <TableCell>{}</TableCell>
+                    <TableCell>{c.status}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          className="hidden"
+                          id={`receipt-${c.investmentPkId}`}
+                          onChange={e =>
+                            handleFileChange(
+                              c.investmentPkId,
+                              e.target.files?.[0] || null
+                            )
+                          }
+                        />
+
+                        <label
+                          htmlFor={`receipt-${c.investmentPkId}`}
+                          className="cursor-pointer text-sm px-3 py-1 bg-gray-700 text-white rounded"
+                        >
+                          Choose
+                        </label>
+
+                        <Button
+                          size="sm"
+                          disabled={c.status === "APPROVED"}
+                          className="bg-orange-500 hover:bg-orange-600 text-white"
+                          onClick={() => handleUploadReceipt(c.investmentPkId)}
+                        >
+                          Upload
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               )}
