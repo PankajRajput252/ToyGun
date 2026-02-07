@@ -69,10 +69,16 @@ console.log('User in AppHeader:', isUserAdmin(user));
               </Link>}
 
               {!isUserAdmin(user) &&<Link
-                to="/rent"
+                to="/containerShipment/rent"
                 className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
               >
                 Rent
+              </Link>}
+                {!isUserAdmin(user) &&<Link
+                to="/containerShipment/sell"
+                className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
+              >
+                Sell
               </Link>}
               {/* Withdrawal DROPDOWN */}
               {isUserAdmin(user) && <div className="relative">

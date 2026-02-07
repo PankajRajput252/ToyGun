@@ -33,6 +33,7 @@ import ManageSubscription from "./pages/Admin/ManageSubscription";
 import ManagerWithdrawal from "./pages/Admin/ManageWithdrawal";
 import Sell from "./pages/SellContainer"
 import RentContainer from "./pages/RentContainer";
+import SellContainer from "./pages/SellContainer";
 
 export default function App() {
   return (
@@ -57,7 +58,8 @@ export default function App() {
               <Route path="profile" element={<UserProfiles />} />
               <Route path="buy" element={<Buy />} />
               <Route path="admin-user" element={<h1>Admin User Page</h1>} />
-              <Route path="rent" element={<UserWallet />} />
+              <Route path="rent" element={<RentContainer />} />
+               <Route path="sell" element={<SellContainer />} />
               <Route path="manager-withdrawal" element={<ManagerWithdrawal />} />
               <Route path="deposit-approval" element={<ManagerWithdrawal />} />
               <Route path="all-user" element={<AdminUsers />} />

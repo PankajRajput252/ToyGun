@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import PageMeta from "../components/common/PageMeta";
 import ComponentCard from "../components/common/ComponentCard";
@@ -7,6 +7,15 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
+import api, { buyContainer, ContainerResponse, depositReceiptUploadApi } from "../services/api";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+
 
 /* =======================
    Container Entity
@@ -20,6 +29,9 @@ interface Container {
   roi: number;
 }
 
+
+const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+const userNodeId = user?.nodeId;
 /* =======================
    Static Master Data
    (Later replace with API)
@@ -46,6 +58,16 @@ const CONTAINERS: Container[] = [
 
 export default function Buy() {
   const [isAddMode, setIsAddMode] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [containerData, setContainerData] = useState<ContainerResponse[]>([]);
+  const [receiptFiles, setReceiptFiles] = useState<{
+    [investmentPkId: number]: File | null;
+  }>({});
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [compressedFile, setCompressedFile] = useState<File | null>(null);
+  const hasFetchedRef = useRef<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     containerType: "" as "20FT" | "40FT" | "",
@@ -55,7 +77,170 @@ export default function Buy() {
     priceInr: 0,
     roi: 0,
     minShares: 0,
+    currency: ''
   });
+  const handleFileChange = (
+    investmentPkId: number,
+    file: File | null
+  ) => {
+    if (!file) return;
+
+    setReceiptFiles(prev => ({
+      ...prev,
+      [investmentPkId]: file,
+    }));
+  };
+  // Helper function to compress and resize image
+  const compressImage = (file: File, maxWidth: number = 800, maxHeight: number = 800, quality: number = 0.8): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Failed to compress image'));
+                return;
+              }
+              const compressedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+        img.onerror = () => reject(new Error('Failed to load image'));
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+    });
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      // Validate file size (max 10MB before compression)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Image size should be less than 10MB. The image will be compressed automatically.');
+      }
+
+      try {
+        // Compress the image
+        const compressed = await compressImage(file);
+        setCompressedFile(compressed);
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewImage(reader.result as string);
+        };
+        reader.readAsDataURL(compressed);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        // Fallback to original file if compression fails
+        setCompressedFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  };
+
+
+  const handleImageUpload = async (investmentPkId: number, investedAmount: number, currency: string) => {
+    const file = compressedFile || fileInputRef.current?.files?.[0];
+    if (!file) {
+      alert('Please select an image to upload');
+      return;
+    }
+
+    // Final size check before upload (max 2MB after compression)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Image is still too large after compression. Please try a smaller image or compress it manually.');
+      return;
+    }
+
+
+
+    try {
+      setIsUploadingImage(true);
+      // const response = await imageUploadApi.uploadUserImage(currentUser.nodeId, file);
+      const response = await depositReceiptUploadApi.uploadUserImage(
+        userNodeId,
+        file,
+        investmentPkId,
+
+        investedAmount,
+        currency
+      );
+
+      // Extract image URL from response (check multiple possible response formats)
+      const imageUrl = response?.data?.imageUrl || response?.data?.imageUrl || response?.message || response?.imageUrl || response?.data?.imageUrl;
+
+      if (imageUrl) {
+        // Update user context with new image URL (store in both fields for compatibility)
+
+        alert('Image uploaded successfully!');
+      } else {
+        console.warn('Image upload response:', response);
+        alert('Image uploaded but URL not received. Please refresh the page.');
+      }
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+
+      // Handle specific error cases
+      if (error.message?.includes('413') || error.message?.includes('Request Entity Too Large')) {
+        alert('Image file is too large. Please select a smaller image (max 2MB recommended).');
+      } else if (error.message?.includes('400') || error.message?.includes('Bad Request')) {
+        alert('Invalid image file. Please select a valid image (JPG, PNG, or GIF).');
+      } else {
+        alert(`Failed to upload image: ${error.message || 'Please try again.'}`);
+      }
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   /* =======================
      Price Auto Calculation
@@ -93,56 +278,90 @@ export default function Buy() {
   //     }));
   //   }
   // }, [form.containerType, form.ownershipType, form.shares]);
-useEffect(() => {
-  if (!form.containerType || !form.ownershipType) return;
+  useEffect(() => {
+    if (!form.containerType || !form.ownershipType) return;
 
-  const config = CONTAINERS.find(
-    c =>
-      c.containerType === form.containerType &&
-      c.ownershipType === form.ownershipType
-  );
+    const config = CONTAINERS.find(
+      c =>
+        c.containerType === form.containerType &&
+        c.ownershipType === form.ownershipType
+    );
 
-  if (!config) return;
+    if (!config) return;
 
-  if (form.ownershipType === "SINGLE") {
-    setForm(prev => ({
-      ...prev,
-      priceUsd: config.priceUsd,
-      priceInr: config.priceInr,
-      shares: 1,
-      minShares: 1,
-      roi: config.roi,
-    }));
-  } else {
-    const shares =
-      form.shares >= config.minShares ? form.shares : config.minShares;
+    if (form.ownershipType === "SINGLE") {
+      setForm(prev => ({
+        ...prev,
+        priceUsd: config.priceUsd,
+        priceInr: config.priceInr,
+        shares: 1,
+        minShares: 1,
+        roi: config.roi,
+      }));
+    } else {
+      const shares =
+        form.shares >= config.minShares ? form.shares : config.minShares;
 
-    setForm(prev => ({
-      ...prev,
-      shares,
-      minShares: config.minShares,
-      priceUsd: shares * config.priceUsd,
-      priceInr: shares * config.priceInr,
-      roi: config.roi,
-    }));
-  }
-}, [form.containerType, form.ownershipType, form.shares]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+      setForm(prev => ({
+        ...prev,
+        shares,
+        minShares: config.minShares,
+        priceUsd: shares * config.priceUsd,
+        priceInr: shares * config.priceInr,
+        roi: config.roi,
+      }));
+    }
+  }, [form.containerType, form.ownershipType, form.shares]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log("Pankaj")
     e.preventDefault();
+    let investedAmount: number | null = null;
+
+    if (form.currency === "USD") {
+      investedAmount = form.priceUsd;
+    } else if (form.currency === "INR") {
+      investedAmount = form.priceInr;
+    } else if (form.currency === "AED") {
+      // Example conversion (replace with live FX later)
+      investedAmount = Math.round(form.priceUsd * 3.67);
+    }
 
     const payload = {
       containerType: form.containerType,
       ownershipType: form.ownershipType,
       shares: form.shares,
-      priceUsd: form.priceUsd,
-      priceInr: form.priceInr,
-      roi: form.roi,
+      roiPercentage: form.roi,
+      currency: form.currency,
+      investedAmount: investedAmount,
+      userFkId: userNodeId,
+      status: 'ACTIVE'
     };
 
     console.log("BUY PAYLOAD 👉", payload);
     // TODO: POST to backend
+    const depositResponse = await buyContainer.add(payload);
+    console.log("investment value--->", depositResponse)
+
   };
+
+
+  const fetchContainerData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await buyContainer.getAll(1, 25, 'ACTIVE', userNodeId);
+      setContainerData(response.content);
+    } catch (error) {
+      console.error('Error fetching income types:', error);
+
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchContainerData();
+  }, []);
+
 
   return (
     <>
@@ -197,6 +416,30 @@ useEffect(() => {
               </div>
             </div>
 
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <Label>Currency Type</Label>
+                <Select
+                  options={[
+                    { value: "INR", label: "INR" },
+                    { value: "USD", label: "USD" },
+                    { value: "AED", label: "AED" },
+                  ]}
+                  onChange={v => setForm({ ...form, currency: v as any })}
+                />
+              </div>
+
+              <div>
+                <Label>Payment Through</Label>
+                <Select
+                  options={[
+                    { value: "BANK", label: "Bank" },
+                  ]}
+                  onChange={v => setForm({ ...form })}
+                />
+              </div>
+            </div>
+
             {form.ownershipType === "SHARED" && (
               <div>
                 <Label>
@@ -231,11 +474,93 @@ useEffect(() => {
             </div>
 
             <div className="flex justify-end">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3">
+              <Button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3">
                 Proceed to Pay
               </Button>
             </div>
           </form>
+        </ComponentCard>
+      )}
+      {!isAddMode && (
+        <ComponentCard title="Available Containers">
+          <Table>
+            <TableHeader>
+              <TableRow className="text-white">
+                <TableCell>#</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Ownership</TableCell>
+                <TableCell>USD</TableCell>
+                <TableCell>ROI %</TableCell>
+                <TableCell>STATUS</TableCell>
+                <TableCell>UPLOAD RECEIPT</TableCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {containerData.length === 0 ? (
+                <TableRow className="text-white">
+                  <TableCell colSpan={5} className="text-center py-6">
+                    No Containers Found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                containerData.map((c) => (
+                  <TableRow key={c.investmentPkId} className="text-white">
+                    <TableCell>{c.investmentPkId}</TableCell>
+                    <TableCell>{c.containerType}</TableCell>
+                    <TableCell>{c.ownershipType}</TableCell>
+                    <TableCell>${c.investedAmount}</TableCell>
+                    <TableCell>{c.roiPercentage}%</TableCell>
+                    <TableCell>{c.status}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {/* <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          className="hidden"
+                          id={`receipt-${c.investmentPkId}`}
+                          onChange={e =>
+                            handleFileChange(
+                              c.investmentPkId,
+                              e.target.files?.[0] || null
+                            )
+                          }
+                        /> */}
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                          id="profile-image-input"
+                        />
+                        <label
+                          htmlFor="profile-image-input"
+                          className="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                        >
+                          Choose Image
+                        </label>
+                        {/* <label
+                          htmlFor={`receipt-${c.investmentPkId}`}
+                          className="cursor-pointer text-sm px-3 py-1 bg-gray-700 text-white rounded"
+                        >
+                          Choose
+                        </label> */}
+
+                        <Button
+                          size="sm"
+                          disabled={c.status === "APPROVED"}
+                          className="bg-orange-500 hover:bg-orange-600 text-white"
+                          onClick={() => handleImageUpload(c.investmentPkId, c.investedAmount, c.currency)}
+                        >
+                          Upload
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </ComponentCard>
       )}
     </>
