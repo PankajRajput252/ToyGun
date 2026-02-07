@@ -1,4 +1,4 @@
-import { useEffect, useState,useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import PageMeta from "../components/common/PageMeta";
 import ComponentCard from "../components/common/ComponentCard";
@@ -7,7 +7,7 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
-import api, { buyContainer, ContainerResponse ,depositReceiptUploadApi} from "../services/api";
+import api, { buyContainer, ContainerResponse, depositReceiptUploadApi } from "../services/api";
 import {
   Table,
   TableBody,
@@ -90,7 +90,7 @@ export default function Buy() {
       [investmentPkId]: file,
     }));
   };
- // Helper function to compress and resize image
+  // Helper function to compress and resize image
   const compressImage = (file: File, maxWidth: number = 800, maxHeight: number = 800, quality: number = 0.8): Promise<File> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -157,7 +157,7 @@ export default function Buy() {
         alert('Please select an image file');
         return;
       }
-      
+
       // Validate file size (max 10MB before compression)
       if (file.size > 10 * 1024 * 1024) {
         alert('Image size should be less than 10MB. The image will be compressed automatically.');
@@ -167,7 +167,7 @@ export default function Buy() {
         // Compress the image
         const compressed = await compressImage(file);
         setCompressedFile(compressed);
-        
+
         // Create preview
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -188,59 +188,59 @@ export default function Buy() {
   };
 
 
-  const handleImageUpload = async (investmentPkId: number,investedAmount:number,currency:string) => {
-      const file = compressedFile || fileInputRef.current?.files?.[0];
-      if (!file) {
-        alert('Please select an image to upload');
-        return;
+  const handleImageUpload = async (investmentPkId: number, investedAmount: number, currency: string) => {
+    const file = compressedFile || fileInputRef.current?.files?.[0];
+    if (!file) {
+      alert('Please select an image to upload');
+      return;
+    }
+
+    // Final size check before upload (max 2MB after compression)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Image is still too large after compression. Please try a smaller image or compress it manually.');
+      return;
+    }
+
+
+
+    try {
+      setIsUploadingImage(true);
+      // const response = await imageUploadApi.uploadUserImage(currentUser.nodeId, file);
+      const response = await depositReceiptUploadApi.uploadUserImage(
+        userNodeId,
+        file,
+        investmentPkId,
+
+        investedAmount,
+        currency
+      );
+
+      // Extract image URL from response (check multiple possible response formats)
+      const imageUrl = response?.data?.imageUrl || response?.data?.imageUrl || response?.imageUrl || response?.imageUrl || response?.data?.imageUrl;
+
+      if (imageUrl) {
+        // Update user context with new image URL (store in both fields for compatibility)
+
+        alert('Image uploaded successfully!');
+      } else {
+        console.warn('Image upload response:', response);
+        alert('Image uploaded but URL not received. Please refresh the page.');
       }
-  
-      // Final size check before upload (max 2MB after compression)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('Image is still too large after compression. Please try a smaller image or compress it manually.');
-        return;
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+
+      // Handle specific error cases
+      if (error.message?.includes('413') || error.message?.includes('Request Entity Too Large')) {
+        alert('Image file is too large. Please select a smaller image (max 2MB recommended).');
+      } else if (error.message?.includes('400') || error.message?.includes('Bad Request')) {
+        alert('Invalid image file. Please select a valid image (JPG, PNG, or GIF).');
+      } else {
+        alert(`Failed to upload image: ${error.message || 'Please try again.'}`);
       }
-  
-     
-  
-      try {
-        setIsUploadingImage(true);
-        // const response = await imageUploadApi.uploadUserImage(currentUser.nodeId, file);
-       const response =  await depositReceiptUploadApi.uploadUserImage(
-  userNodeId,
-  file,
-  investmentPkId,
-  
-  investedAmount,
-  currency
-);
-        
-        // Extract image URL from response (check multiple possible response formats)
-        const imageUrl = response?.data?.profileImageUrl || response?.data?.imageUrl || response?.profileImageUrl || response?.imageUrl || response?.data?.url;
-        
-        if (imageUrl) {
-          // Update user context with new image URL (store in both fields for compatibility)
-      
-          alert('Image uploaded successfully!');
-        } else {
-          console.warn('Image upload response:', response);
-          alert('Image uploaded but URL not received. Please refresh the page.');
-        }
-      } catch (error: any) {
-        console.error('Error uploading image:', error);
-        
-        // Handle specific error cases
-        if (error.message?.includes('413') || error.message?.includes('Request Entity Too Large')) {
-          alert('Image file is too large. Please select a smaller image (max 2MB recommended).');
-        } else if (error.message?.includes('400') || error.message?.includes('Bad Request')) {
-          alert('Invalid image file. Please select a valid image (JPG, PNG, or GIF).');
-        } else {
-          alert(`Failed to upload image: ${error.message || 'Please try again.'}`);
-        }
-      } finally {
-        setIsUploadingImage(false);
-      }
-    };
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   /* =======================
      Price Auto Calculation
@@ -525,20 +525,20 @@ export default function Buy() {
                             )
                           }
                         /> */}
-<input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    id="profile-image-input"
-                  />
-                  <label
-                    htmlFor="profile-image-input"
-                    className="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
-                  >
-                    Choose Image
-                  </label>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                          id="profile-image-input"
+                        />
+                        <label
+                          htmlFor="profile-image-input"
+                          className="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                        >
+                          Choose Image
+                        </label>
                         {/* <label
                           htmlFor={`receipt-${c.investmentPkId}`}
                           className="cursor-pointer text-sm px-3 py-1 bg-gray-700 text-white rounded"
@@ -550,7 +550,7 @@ export default function Buy() {
                           size="sm"
                           disabled={c.status === "APPROVED"}
                           className="bg-orange-500 hover:bg-orange-600 text-white"
-                          onClick={() => handleImageUpload(c.investmentPkId,c.investedAmount,c.currency)}
+                          onClick={() => handleImageUpload(c.investmentPkId, c.investedAmount, c.currency)}
                         >
                           Upload
                         </Button>
