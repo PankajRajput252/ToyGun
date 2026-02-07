@@ -42,7 +42,7 @@ export default function App() {
         <Routes>
           {/* Redirect root to sign-in */}
           <Route path="/" element={<Navigate to="/StyloCoin/signin" replace />} />
-          
+
           {/* Auth Layout */}
           <Route path="/StyloCoin/signin" element={<SignIn />} />
           <Route path="/StyloCoin/signup" element={<SignUp />} />
@@ -53,39 +53,45 @@ export default function App() {
               <Route index element={<ConditionalHome />} />
               <Route path="dashboard" element={<Home />} />
 
-            {/* Others Page */}
-            <Route path="profile" element={<UserProfiles />} />
-            <Route path="buy" element={<Buy/>} />
-            <Route path="sell" element={<Sell/>} />
-            <Route path="rent" element={<RentContainer/>}/>
-           
-            <Route path="withdrawFund" element={<WithdrawFund />} />
-            <Route path="support" element={<Support />} />
-      
+              {/* Others Page */}
+              <Route path="profile" element={<UserProfiles />} />
+              <Route path="buy" element={<Buy />} />
+              <Route path="admin-user" element={<h1>Admin User Page</h1>} />
+              <Route path="rent" element={<UserWallet />} />
+              <Route path="manager-withdrawal" element={<ManagerWithdrawal />} />
+              <Route path="deposit-approval" element={<ManagerWithdrawal />} />
+              <Route path="all-user" element={<AdminUsers />} />
+              <Route path="active-user" element={<AdminUsers />} />
+              <Route path="inactive-user" element={<AdminUsers />} />
 
-            {/* Forms */}
-            <Route path="form-elements" element={<FormElements />} />
 
-            {/* Tables */}
-            <Route path="basic-tables" element={<BasicTables />} />
+              <Route path="withdrawFund" element={<WithdrawFund />} />
+              <Route path="support" element={<Support />} />
 
-            {/* Ui Elements */}
-            <Route path="alerts" element={<Alerts />} />
-            <Route path="avatars" element={<Avatars />} />
-            <Route path="badge" element={<Badges />} />
-            <Route path="buttons" element={<Buttons />} />
-            <Route path="images" element={<Images />} />
-            <Route path="videos" element={<Videos />} />
 
-            {/* Charts */}
-            <Route path="line-chart" element={<LineChart />} />
-            <Route path="bar-chart" element={<BarChart />} />
+              {/* Forms */}
+              <Route path="form-elements" element={<FormElements />} />
+
+              {/* Tables */}
+              <Route path="basic-tables" element={<BasicTables />} />
+
+              {/* Ui Elements */}
+              <Route path="alerts" element={<Alerts />} />
+              <Route path="avatars" element={<Avatars />} />
+              <Route path="badge" element={<Badges />} />
+              <Route path="buttons" element={<Buttons />} />
+              <Route path="images" element={<Images />} />
+              <Route path="videos" element={<Videos />} />
+
+              {/* Charts */}
+              <Route path="line-chart" element={<LineChart />} />
+              <Route path="bar-chart" element={<BarChart />} />
             </Route>
           </Route>
 
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
-            <Route path="/StyloCoin/admin" element={<AppLayout />}>
+            <Route path="/containerShipment/admin" element={<AppLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="ranks" element={<ManageRankReward />} />

@@ -53,7 +53,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Helper function to check if user is admin based on roles
-const isUserAdmin = (user: User | null): boolean => {
+export const isUserAdmin = (user: User | null): boolean => {
   if (!user) return false;
   
   // Check if user has ADMIN_USER role
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signal: controller.signal,
       }).finally(() => clearTimeout(timeoutId));
 
-      console.log('Login response status:', response.status);
+      console.log('Login response data:', response.status);
       console.log('Login response headers:', Object.fromEntries(response.headers.entries()));
 
       const responseData = await response.json();
