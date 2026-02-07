@@ -1,6 +1,6 @@
 // API Service Layer for StyloCoin Admin Dashboard
 // Centralized API calls with authentication handling
- 
+
 // Prefer configured API URL; avoid localhost default in production to prevent Netlify runtime failures
 // const API_BASE_URL =
 //   import.meta.env.VITE_API_BASE_URL && import.meta.env.VITE_API_BASE_URL.trim() !== ''
@@ -8,16 +8,16 @@
 //     : (import.meta.env.PROD ? '' : 'http://localhost:8080');
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.trim() || 
+  import.meta.env.VITE_API_BASE_URL?.trim() ||
   // "https://Minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com";
   "http://containershipment-app-env.eba-p7ijagki.ap-south-1.elasticbeanstalk.com"
 
- 
+
 // Get auth token from localStorage
 export const getAuthToken = (): string | null => {
   return localStorage.getItem("stylocoin_token");
 };
- 
+
 // Create headers with auth token
 const createHeaders = (): HeadersInit => {
   const token = getAuthToken();
@@ -27,7 +27,7 @@ const createHeaders = (): HeadersInit => {
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
 };
- 
+
 // Create headers for file upload (without Content-Type to let browser set boundary)
 const createFileUploadHeaders = (): HeadersInit => {
   const token = getAuthToken();
@@ -35,7 +35,7 @@ const createFileUploadHeaders = (): HeadersInit => {
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
 };
- 
+
 // Generic API call function
 const apiCall = async <T>(
   endpoint: string,
@@ -43,13 +43,13 @@ const apiCall = async <T>(
   body?: any
 ): Promise<T> => {
   const url = `${API_BASE_URL}${endpoint}`;
- 
+
   const response = await fetch(url, {
     method,
     headers: createHeaders(),
     ...(body && { body: JSON.stringify(body) })
   });
- 
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     console.error('API Error:', {
@@ -60,10 +60,10 @@ const apiCall = async <T>(
     });
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
- 
+
   return response.json();
 };
- 
+
 // Rank & Reward API functions
 export interface RankReward {
   rankId: number | null;
@@ -83,7 +83,7 @@ export interface RankReward {
   isDeleted?: boolean;
   isGenericFlag?: boolean;
 }
- 
+
 export interface AddRankRewardRequest {
   rankId: null;
   rankName: string;
@@ -92,7 +92,7 @@ export interface AddRankRewardRequest {
   reward: Number;
   achieved: boolean;
 }
- 
+
 export const rankRewardApi = {
   // Get all ranks with pagination and filtering
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: RankReward[], totalElements: number }> =>
@@ -105,20 +105,20 @@ export const rankRewardApi = {
       content: response.data || [],
       totalElements: response.count || 0
     })),
- 
+
   // Add new rank
   add: (data: AddRankRewardRequest): Promise<RankReward> =>
     apiCall<any>('/api/admin/addRankAndReward', 'POST', data).then(response => response.data?.[0] || response),
- 
+
   // Update existing rank
   update: (id: number, data: Partial<RankReward>): Promise<RankReward> =>
     apiCall<any>(`/api/admin/updateRankAndReward/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
- 
+
   // Delete rank
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteRankAndReward/${id}`, 'DELETE')
 };
- 
+
 // Income Type API functions
 export interface IncomeType {
   incomeTypePkId: number | null;
@@ -137,7 +137,7 @@ export interface IncomeType {
   isDeleted?: boolean;
   isGenericFlag?: boolean;
 }
- 
+
 export interface AddIncomeTypeRequest {
   incomeTypePkId: null;
   incomeName: string;
@@ -207,8 +207,8 @@ export interface IncomeStreams {
   miningProfitSharingAmount?: number;
   miningGenerationIncomeAmount?: number;
   nodeBusinessSharingAmount?: number;
-  userNodeId:number,
-  userName:string
+  userNodeId: number,
+  userName: string
   // Additional fields for updates
   notesG11nBigTxt?: string | null;
   effectiveDateTime?: string;
@@ -230,12 +230,12 @@ export interface businessApiType {
   weakerLegTeam?: number;
   carryForwardLeft?: number;
   carryForwardRight?: number;
-  currentMiningBusinessLeft:number,
-  currentMiningBusinessRight:number,
-  totalMiningBusinessLeft:number,
-  totalMiningBusinessRight:number,
-  userNodeId:number,
-  userName:string
+  currentMiningBusinessLeft: number,
+  currentMiningBusinessRight: number,
+  totalMiningBusinessLeft: number,
+  totalMiningBusinessRight: number,
+  userNodeId: number,
+  userName: string
   // Additional fields for updates
   notesG11nBigTxt?: string | null;
   effectiveDateTime?: string;
@@ -252,7 +252,7 @@ export interface AddSubscriptionTypeRequest {
   subscriptionName: string;
   subscriptionAmount: number;
 }
- 
+
 // Wallet Data interfaces
 export interface WalletData {
   walletPkId: number;
@@ -273,27 +273,27 @@ export interface WalletData {
   createdDatetime?: string;
   lastModifiedDateTime?: string;
 }
-export interface DataApi{
-totalUser: number,
-totalActiveUser: number,
-totalInactiveUser: number,
-totalNormalUser: number,
-totalAdminUser: number,
-totalWallet: number,
-totalMineWallet: number,
-totalMineInvestment?: string | null,
-nodewallet: number,
-capitalWallet: number,
-totalROIIncome?: string | null,
-totalWithdrawal?: string | null,
-totalDirectIncome?: string | null,
-totalDeposit?: string | null,
-totalCredit: number,
-totalDebit: number,
-totalRevenue?: string | null,
-totalNetProfit?: string | null,
+export interface DataApi {
+  totalUser: number,
+  totalActiveUser: number,
+  totalInactiveUser: number,
+  totalNormalUser: number,
+  totalAdminUser: number,
+  totalWallet: number,
+  totalMineWallet: number,
+  totalMineInvestment?: string | null,
+  nodewallet: number,
+  capitalWallet: number,
+  totalROIIncome?: string | null,
+  totalWithdrawal?: string | null,
+  totalDirectIncome?: string | null,
+  totalDeposit?: string | null,
+  totalCredit: number,
+  totalDebit: number,
+  totalRevenue?: string | null,
+  totalNetProfit?: string | null,
 }
- 
+
 export interface AddWalletDataRequest {
   walletPkId: null;
   mineWallet: number;
@@ -303,7 +303,7 @@ export interface AddWalletDataRequest {
   totalDebit: number;
   userFkId: number;
 }
- 
+
 export const incomeTypeApi = {
   // Get all income types with pagination and filtering
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: IncomeType[], totalElements: number }> =>
@@ -311,32 +311,32 @@ export const incomeTypeApi = {
       content: response.data || [],
       totalElements: response.count || 0
     })),
- 
+
   // Add new income type
   add: (data: AddIncomeTypeRequest): Promise<IncomeType> =>
     apiCall<any>('/api/admin/addIncomeType', 'POST', data).then(response => response.data?.[0] || response),
- 
+
   // Update existing income type
   update: (id: number, data: Partial<IncomeType>): Promise<IncomeType> =>
     apiCall<any>(`/api/admin/updateIncomeType/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
- 
+
   // Delete income type
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteIncomeType/${id}`, 'DELETE')
 };
-export const walletAddressApi={
-   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: WalletData[], totalElements: number }> =>
+export const walletAddressApi = {
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: WalletData[], totalElements: number }> =>
     apiCall<any>(`/api/individual/getUserWalletAddress?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`).then(response => ({
       content: response.data || [],
       totalElements: response.count || 0
     })),
 }
-export const businessApi={
+export const businessApi = {
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: businessApiType[], totalElements: number }> =>
     apiCall<any>(`/api/individual/getBusinessDetails?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`).then(response => ({
-      content: response|| [],
+      content: response || [],
       totalElements: response.count || 0
- })),
+    })),
 }
 export const subscriptionIncomeTypeApi = {
   // Get all subscription types with pagination and filtering
@@ -345,34 +345,34 @@ export const subscriptionIncomeTypeApi = {
       content: response.data || [],
       totalElements: response.count || 0
     })),
- 
+
   // Add new subscription type
   add: (data: AddSubscriptionTypeRequest): Promise<SubscriptionType> =>
     apiCall<any>('/api/admin/addSubscriptionDefinition', 'POST', data).then(response => response.data?.[0] || response),
- 
+
   // Update existing subscription type
   update: (id: number, data: Partial<SubscriptionType>): Promise<SubscriptionType> =>
     apiCall<any>(`/api/admin/updateSubscriptionDefinition/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
- 
+
   // Delete subscription type
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteSubscriptionDefinition/${id}`, 'DELETE')
 };
-export const manageWithdrawalApi={
+export const manageWithdrawalApi = {
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: WithdrawalType[], totalElements: number }> =>
     apiCall<any>(`/api/individual/getWithdrawalRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`).then(response => ({
       content: response.data || [],
       totalElements: response.count || 0
     })),
-    // addOtp: (email: string , userNodeId?: string | null): Promise<UsersResponse> =>
-    //   apiCall<any>(`/api/individual/sendEmailOtp?email=${email}&userNodeId=${userNodeId}`, 'POST').then(response => response.data?.[0] || response)
-    add: (withdrawalRequestPkId: number | null): Promise<SubscriptionType> =>
+  // addOtp: (email: string , userNodeId?: string | null): Promise<UsersResponse> =>
+  //   apiCall<any>(`/api/individual/sendEmailOtp?email=${email}&userNodeId=${userNodeId}`, 'POST').then(response => response.data?.[0] || response)
+  add: (withdrawalRequestPkId: number | null): Promise<SubscriptionType> =>
     apiCall<any>(`/api/withdraw/approve/${withdrawalRequestPkId}`, 'POST').then(response => response.data?.[0] || response),
-    //reject withdrawal
-    reject: (withdrawalRequestPkId: number | null): Promise<SubscriptionType> =>
-      apiCall<any>(`/api/withdraw/reject/${withdrawalRequestPkId}`, 'PUT').then(response => response.data?.[0] || response),
+  //reject withdrawal
+  reject: (withdrawalRequestPkId: number | null): Promise<SubscriptionType> =>
+    apiCall<any>(`/api/withdraw/reject/${withdrawalRequestPkId}`, 'PUT').then(response => response.data?.[0] || response),
 }
- 
+
 // Wallet Data API functions
 export const walletDataApi = {
   // Get all wallet data with pagination and filtering
@@ -381,26 +381,26 @@ export const walletDataApi = {
       content: response.data || [],
       totalElements: response.count || 0
     })),
-  
+
   // Add new wallet data
   add: (data: AddWalletDataRequest): Promise<WalletData> =>
     apiCall<any>('/api/individual/addWalletData', 'POST', data).then(response => response.data?.[0] || response),
- 
+
   // Update existing wallet data
   update: (id: number, data: Partial<WalletData>): Promise<WalletData> =>
     apiCall<any>(`/api/individual/updateWalletData/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
- 
+
   // Delete wallet data
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteWalletData/${id}`, 'DELETE'),
 
-    // Add new wallet data
-  addOtp: (email: string , userNodeId?: string | null): Promise<UsersResponse> =>
-      apiCall<any>(`/api/individual/sendEmailOtp?email=${email}&userNodeId=${userNodeId}`, 'POST').then(response => response.data?.[0] || response),
-   
+  // Add new wallet data
+  addOtp: (email: string, userNodeId?: string | null): Promise<UsersResponse> =>
+    apiCall<any>(`/api/individual/sendEmailOtp?email=${email}&userNodeId=${userNodeId}`, 'POST').then(response => response.data?.[0] || response),
+
 };
-export const incomeStreamsApi ={
-  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{content: IncomeStreams[],totalElements: number }> =>
+export const incomeStreamsApi = {
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: IncomeStreams[], totalElements: number }> =>
     apiCall<any>(`/api/individual/getIndividualIncomeSummary?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`).then(response => ({
       content: response.data || [],
       totalElements: response.count || 0
@@ -414,7 +414,7 @@ export const transferWalletDropdownApi = {
       totalElements: response.count || 0
     }))
 };
- 
+
 // Wallet Transaction interfaces
 export interface WalletTransaction {
   walletTxnPkId?: number;
@@ -424,7 +424,7 @@ export interface WalletTransaction {
   walletType?: string; // 'MINE' | 'NODE' | 'CAPITAL'
   status?: string; // 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'IN_PROGRESS' | 'SUCCESS' | 'FAILED'
   userFkId?: number;
-  userName?: string ;
+  userName?: string;
   fromUserId?: string;
   toUserId?: string;
   fromWallet?: string;
@@ -443,7 +443,7 @@ export interface WalletTransaction {
   createdDatetime?: string;
   lastModifiedDateTime?: string;
 }
- 
+
 // Wallet Transfer Request interface
 export interface WalletTransferRequest {
   walletTxnPkId?: null;
@@ -465,7 +465,7 @@ export interface WalletAddressRequest {
   // createdAt: string;
   status: string;
 }
- 
+
 // Wallet Transaction API functions
 export const walletTransactionApi = {
   // Get all wallet transactions with pagination and filtering
@@ -473,28 +473,28 @@ export const walletTransactionApi = {
     page: number = 0,
     size: number = 25,
     filterBy: string = 'ACTIVE',
-    inputPkId:string |null,
-    inputFkId:string |null,
+    inputPkId: string | null,
+    inputFkId: string | null,
     userNodeId?: string | null
   ): Promise<{ content: WalletTransaction[]; totalElements: number; count?: number }> =>
     apiCall<any>(
       `/api/individual/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=${inputPkId}&inputFkId=${inputFkId}`
- 
- 
+
+
       // `/api/admin/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,
       count: response.count,
     })),
- 
+
   // Confirm wallet transaction (admin only)
   confirmWalletTransaction: (walletTxnPkId: number): Promise<WalletTransaction> =>
     apiCall<any>(`/api/admin/confirmWalletTransaction/${walletTxnPkId}`, 'POST').then(
       (response) => response.data?.[0] || response
     ),
 };
- 
+
 // Wallet Transfer API functions
 export const walletTransferApi = {
   // Create wallet transfer
@@ -511,7 +511,7 @@ export const addwalletAddressApi = {
     ),
 };
 
- 
+
 // Individual Income Summary interfaces
 export interface IndividualIncomeSummary {
   individualIncomeSummaryPkId: number;
@@ -534,7 +534,7 @@ export interface IndividualIncomeSummary {
   createdDatetime?: string;
   lastModifiedDateTime?: string;
 }
- 
+
 export interface AddIndividualIncomeSummaryRequest {
   individualIncomeSummaryPkId: null;
   serviceGenerationAmount: number;
@@ -547,7 +547,7 @@ export interface AddIndividualIncomeSummaryRequest {
   nodeBusinessSharingAmount: number;
   userFkId: number;
 }
- 
+
 // Individual Income Summary API functions
 export const individualIncomeSummaryApi = {
   // Get all individual income summary with pagination and filtering
@@ -556,20 +556,20 @@ export const individualIncomeSummaryApi = {
       data: response.data || [],
       count: response.count || 0
     })),
- 
+
   // Add new individual income summary
   add: (data: AddIndividualIncomeSummaryRequest): Promise<IndividualIncomeSummary> =>
     apiCall<any>('/api/individual/addIndividualIncomeSummary', 'POST', data).then(response => response.data?.[0] || response),
- 
+
   // Update existing individual income summary
   update: (id: number, data: Partial<IndividualIncomeSummary>): Promise<IndividualIncomeSummary> =>
     apiCall<any>(`/api/individual/updateIndividualIncomeSummary/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
- 
+
   // Delete individual income summary
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteIndividualIncomeSummary/${id}`, 'DELETE')
 };
- 
+
 // User interfaces
 export interface User {
   userPkId: number;
@@ -592,7 +592,7 @@ export interface User {
   credentialsNonExpired: boolean;
   isDeleted: boolean;
   isGenericFlag: boolean;
-  userStatus:string;
+  userStatus: string;
   isConfirmed?: boolean; // User confirmation status for mining access
   imageUrl?: string | null; // User profile image URL (deprecated, use profileImageUrl)
   profileImageUrl?: string | null; // User profile image URL from API
@@ -606,7 +606,7 @@ export interface User {
   createdDatetime?: string;
   lastModifiedDateTime?: string;
 }
- 
+
 export interface UsersResponse {
   id: null;
   uuid: null;
@@ -639,53 +639,53 @@ export interface UsersResponse {
   regionList: null;
   countSize: number;
 }
- 
+
 export interface UpdateUserStatusRequest {
   userId: number;
   enabled: boolean;
 }
- 
+
 export interface ApproveTransactionRequest {
   userId: number;
   transactionId: number;
   approved: boolean;
 }
- 
+
 // Users API functions
 export const usersApi = {
   // Get all users with pagination and filtering
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<UsersResponse> =>
     apiCall<UsersResponse>(`/api/users/getUser?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`),
- 
+
   // Get user by userPkId
   getById: (userPkId: number, filterBy: string = 'ACTIVE'): Promise<User | null> =>
     apiCall<UsersResponse>(`/api/users/getUser?page=0&size=25&filterBy=${filterBy}&inputPkId=${userPkId}&inputFkId=null`)
       .then(response => response.data && response.data.length > 0 ? response.data[0] : null),
- 
+
   // Delete user
   delete: (userId: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteUser/${userId}`, 'DELETE'),
- 
+
   // Update user status (active/inactive)
   updateStatus: (userId: number, enabled: boolean): Promise<User> =>
     apiCall<User>(`/api/admin/updateUserStatus/${userId}`, 'PUT', { enabled }),
- 
+
   // Approve transaction
   approveTransaction: (data: ApproveTransactionRequest): Promise<void> =>
     apiCall<void>('/api/admin/approveTransaction', 'POST', data),
- 
+
   // Confirm user (admin only)
   confirmUser: (nodeId: string): Promise<void> =>
     apiCall<void>(`/api/admin/confirmUser/${nodeId}`, 'PUT')
 };
- 
+
 // Mining Package interfaces
 export interface MiningPackageItem {
   miningPackagePkId?: number;
   userNodeCode?: string;
   packageAmount?: number;
   remarks?: string;
-  nodeAmount:number;
+  nodeAmount: number;
   mode?: string; // e.g. 'NODE'
   transactionPassword?: string;
   packageStatus?: string; // e.g. 'IN_PROGRESS'
@@ -702,7 +702,7 @@ export interface MiningPackageItem {
   createdDatetime?: string;
   lastModifiedDateTime?: string;
 }
- 
+
 export interface AddMiningPackageRequest {
   miningPackagePkId: null;
   // Depending on backend, one of these identifiers might be required
@@ -714,13 +714,13 @@ export interface AddMiningPackageRequest {
   packageStatus: 'IN_PROGRESS' | 'APPROVED';
   localDateTime?: string | null; // ISO string format date/time
 }
- 
+
 // Mining Package API functions
 export const miningPackageApi = {
   getAll: (
     page: number = 0,
     size: number = 25,
-    mode:string,
+    mode: string,
     filterBy: string = 'ACTIVE',
     userNodeId?: string | null
   ): Promise<{ content: MiningPackageItem[]; totalElements: number; count?: number }> =>
@@ -731,12 +731,12 @@ export const miningPackageApi = {
       totalElements: response.count || 0,
       count: response.count,
     })),
- 
+
   add: (data: AddMiningPackageRequest): Promise<MiningPackageItem> =>
     apiCall<any>(`/api/individual/addMiningPackage`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   update: (
     id: number,
     data: Partial<MiningPackageItem>
@@ -744,7 +744,7 @@ export const miningPackageApi = {
     apiCall<any>(`/api/individual/updateMiningPackage/${id}`, 'PUT', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteMiningPackage/${id}`, 'DELETE'),
 };
@@ -780,7 +780,7 @@ export const ieDataApi = {
       totalElements: response.count || 0,
     })),
 };
- 
+
 // Deposit Fund interfaces
 export interface DepositFundItem {
   depositPkId?: number;
@@ -803,9 +803,9 @@ export interface DepositFundItem {
   recordStateCodeFkId?: string;
   createdDatetime?: string;
   lastModifiedDateTime?: string;
-  response?:DepositFundItem
+  response?: DepositFundItem
 }
- 
+
 export interface AddDepositFundRequest {
   // depositFundPkId: null;
   depositPkId: null;
@@ -815,7 +815,7 @@ export interface AddDepositFundRequest {
   userFkId?: number;
   userNodeCode?: string;
 }
- 
+
 // Deposit Fund API functions
 export const depositFundApi = {
   getAll: (
@@ -831,27 +831,27 @@ export const depositFundApi = {
       totalElements: response.count || 0,
       count: response.count,
     })),
- 
+
   add: (data: AddDepositFundRequest): Promise<DepositFundItem> =>
     apiCall<any>(`/api/individual/addDepositFund`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   update: (id: number, data: Partial<DepositFundItem>): Promise<DepositFundItem> =>
     apiCall<any>(`/api/individual/updateDepositFund/${id}`, 'PUT', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
- 
+
   // Confirm deposit (admin only)
   confirmDeposit: (depositId: number): Promise<DepositFundItem> =>
     apiCall<any>(`/api/admin/confirmDeposit/${depositId}`, 'POST').then(
       (response) => response.data?.[0] || response
     ),
 };
- 
+
 // Update Profile interfaces
 export interface UpdateProfileRequest {
   userName: string | null;
@@ -861,7 +861,7 @@ export interface UpdateProfileRequest {
   transactionPassword: string | null;
   userNodeId: string | null;
 }
- 
+
 export interface UpdateProfileResponse {
   success?: boolean;
   message?: string;
@@ -874,7 +874,7 @@ export interface UpdateProfileResponse {
   transactionPassword?: string | null;
   userNodeId?: string;
 }
- 
+
 // Individual Profile API functions
 export const individualProfileApi = {
   // Update user profile
@@ -883,7 +883,7 @@ export const individualProfileApi = {
       (response) => response
     ),
 };
- 
+
 // Image Upload interfaces
 export interface ImageUploadResponse {
   success?: boolean;
@@ -900,7 +900,7 @@ export interface ImageUploadResponse {
   imageId?: string;
   [key: string]: any;
 }
- 
+
 // Image Upload API functions
 export const imageUploadApi = {
   // Upload user image
@@ -908,7 +908,7 @@ export const imageUploadApi = {
     const url = `${API_BASE_URL}/api/image/upload?userNodeId=${userNodeId}`;
     const formData = new FormData();
     formData.append('file', file);
-   
+
     return fetch(url, {
       method: 'POST',
       headers: createFileUploadHeaders(),
@@ -916,14 +916,14 @@ export const imageUploadApi = {
     }).then(async (response) => {
       if (!response.ok) {
         let errorMessage = `HTTP error! status: ${response.status}`;
-       
+
         // Handle specific status codes
         if (response.status === 413) {
           errorMessage = '413 Request Entity Too Large - Image file is too large. Please compress the image before uploading.';
         } else if (response.status === 400) {
           errorMessage = '400 Bad Request - Invalid image file format.';
         }
-       
+
         const errorData = await response.json().catch(() => ({}));
         console.error('Image Upload Error:', {
           endpoint: '/api/image/upload',
@@ -932,14 +932,14 @@ export const imageUploadApi = {
           errorData,
           fileSize: file.size,
         });
-       
+
         throw new Error(errorData.message || errorMessage);
       }
       return response.json();
     });
   },
 };
- 
+
 // Support Ticket interfaces
 export interface SupportTicket {
   supportTicketPkId: number | null;
@@ -962,7 +962,7 @@ export interface SupportTicket {
   createdDatetime?: string;
   lastModifiedDateTime?: string;
 }
- 
+
 export interface AddSupportTicketRequest {
   supportTicketPkId: null;
   category: string; // DEPOSIT, CLOSING, WITHDRAWAL, OTHERS
@@ -974,7 +974,7 @@ export interface AddSupportTicketRequest {
   transactionPassword?: string | null;
   otp?: string | null;
 }
- 
+
 // Support Ticket API functions
 export const supportTicketApi = {
   // Get all support tickets with pagination and filtering
@@ -991,24 +991,24 @@ export const supportTicketApi = {
       totalElements: response.count || 0,
       count: response.count,
     })),
- 
+
   // Add new support ticket
   add: (data: AddSupportTicketRequest): Promise<SupportTicket> =>
     apiCall<any>(`/api/individual/addSupportTicket`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   // Update existing support ticket
   update: (id: number, data: Partial<SupportTicket>): Promise<SupportTicket> =>
     apiCall<any>(`/api/individual/updateSupportTicket/${id}`, 'PUT', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   // Delete support ticket
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteSupportTicket/${id}`, 'DELETE'),
 };
- 
+
 // Withdrawal Request interfaces
 export interface WithdrawalRequest {
   withdrawalRequestPkId: number | null;
@@ -1032,7 +1032,7 @@ export interface WithdrawalRequest {
   createdDatetime?: string;
   lastModifiedDateTime?: string;
 }
- 
+
 export interface AddWithdrawalRequestRequest {
   withdrawalRequestPkId: null;
   username: string;
@@ -1045,7 +1045,7 @@ export interface AddWithdrawalRequestRequest {
   transactionPassword: string | null;
   otp: string | null;
 }
- 
+
 // Withdrawal Request API functions
 export const withdrawalRequestApi = {
   // Get all withdrawal requests with pagination and filtering
@@ -1062,24 +1062,24 @@ export const withdrawalRequestApi = {
       totalElements: response.count || 0,
       count: response.count,
     })),
- 
+
   // Add new withdrawal request
   add: (data: AddWithdrawalRequestRequest): Promise<WithdrawalRequest> =>
     apiCall<any>(`/api/individual/addWithDrawalRequest`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   // Update existing withdrawal request
   update: (id: number, data: Partial<WithdrawalRequest>): Promise<WithdrawalRequest> =>
     apiCall<any>(`/api/individual/updateWithDrawalRequest/${id}`, 'PUT', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   // Delete withdrawal request
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteWithDrawalRequest/${id}`, 'DELETE'),
 };
- 
+
 // Export default API object
 export default {
   rankReward: rankRewardApi,
@@ -1108,14 +1108,14 @@ export interface IeData {
   isGenericFlag?: boolean;
   notesG11nBigTxt?: string | null;
 }
- 
+
 export interface AddIeDataRequest {
   ieDataPkId: null;
   ieName: string;
   description: string;
   amount: number;
   status: string;
-} 
+}
 
 export interface DepositRequest {
   userNodeId: string;
@@ -1139,23 +1139,23 @@ export const depositApi = {
 interface Container {
   containerType: string;
   ownershipType: string;
-  status:string;
-  userFkId:string;
-  shares:number;
-  roiPercentage:number |null;
-  currency:string;
-  investedAmount:number |null
+  status: string;
+  userFkId: string;
+  shares: number;
+  roiPercentage: number | null;
+  currency: string;
+  investedAmount: number | null
 }
 export interface ContainerResponse {
   containerType: string;
   ownershipType: string;
-  status:string;
-  userFkId:string;
-  shares:number;
-  roiPercentage:number |null;
-  currency:string;
-  investedAmount:number |null,
-  investmentPkId:number
+  status: string;
+  userFkId: string;
+  shares: number;
+  roiPercentage: number | null;
+  currency: string;
+  investedAmount: number | null,
+  investmentPkId: number
 }
 
 // buy
@@ -1173,23 +1173,80 @@ export const buyContainer = {
       totalElements: response.count || 0,
       count: response.count,
     })),
- 
+
   add: (data: Container): Promise<Container> =>
     apiCall<any>(`/api/container/addInvestment`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   update: (id: number, data: Partial<DepositFundItem>): Promise<DepositFundItem> =>
     apiCall<any>(`/api/individual/updateDepositFund/${id}`, 'PUT', data).then(
       (response) => response.data?.[0] || response
     ),
- 
+
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
- 
+
   // Confirm deposit (admin only)
   confirmDeposit: (depositId: number): Promise<DepositFundItem> =>
     apiCall<any>(`/api/admin/confirmDeposit/${depositId}`, 'POST').then(
       (response) => response.data?.[0] || response
     ),
+
+  depositAmountImg: (
+  formData: FormData,
+  investmentPkId: number,
+  userNodeId?: string | null,
+  investedAmount?: number,
+  currency?: string
+): Promise<void> =>
+  apiCall<void>(
+    `/api/image/depositAmount?userNodeId=${userNodeId}&investmentId=${investmentPkId}&transactionId=null&amount=${investedAmount}&currency=${currency}&paidAt=null`,
+    'POST',
+    formData // ✅ BODY GOES HERE
+  ),
+
+
+
+ 
+};
+
+
+
+export const depositReceiptUploadApi = {
+  // Upload user image
+  uploadUserImage: (userNodeId: string, file: File,investmentPkId:number,investedAmount?: number, currency?: string): Promise<ImageUploadResponse> => {
+    const url = `${API_BASE_URL}/api/image/depositAmount?userNodeId=${userNodeId}&investmentId=${investmentPkId}&transactionId=null&amount=${investedAmount}&currency=${currency}&paidAt=null`;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return fetch(url, {
+      method: 'POST',
+      headers: createFileUploadHeaders(),
+      body: formData
+    }).then(async (response) => {
+      if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
+
+        // Handle specific status codes
+        if (response.status === 413) {
+          errorMessage = '413 Request Entity Too Large - Image file is too large. Please compress the image before uploading.';
+        } else if (response.status === 400) {
+          errorMessage = '400 Bad Request - Invalid image file format.';
+        }
+
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Image Upload Error:', {
+          endpoint: '/api/image/upload',
+          method: 'POST',
+          status: response.status,
+          errorData,
+          fileSize: file.size,
+        });
+
+        throw new Error(errorData.message || errorMessage);
+      }
+      return response.json();
+    });
+  },
 };
