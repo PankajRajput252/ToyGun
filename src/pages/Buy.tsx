@@ -216,7 +216,7 @@ export default function Buy() {
       );
 
       // Extract image URL from response (check multiple possible response formats)
-      const imageUrl = response?.data?.imageUrl || response?.data?.imageUrl || response?.imageUrl || response?.imageUrl || response?.data?.imageUrl;
+      const imageUrl = response?.data?.imageUrl || response?.data?.imageUrl || response?.message || response?.imageUrl || response?.data?.imageUrl;
 
       if (imageUrl) {
         // Update user context with new image URL (store in both fields for compatibility)
