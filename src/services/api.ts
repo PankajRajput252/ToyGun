@@ -220,6 +220,42 @@ export interface IncomeStreams {
   isDeleted?: boolean;
   isGenericFlag?: boolean;
 }
+export interface PaymentUser {
+  userPkId: number;
+  versionId: string;
+  name: string;
+  email: string;
+  password: string;
+  nodeId: string;
+  isUserIsAdmin: boolean;
+  enabled: boolean;
+  username: string;
+
+  notesG11nBigTxt?: string | null;
+  effectiveDateTime?: string;
+  saveStateCodeFkId?: string;
+  activeStateCodeFkId?: string;
+  recordStateCodeFkId?: string;
+  createdDatetime?: string;
+  lastModifiedDateTime?: string;
+
+  roles?: {
+    roleId: number;
+    name: string;
+  }[];
+
+  authorities?: {
+    authority: string;
+  }[];
+
+  accountNonExpired?: boolean;
+  accountNonLocked?: boolean;
+  credentialsNonExpired?: boolean;
+  isDeleted?: boolean;
+  isGenericFlag?: boolean;
+}
+
+
 export interface businessApiType {
   directTeam: number | null;
   totalTeam: number;
@@ -397,6 +433,19 @@ export const walletDataApi = {
     // Add new wallet data
   addOtp: (email: string , userNodeId?: string | null): Promise<UsersResponse> =>
       apiCall<any>(`/api/individual/sendEmailOtp?email=${email}&userNodeId=${userNodeId}`, 'POST').then(response => response.data?.[0] || response),
+   
+};
+//container payment 
+export const containerPaymentApiData = {
+  // Get all wallet data with pagination and filtering
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: PaymentUser[], totalElements: number }> =>
+    apiCall<any>(`/api/container/getPayment?inputPkId=null&inputFkId=null&page=${page}&size=${size}&filterBy=${filterBy}&searchValue=null`).then(response => ({
+      content: response.data || [],
+      totalElements: response.count || 0
+    })),
+    update: (id: number, data: Partial<PaymentUser>): Promise<PaymentUser> =>
+    apiCall<any>(`/api/container/updatePayment/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
+ 
    
 };
 export const incomeStreamsApi ={

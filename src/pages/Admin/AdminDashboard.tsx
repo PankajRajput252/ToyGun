@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
 import MetricCard from '../../components/admin/MetricCard';
-import { User, WalletData, usersApi, walletDataApi,ieDataApi,DataApi } from '../../services/api';
+import { User, WalletData, usersApi, walletDataApi,ieDataApi,DataApi, containerPaymentApiData,PaymentUser } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import UserMetricCard from './UserMetricCard';
- 
+import PaymentSuccessCard from '../PaymentSuccessCard';
+import SellRequestResultCard from '../SellRequestResultCard';
+import ManageRankReward from './ManageRankReward';
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [walletData, setWalletData] = useState<WalletData[]>([]);
-  const [dataApi, setDataApi] = useState<DataApi[]>([]);
+  const [dataApi, setDataApi] = useState<PaymentUser[]>([]);
  
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -23,16 +26,16 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      // const [usersResponse, walletResponse, dataResponse] = await Promise.all([
-      //   usersApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null),
-      //   walletDataApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null),
-      //   ieDataApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null),
-      // ]);
+      const [usersResponse] = await Promise.all([
+        // usersApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null),
+        containerPaymentApiData.getAll(0, 100, 'ACTIVE'),
+        // ieDataApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null),
+      ]);
  
-      // console.log('Users: dataResponse', dataResponse.content)
+      console.log('Users: dataResponse', usersResponse.content)
       // setUsers(usersResponse.data);
-      // setWalletData(walletResponse.content);
-      // setDataApi(dataResponse.content);
+      // setWalletData(walletResponse.content);s
+      setDataApi(usersResponse.content);
     } catch (error) {
       console.error('Error fetching data:', error);
       // Use mock data for development
@@ -205,7 +208,7 @@ export default function AdminDashboard() {
           </h2>
           <nav>
             <ol className="flex items-center gap-2">
-              <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/">Home /</a></li>
+              {/* <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/">Home /</a></li> */}
               <li className="font-medium text-orange-500">Admin Dashboard</li>
             </ol>
           </nav>
@@ -222,6 +225,9 @@ export default function AdminDashboard() {
          
          
         </div>
+        {/* <PaymentSuccessCard data={dataApi}/> */}
+        {/* <SellRequestResultCard data={dataApi}/> */}
+        <ManageRankReward/>
  
      
       </div>

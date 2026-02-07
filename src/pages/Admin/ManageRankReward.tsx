@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import PageMeta from '../../components/common/PageMeta';
 import AdminModal, { FormField } from '../../components/admin/AdminModal';
 import { PopupModal } from '../Dashboard/PopupModal';
-import { rankRewardApi, RankReward, AddRankRewardRequest } from '../../services/api';
+import { rankRewardApi, RankReward, AddRankRewardRequest, containerPaymentApiData, PaymentUser } from '../../services/api';
 
 export default function ManageRankReward() {
   const [ranks, setRanks] = useState<RankReward[]>([]);
-  const [rankMaster, setrankMaster] = useState<RankReward[]>([]);
+  const [rankMaster, setrankMaster] = useState<PaymentUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRank, setEditingRank] = useState<RankReward | null>(null);
@@ -20,16 +20,18 @@ export default function ManageRankReward() {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [rankToDelete, setRankToDelete] = useState<RankReward | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL'>('PENDING');
+
   console.log("rankMaster in income rank", rankMaster);
 
   // Fetch ranks from API
   const fetchRanks = async () => {
     try {
       setIsLoading(true);
-      const response = await rankRewardApi.getAll(currentPage - 1, rowsPerPage, 'ACTIVE');
-      const response2 = await rankRewardApi.getRankMaster(0, 25, 'ACTIVE');
-      setRanks(response.content);
-      setrankMaster(response2.content);
+      // const response = await rankRewardApi.getAll(currentPage - 1, rowsPerPage, 'ACTIVE');
+      const response = await containerPaymentApiData.getAll(0, 25, 'ACTIVE');
+      // setRanks(response.content);
+      setrankMaster(response.content);
     } catch (error) {
       console.error('Error fetching ranks:', error);
     } finally {
@@ -42,10 +44,10 @@ export default function ManageRankReward() {
   }, [currentPage, rowsPerPage]);
 
   // Prepare dropdown options from rankMaster
-  const rankNameOptions = rankMaster.map(rank => ({
-    value: rank.rankName,
-    label: rank.rankName
-  }));
+  // const rankNameOptions = rankMaster.map(rank => ({
+  //   value: rank.rankName,
+  //   label: rank.rankName
+  // }));
 
   // Modal form fields
   const rankFields: FormField[] = [
@@ -55,7 +57,7 @@ export default function ManageRankReward() {
       type: 'select',
       placeholder: 'Select rank name',
       required: true,
-      options: rankNameOptions
+      // options: rankNameOptions
     },
     {
       name: 'userNodeId',
@@ -112,7 +114,7 @@ export default function ManageRankReward() {
       setDeleteLoading(true);
       await rankRewardApi.delete(rankToDelete.rankId!);
       await fetchRanks(); // Refresh the list
-      
+
       setShowDeletePopup(false);
       setRankToDelete(null);
     } catch (error) {
@@ -159,11 +161,33 @@ export default function ManageRankReward() {
       setIsSubmitting(false);
     }
   };
+  const handlePaymentAction = async (
+    paymentId: number,
+    status: 'APPROVED' | 'REJECTED'
+  ) => {
+    try {
+      await containerPaymentApiData.update(paymentId, { status });
+
+      // Refresh list after update
+      await fetchRanks();
+    } catch (error) {
+      console.error(`Error updating payment status to ${status}`, error);
+      alert('Failed to update payment status');
+    }
+  };
 
   // Filter and paginate ranks
-  const filteredRanks = (ranks || []).filter(rank =>
-    rank.rankName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRanks = (rankMaster || []).filter(payment => {
+    const matchesSearch = payment.userFkId
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === 'ALL' || payment.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
 
   const totalPages = Math.ceil(filteredRanks.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -199,21 +223,21 @@ export default function ManageRankReward() {
   return (
     <>
       <PageMeta
-        title="Manage Rank & Reward - Admin"
+        title="Payment Approval - Admin"
         description="Admin panel for managing rank and reward system"
       />
-      
+
       <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen">
         {/* Breadcrumb */}
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-title-md2 font-semibold text-white">
-            Manage Rank & Reward
+            Payment Approval
           </h2>
           <nav>
             <ol className="flex items-center gap-2">
-              <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/">Home /</a></li>
-              <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/admin">Admin /</a></li>
-              <li className="font-medium text-orange-500">Manage Rank & Reward</li>
+              {/* <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/">Home /</a></li>
+              <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/admin">Admin /</a></li> */}
+              <li className="font-medium text-orange-500">Payment Approval</li>
             </ol>
           </nav>
         </div>
@@ -222,29 +246,20 @@ export default function ManageRankReward() {
         <div className="bg-[rgb(16_16_16_/1)] rounded-xl border border-[rgb(35_35_35_/1)] shadow-2xl overflow-hidden">
           <div className="p-6 border-b border-gray-700">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <h3 className="text-white font-bold text-xl">Rank & Reward Management</h3>
+              <h3 className="text-white font-bold text-xl">Admin Payment Approval</h3>
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search ranks..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full sm:w-64 rounded-lg border-2 border-gray-600 bg-gray-700 py-3 pl-10 pr-4 text-white placeholder-gray-400 outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                  />
-                  <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as any)}
+                    className="rounded-lg border border-gray-600 bg-gray-700 px-5 py-5 text-white cursor-pointer"
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
+                    <option value="ALL">All</option>
+                  </select>
                 </div>
-                <button
-                  onClick={handleAddRank}
-                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Add Rank
-                </button>
               </div>
             </div>
           </div>
@@ -261,55 +276,109 @@ export default function ManageRankReward() {
                   <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
                     <tr>
                       <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Rank Name</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Matching</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Reward</th>
+                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">User Id</th>
+                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">User Name</th>
+                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Currency</th>
+                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Amount</th>
                       <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Status</th>
+                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">View Document</th>
                       <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
                     {currentRanks.length > 0 ? (
-                      currentRanks.map((rank, index) => (
-                        <tr key={rank.rankId} className="hover:bg-gray-700/50 transition-colors">
-                          <td className="py-4 px-6 text-white font-medium">{startIndex + index + 1}</td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-sm">
-                                {rank.rankName.charAt(0)}
-                              </div>
-                              <span className="text-white font-semibold">{rank.rankName}</span>
-                            </div>
+                      currentRanks.map((payment, index) => (
+                        <tr key={payment.paymentPkId} className="hover:bg-gray-700/50 transition-colors">
+
+                          {/* Serial No */}
+                          <td className="py-4 px-6 text-white font-medium">
+                            {startIndex + index + 1}
                           </td>
-                          <td className="py-4 px-6 text-gray-300 font-medium">{formatNumber(rank.matching)}</td>
-                          <td className="py-4 px-6 text-green-400 font-bold">${rank.reward.toLocaleString()}</td>
-                          <td className="py-4 px-6">
-                            {getStatusBadge(rank.achieved)}
+
+                          {/* User ID */}
+                          <td className="py-4 px-6 text-white">
+                            {payment.userFkId}
                           </td>
+
+                          {/* User Name */}
+                          <td className="py-4 px-6 text-white">
+                            {payment.user?.name || '-'}
+                          </td>
+
+                          {/* Currency */}
+                          <td className="py-4 px-6 text-gray-300">
+                            {payment.currency}
+                          </td>
+
+                          {/* Amount */}
+                          <td className="py-4 px-6 text-green-400 font-bold">
+                            ₹{Number(payment.amount).toLocaleString()}
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-4 px-6">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium
+                              ${payment.status === 'PENDING' && 'bg-yellow-100 text-yellow-800'}
+                              ${payment.status === 'APPROVED' && 'bg-green-100 text-green-800'}
+                              ${payment.status === 'REJECTED' && 'bg-red-100 text-red-800'}
+                            `}>
+                              {payment.status}
+                            </span>
+                          </td>
+
+                          {/* View Document */}
+                          <td className="py-4 px-6">
+                            {payment.imageUrl ? (
+                              <a
+                                href={payment.imageUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:underline"
+                              >
+                                View
+                              </a>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+
+                          {/* Actions */}
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleEditRank(rank)}
-                                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 rounded-lg transition-colors"
-                                title="Edit"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteClick(rank)}
-                                className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-colors"
-                                title="Delete"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
+
+                              {payment.status === 'PENDING' ? (
+                                <button
+                                  onClick={() =>
+                                    handlePaymentAction(payment.paymentPkId, 'APPROVED')
+                                  }
+                                  className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded"
+                                >
+                                  Approve
+                                </button>
+                              ) : (
+                                <span className="text-red-500 font-semibold">-</span>
+                              )}
+
+                              {payment.status === 'PENDING' ? (
+                                <button
+                                  onClick={() =>
+                                    handlePaymentAction(payment.paymentPkId, 'REJECTED')
+                                  }
+                                  className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
+                                >
+                                  Reject
+                                </button>
+                              ) : (
+                                <span className="text-red-500 font-semibold">-</span>
+                              )}
+
+
                             </div>
                           </td>
+
                         </tr>
                       ))
+
                     ) : (
                       <tr>
                         <td colSpan={6} className="py-12 text-center">
@@ -356,21 +425,20 @@ export default function ManageRankReward() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                        page === currentPage
-                          ? "bg-orange-500 text-white"
-                          : "text-gray-400 bg-gray-700 border border-gray-600 hover:text-white hover:bg-gray-600"
-                      }`}
+                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${page === currentPage
+                        ? "bg-orange-500 text-white"
+                        : "text-gray-400 bg-gray-700 border border-gray-600 hover:text-white hover:bg-gray-600"
+                        }`}
                     >
                       {page}
                     </button>
                   ))}
-                  
+
                   <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
@@ -403,7 +471,7 @@ export default function ManageRankReward() {
           onConfirm={handleDeleteConfirm}
           title="Delete Rank"
           message={
-            rankToDelete 
+            rankToDelete
               ? `Are you sure you want to delete the rank ${rankToDelete.rankName}`
               : "Are you sure you want to delete this rank?"
           }
