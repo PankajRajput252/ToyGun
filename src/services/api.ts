@@ -1299,3 +1299,50 @@ export const depositReceiptUploadApi = {
     });
   },
 };
+
+interface SellContainer {
+  investmentFkId:number;
+  requestedAt:string;
+  status: string;
+  userFkId: string;
+  sellAmount: number | null;
+  sellingChargePercentage: number | null
+  final_amount:number| null;
+  holdingDays:number|null;
+}
+   
+        
+        
+      
+  
+
+// buy
+export const sellContainer = {
+  getAll: (
+    page: number = 0,
+    size: number = 25,
+    filterBy: string = 'ACTIVE',
+    userNodeId?: string | null
+  ): Promise<{ content: ContainerResponse[]; totalElements: number; count?: number }> =>
+    apiCall<any>(
+      `/api/container/getInvestment?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+    ).then((response) => ({
+      content: response.data || [],
+      totalElements: response.count || 0,
+      count: response.count,
+    })),
+
+  add: (data: SellContainer): Promise<Container> =>
+    apiCall<any>(`/api/container/addSellRequest`, 'POST', data).then(
+      (response) => response.data?.[0] || response
+    ),
+
+  update: (id: number, data: Partial<DepositFundItem>): Promise<DepositFundItem> =>
+    apiCall<any>(`/api/individual/updateDepositFund/${id}`, 'PUT', data).then(
+      (response) => response.data?.[0] || response
+    ),
+
+  delete: (id: number): Promise<void> =>
+    apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
+ 
+};

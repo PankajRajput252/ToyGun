@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { sellContainer } from "../services/api";
 
 type OwnershipType = "BANK" | "SHARED";
 type ContainerType = "20FT" | "40FT";
@@ -122,7 +123,6 @@ export default function SellContainer() {
         investmentFkId: sellData.investmentFkId,
         userFkId: userNodeId,
         requestedAt: formattedDateTime,
-        approvedAt: null,
         sellAmount: sellData.marketValue,
         sellingChargePercentage: sellingChargePercent,
         final_amount: finalPayout,
@@ -130,22 +130,12 @@ export default function SellContainer() {
         status: 'REQUESTED'
       };
 
-      // const response = await fetch(
-      //   "http://containershipment-app-env.eba-p7ijagki.ap-south-1.elasticbeanstalk.com/api/container/addSellRequest",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer YOUR_TOKEN_HERE`,
-      //     },
-      //     body: JSON.stringify(payload),
-      //   }
-      // );
+     
 
       console.log("SELL PAYLOAD 👉", payload);
       // TODO: POST to backend
-      // const depositResponse = await buyContainer.add(payload);
-      // console.log("investment value--->", depositResponse)
+      const depositResponse = await sellContainer.add(payload);
+      console.log("investment value--->", depositResponse)
 
 
       // if (!response.ok) {
