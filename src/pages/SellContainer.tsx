@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 type OwnershipType = "BANK" | "SHARED";
 type ContainerType = "20FT" | "40FT";
 
+const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+const userNodeId = user?.nodeId;
+
 interface Investment {
   investmentPkId: number;
   containerType: ContainerType;
@@ -20,9 +23,13 @@ interface SellData {
   marketValue: number;
   roiPending: number;
   holdingDays: number;
+  investmentFkId: number;
 }
 
 export default function SellContainer() {
+  const [isSelling, setIsSelling] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [sellData, setSellData] = useState<SellData>({
     containerType: "",
@@ -31,6 +38,7 @@ export default function SellContainer() {
     marketValue: 0,
     roiPending: 0,
     holdingDays: 60,
+    investmentFkId: 0
   });
 
   const [sellingChargePercent, setSellingChargePercent] = useState<number>(7);
@@ -75,6 +83,7 @@ export default function SellContainer() {
       marketValue: selected.investedAmount, // ✅ auto populate
       roiPending,
       holdingDays: sellData.holdingDays,
+      investmentFkId: investmentPkId
     });
   };
 
@@ -91,6 +100,65 @@ export default function SellContainer() {
 
   const finalPayout =
     sellData.marketValue - sellingCharges + sellData.roiPending;
+
+
+  const handleSellContainer = async () => {
+    if (!isSellAllowed) return;
+
+    try {
+      setIsSelling(true);
+      setError(null);
+      const now = new Date();
+
+      const formattedDateTime = `${now.getFullYear()}-${String(
+        now.getMonth() + 1
+      ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(
+        now.getHours()
+      ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(
+        now.getSeconds()
+      ).padStart(2, "0")}`;
+
+      const payload = {
+        investmentFkId: sellData.investmentFkId,
+        userFkId: userNodeId,
+        requestedAt: formattedDateTime,
+        approvedAt: null,
+        sellAmount: sellData.marketValue,
+        sellingChargePercentage: sellingChargePercent,
+        final_amount: finalPayout,
+        holdingDays: sellData.holdingDays,
+        status: 'REQUESTED'
+      };
+
+      // const response = await fetch(
+      //   "http://containershipment-app-env.eba-p7ijagki.ap-south-1.elasticbeanstalk.com/api/container/addSellRequest",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer YOUR_TOKEN_HERE`,
+      //     },
+      //     body: JSON.stringify(payload),
+      //   }
+      // );
+
+      console.log("SELL PAYLOAD 👉", payload);
+      // TODO: POST to backend
+      // const depositResponse = await buyContainer.add(payload);
+      // console.log("investment value--->", depositResponse)
+
+
+      // if (!response.ok) {
+      //   throw new Error("Sell container failed");
+      // }
+
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setIsSelling(false);
+    }
+  };
 
   return (
     <section className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
@@ -177,16 +245,38 @@ export default function SellContainer() {
       </div>
 
       {/* Sell Button */}
-      <button
+      {/* <button
         disabled={!isSellAllowed}
-        className={`w-full py-3 rounded-xl text-white font-semibold ${
-          isSellAllowed
+        className={`w-full py-3 rounded-xl text-white font-semibold ${isSellAllowed
             ? "bg-blue-600 hover:bg-blue-700"
             : "bg-gray-400 cursor-not-allowed"
-        }`}
+          }`}
       >
         {isSellAllowed ? "Sell Container" : "Sell allowed after 45 days"}
+      </button> */}
+      <button
+        onClick={handleSellContainer}
+        disabled={!isSellAllowed || isSelling}
+        className={`w-full py-3 rounded-xl text-white font-semibold ${!isSellAllowed || isSelling
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-600 hover:bg-blue-700"
+          }`}
+      >
+        {isSelling ? "Processing..." : "Sell Container"}
       </button>
+      {success && (
+        <p className="mt-4 text-green-600 font-medium">
+          ✅ Container sold successfully
+        </p>
+      )}
+
+      {error && (
+        <p className="mt-4 text-red-600 font-medium">
+          ❌ {error}
+        </p>
+      )}
+
     </section>
+
   );
 }
