@@ -1300,7 +1300,7 @@ export const depositReceiptUploadApi = {
   },
 };
 
-interface SellContainer {
+ export interface SellContainerData {
   investmentFkId:number;
   requestedAt:string;
   status: string;
@@ -1323,16 +1323,16 @@ export const sellContainer = {
     size: number = 25,
     filterBy: string = 'ACTIVE',
     userNodeId?: string | null
-  ): Promise<{ content: ContainerResponse[]; totalElements: number; count?: number }> =>
+  ): Promise<{ content: SellContainerData[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/container/getInvestment?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+      `/api/container/getSellRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,
       count: response.count,
     })),
 
-  add: (data: SellContainer): Promise<Container> =>
+  add: (data: SellContainerData): Promise<Container> =>
     apiCall<any>(`/api/container/addSellRequest`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
