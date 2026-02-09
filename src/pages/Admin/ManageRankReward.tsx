@@ -163,10 +163,11 @@ export default function ManageRankReward() {
   };
   const handlePaymentAction = async (
     paymentId: number,
-    status: 'APPROVED' | 'REJECTED'
+    status: 'APPROVED' | 'REJECTED',
+    investmentFkId?: number,
   ) => {
     try {
-      await containerPaymentApiData.update(paymentId, { status });
+      await containerPaymentApiData.update(paymentId, { status,investmentFkId });
 
       // Refresh list after update
       await fetchRanks();

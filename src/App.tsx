@@ -30,10 +30,11 @@ import AdminUsers from "./pages/Admin/AdminUsers";
 import AdminDeposits from "./pages/Admin/AdminDeposits";
 import AdminWalletTransactions from "./pages/Admin/AdminWalletTransactions";
 import ManageSubscription from "./pages/Admin/ManageSubscription";
-import ManagerWithdrawal from "./pages/Admin/ManageWithdrawal";
+import SellRequests from "./pages/Admin/ManageWithdrawal";
 import Sell from "./pages/SellContainer"
 import RentContainer from "./pages/RentContainer";
 import SellContainer from "./pages/SellContainer";
+import WithdrawBankDetailsForm from "./pages/Admin/WithdrawBankDetailsForm";
 
 export default function App() {
   return (
@@ -60,11 +61,12 @@ export default function App() {
               <Route path="admin-user" element={<h1>Admin User Page</h1>} />
               <Route path="rent" element={<RentContainer />} />
                <Route path="sell" element={<SellContainer />} />
-              <Route path="manager-withdrawal" element={<ManagerWithdrawal />} />
-              <Route path="deposit-approval" element={<ManagerWithdrawal />} />
+              <Route path="sell-request" element={<SellRequests />} />
+              <Route path="deposit-approval" element={<SellRequests />} />
               <Route path="all-user" element={<AdminUsers />} />
               <Route path="active-user" element={<AdminUsers />} />
               <Route path="inactive-user" element={<AdminUsers />} />
+              <Route path="bank-details" element={<WithdrawBankDetailsForm  />} />
 
 
               <Route path="withdrawFund" element={<WithdrawFund />} />
@@ -99,7 +101,7 @@ export default function App() {
               <Route path="ranks" element={<ManageRankReward />} />
               <Route path="income-types" element={<ManageIncomeType />} />
               <Route path="subscription" element={<ManageSubscription />} />
-              <Route path="withdrawal" element={<ManagerWithdrawal />} />
+              <Route path="withdrawal" element={<SellRequests />} />
               <Route path="deposits" element={<AdminDeposits />} />
               <Route path="wallet-transactions" element={<AdminWalletTransactions />} />
             </Route>

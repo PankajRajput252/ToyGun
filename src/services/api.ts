@@ -181,6 +181,21 @@ export interface WithdrawalType {
   isDeleted?: boolean;
   isGenericFlag?: boolean;
 }
+export interface SellRequestUser {
+  sellRequestPkId: number;
+  investmentFkId: number;
+  userFkId: string;
+  requestedAt: string;
+  approvedAt: string | null;
+  sellingChargePercentage: number;
+  marketMarginPercentage: number | null;
+  final_amount: number;
+  status: string;
+  user: number;
+  investment: number;
+  createdDatetime?: string;
+}
+
 export interface WalletAddressType {
   wallet: string;
   address: string,
@@ -230,7 +245,7 @@ export interface PaymentUser {
   isUserIsAdmin: boolean;
   enabled: boolean;
   username: string;
-
+  investmentFkId?: number;
   notesG11nBigTxt?: string | null;
   effectiveDateTime?: string;
   saveStateCodeFkId?: string;
@@ -408,6 +423,15 @@ export const manageWithdrawalApi = {
   reject: (withdrawalRequestPkId: number | null): Promise<SubscriptionType> =>
     apiCall<any>(`/api/withdraw/reject/${withdrawalRequestPkId}`, 'PUT').then(response => response.data?.[0] || response),
 }
+export const sellRequestApi ={
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: SellRequestUser[], totalElements: number }> =>
+    apiCall<any>(`/api/container/getSellRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`).then(response => ({
+      content: response.data || [],
+      totalElements: response.count || 0
+    })),
+    update: (id: number, data: Partial<SellRequestUser>,): Promise<SellRequestUser> =>
+    apiCall<any>(`/api/container/updateSellRequest/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
+}
 
 // Wallet Data API functions
 export const walletDataApi = {
@@ -443,7 +467,7 @@ export const containerPaymentApiData = {
       content: response.data || [],
       totalElements: response.count || 0
     })),
-    update: (id: number, data: Partial<PaymentUser>): Promise<PaymentUser> =>
+    update: (id: number, data: Partial<PaymentUser>,): Promise<PaymentUser> =>
     apiCall<any>(`/api/container/updatePayment/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
  
    

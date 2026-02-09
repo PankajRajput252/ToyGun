@@ -10,6 +10,7 @@ const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isWithDrawlOpen, setIsWithDrawlOpen] = useState(false);
+  const [bankOpen, setBankOpen] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { user } = useAuth();
@@ -22,7 +23,7 @@ const AppHeader: React.FC = () => {
   };
 
   const inputRef = useRef<HTMLInputElement>(null);
-console.log('User in AppHeader:', isUserAdmin(user));
+  console.log('User in AppHeader:', isUserAdmin(user));
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "k") {
@@ -54,27 +55,27 @@ console.log('User in AppHeader:', isUserAdmin(user));
             {/* DESKTOP NAV */}
             <nav className="hidden lg:flex items-center gap-10 ml-12">
 
-              {!isUserAdmin(user) &&<Link
+              {!isUserAdmin(user) && <Link
                 to="/containerShipment/dashboard"
                 className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
               >
                 Home
               </Link>}
 
-              {!isUserAdmin(user) &&<Link
+              {!isUserAdmin(user) && <Link
                 to="/containerShipment/buy"
                 className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
               >
                 Buy
               </Link>}
 
-              {!isUserAdmin(user) &&<Link
+              {!isUserAdmin(user) && <Link
                 to="/containerShipment/rent"
                 className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
               >
                 Rent
               </Link>}
-                {!isUserAdmin(user) &&<Link
+              {!isUserAdmin(user) && <Link
                 to="/containerShipment/sell"
                 className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
               >
@@ -94,11 +95,11 @@ console.log('User in AppHeader:', isUserAdmin(user));
                 {isWithDrawlOpen && (
                   <div className="absolute left-0 mt-2 w-42 bg-white rounded-md shadow-lg py-2 z-50">
                     <Link
-                      to="/containerShipment/manager-withdrawal"
+                      to="/containerShipment/sell-request"
                       onClick={() => setIsWithDrawlOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Withdrawal
+                      Sell Request
                     </Link>
                     <Link
                       to="/containerShipment/deposit-approval"
@@ -123,7 +124,7 @@ console.log('User in AppHeader:', isUserAdmin(user));
                 </button>
 
                 {isUsersOpen && (
-                  <div className="absolute left-0 mt-2 w-44 bg-white rounded-md shadow-lg py-2 z-50">
+                  <div className="absolute left-0 mt-2 w-42 bg-white rounded-md shadow-lg py-2 z-50">
                     <Link
                       to="/containerShipment/all-user"
                       onClick={() => setIsUsersOpen(false)}
@@ -159,7 +160,30 @@ console.log('User in AppHeader:', isUserAdmin(user));
                 )}
 
               </div>}
+              {isUserAdmin(user) && <div className="relative">
+                <button
+                  onClick={() => setBankOpen(!bankOpen)}
+                  className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
+                >
+                  Bank Details
+                  <span className={`text-xs transition-transform ${bankOpen ? "rotate-180" : ""}`}>
+                    ▼
+                  </span>
+                </button>
 
+                {bankOpen && (
+                  <div className="absolute left-0 mt-2 w-44 bg-white rounded-md shadow-lg py-2 z-50">
+                    <Link
+                      to="/containerShipment/bank-details"
+                      onClick={() => setBankOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Bank
+                    </Link>
+                  </div>
+                )}
+
+              </div>}
             </nav>
 
           </div>
