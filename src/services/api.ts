@@ -92,6 +92,31 @@ export interface AddRankRewardRequest {
   reward: Number;
   achieved: boolean;
 }
+export interface AddWithdrawRequest {
+  withdrawRequestPkId: null;
+  userFkId: string;
+  accountType: 'BANK' | 'UPI' | null;
+  accountHolderName: string | null;
+  bankName: string | null;
+  accountNumber: string | null;
+  ifscCode: string | null;
+  upiId: string | null;
+  isDefault: boolean | null;
+  createdAt: null;
+}
+export interface WithdrawRequest {
+  withdrawRequestPkId: number;
+  userFkId: string;
+  accountType: 'BANK' | 'UPI' | null;
+  accountHolderName: string | null;
+  bankName: string | null;
+  accountNumber: string | null;
+  ifscCode: string | null;
+  upiId: string | null;
+  isDefault: boolean | null;
+  createdAt: string | null;
+}
+
 
 export const rankRewardApi = {
   // Get all ranks with pagination and filtering
@@ -118,6 +143,20 @@ export const rankRewardApi = {
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteRankAndReward/${id}`, 'DELETE')
 };
+export const BankApi ={
+  //get Bank Details
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: WithdrawRequest[], totalElements: number }> =>
+    apiCall<any>(`/api/container/getWithdrawalAccount?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`).then(response => 
+      ({
+        
+      content: response || [],
+      totalElements: response.count || 0
+    })),
+  //Add bank details
+  add: (data: AddWithdrawRequest): Promise<WithdrawRequest> =>
+    apiCall<any>('/api/container/addWithdrawalAccount', 'POST', data).then(response => response.data?.[0] || response),
+ 
+}
 
 // Income Type API functions
 export interface IncomeType {
