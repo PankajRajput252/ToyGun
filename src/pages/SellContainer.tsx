@@ -309,7 +309,7 @@ export default function SellContainer() {
         </section>
       )}
       {!isAddMode && (
-        <ComponentCard title="Available Containers">
+        <ComponentCard title="Sold Containers">
           <Table>
             <TableHeader>
               <TableRow className="text-white">

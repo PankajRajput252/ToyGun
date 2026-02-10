@@ -81,6 +81,12 @@ const AppHeader: React.FC = () => {
               >
                 Sell
               </Link>}
+               {!isUserAdmin(user) && <Link
+                to="/containerShipment/sellMonthlyInterest"
+                className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
+              >
+                Monthly Interest
+              </Link>}
               {/* Withdrawal DROPDOWN */}
               {isUserAdmin(user) && <div className="relative">
                 <button
