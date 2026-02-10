@@ -1346,3 +1346,46 @@ export const sellContainer = {
     apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
  
 };
+
+
+ export interface RentContainerData {
+  investmentFkId:number;
+  contractMonth:number;
+  rentStartDate: string;
+  currency:string;
+  userFkId: string;
+  creditedAt: string
+  monthlyPayout:number| null;
+  roiPercentage:number|null;
+  totalContractReturn:number|null;
+}
+ 
+    
+
+// buy
+export const rentContainer = {
+  getAll: (
+    page: number = 0,
+    size: number = 25,
+    filterBy: string = 'ACTIVE',
+    userNodeId?: string | null
+  ): Promise<{ content: RentContainerData[]; totalElements: number; count?: number }> =>
+    apiCall<any>(
+      `/api/container/getSellRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+    ).then((response) => ({
+      content: response.data || [],
+      totalElements: response.count || 0,
+      count: response.count,
+    })),
+
+  add: (data: RentContainerData): Promise<Container> =>
+    apiCall<any>(`/api/container/addRoiTransaction`, 'POST', data).then(
+      (response) => response.data?.[0] || response
+    ),
+
+ 
+
+  delete: (id: number): Promise<void> =>
+    apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
+ 
+};

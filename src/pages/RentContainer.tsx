@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
+import { rentContainer, RentContainerData } from "../services/api";
+
 
 /* ============================
-   Types aligned with backend
+   Types
 ============================ */
 type ContainerType = "20FT" | "40FT";
 type OwnershipType = "BANK" | "SHARED";
+
+const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+const userNodeId = user?.nodeId;
 
 interface Investment {
   investmentPkId: number;
@@ -13,6 +18,7 @@ interface Investment {
   investedAmount: number;
   roiPercentage: number;
   status: string;
+  currency: string;
 }
 
 interface RentData {
@@ -22,18 +28,22 @@ interface RentData {
   investedAmount: number;
   monthlyROI: number;
   contractMonths: number;
-  startDate: string;
+  startDate: string; // yyyy-mm-dd
+  currency: string;
 }
 
 export default function RentContainer() {
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState(false);
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [rentData, setRentData] = useState<RentData>({
     containerType: "",
     ownershipType: "",
     investedAmount: 0,
     monthlyROI: 0,
-    contractMonths: 36, // ✅ minimum 3 years
+    contractMonths: 36,
     startDate: "",
+    currency: "",
   });
 
   /* ============================
@@ -55,6 +65,17 @@ export default function RentContainer() {
   }, []);
 
   /* ============================
+     Set Today Date (yyyy-mm-dd)
+  ============================ */
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    setRentData((prev) => ({
+      ...prev,
+      startDate: today,
+    }));
+  }, []);
+
+  /* ============================
      Handle Container Selection
   ============================ */
   const handleInvestmentSelect = (investmentPkId: number) => {
@@ -71,6 +92,7 @@ export default function RentContainer() {
       ownershipType: selected.ownershipType,
       investedAmount: selected.investedAmount,
       monthlyROI: selected.roiPercentage,
+      currency: selected.currency,
     }));
   };
 
@@ -84,38 +106,55 @@ export default function RentContainer() {
     monthlyPayout * rentData.contractMonths;
 
   /* ============================
+     Helpers
+  ============================ */
+  const formatDateDDMMYYYY = (date: string) => {
+    if (!date) return "";
+    const [y, m, d] = date.split("-");
+    return `${d}-${m}-${y}`;
+  };
+
+  /* ============================
      Submit Rent
   ============================ */
-  const handleRent = () => {
+  const handleRent = async () => {
     if (!rentData.investmentPkId) return;
 
+    try{
+
+    
+
     const payload = {
-      investmentPkId: rentData.investmentPkId,
-      contractMonths: rentData.contractMonths,
-      startDate: rentData.startDate,
-      monthlyROI: rentData.monthlyROI,
+      investmentFkId: rentData.investmentPkId,
+      userFkId: userNodeId,
+      contractMonth: rentData.contractMonths,
+      rentStartDate: rentData.startDate,
+      currency: rentData.currency,
+      roiPercentage: rentData.monthlyROI,
       monthlyPayout,
       totalContractReturn,
+      creditedAt:rentData.startDate
     };
 
     console.log("RENT PAYLOAD", payload);
-    // TODO: POST to backend
+    // TODO: POST API
+    const depositResponse = await rentContainer.add(payload);
+          console.log("investment value--->", depositResponse)
+          
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+     
+    }
+    
   };
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
-    setRentData((prev) => ({
-      ...prev,
-      startDate: today,
-    }));
-  }, []);
 
   return (
     <section className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-semibold mb-6">
-        Rent Container
-      </h2>
+      <h2 className="text-2xl font-semibold mb-6">Rent Container</h2>
 
-      {/* Container Selection */}
+      {/* Select Container */}
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         <div>
           <label className="text-sm font-medium">Select Container</label>
@@ -151,10 +190,9 @@ export default function RentContainer() {
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         <div>
           <label className="text-sm font-medium">
-            Invested Amount (INR)
+            Invested Amount ({rentData.currency})
           </label>
           <input
-            type="number"
             className="w-full border rounded-lg px-4 py-2 mt-1 bg-gray-100"
             value={rentData.investedAmount}
             disabled
@@ -173,24 +211,19 @@ export default function RentContainer() {
             onChange={(e) =>
               setRentData({
                 ...rentData,
-                contractMonths: Math.max(
-                  36,
-                  Number(e.target.value)
-                ),
+                contractMonths: Math.max(36, Number(e.target.value)),
               })
             }
           />
           <p className="text-xs text-gray-500 mt-1">
-            Minimum 36 months (3 years)
+            Minimum 36 months
           </p>
         </div>
       </div>
 
       {/* Start Date */}
       <div className="mb-6">
-        <label className="text-sm font-medium">
-          Rent Start Date
-        </label>
+        <label className="text-sm font-medium">Rent Start Date</label>
         <input
           type="date"
           className="w-full border rounded-lg px-4 py-2 mt-1"
@@ -202,21 +235,22 @@ export default function RentContainer() {
             })
           }
         />
-
+        <p className="text-xs text-gray-500 mt-1">
+          Selected: {formatDateDDMMYYYY(rentData.startDate)}
+        </p>
       </div>
 
       {/* Summary */}
       <div className="bg-gray-50 rounded-xl p-6 mb-6">
         <p>
-          <strong>Monthly ROI:</strong>{" "}
-          {rentData.monthlyROI}%
+          <strong>Monthly ROI:</strong> {rentData.monthlyROI}%
         </p>
         <p>
-          <strong>Monthly Payout:</strong> ₹
-          {monthlyPayout.toFixed(2)}
+          <strong>Monthly Payout:</strong>{" "}
+          {rentData.currency} {monthlyPayout.toFixed(2)}
         </p>
         <p className="text-green-600 font-semibold">
-          Total Return (Contract): ₹
+          Total Return: {rentData.currency}{" "}
           {totalContractReturn.toFixed(2)}
         </p>
       </div>
