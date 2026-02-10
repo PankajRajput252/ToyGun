@@ -384,7 +384,7 @@ export default function Buy() {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex gap-3">
         <InfoIcon className="w-5 h-5 text-blue-600" />
         <p className="text-sm text-blue-700">
-          Minimum contract period: <b>15 months</b>. ROI credited monthly until container is sold.
+          Minimum contract period: <b>36 months</b>. ROI credited monthly until container is sold.
         </p>
       </div>
 
