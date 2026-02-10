@@ -1395,7 +1395,7 @@ export const rentContainer = {
     userNodeId?: string | null
   ): Promise<{ content: RentContainerData[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/container/getSellRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+      `/api/container/getRoiTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,

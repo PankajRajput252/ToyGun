@@ -329,7 +329,7 @@ export default function SellContainer() {
                 </TableRow>
               ) : (
                 containerData.map((c) => (
-                  <TableRow key={c.sellRequestPkId} className="text-white">
+                  <TableRow  className="text-white">
                     <TableCell>{c.userFkId}</TableCell>
                     <TableCell>{c.requestedAt}</TableCell>
                     <TableCell>{c.final_amount}</TableCell>
