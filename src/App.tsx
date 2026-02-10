@@ -35,6 +35,7 @@ import Sell from "./pages/SellContainer"
 import RentContainer from "./pages/RentContainer";
 import SellContainer from "./pages/SellContainer";
 import WithdrawBankDetailsForm from "./pages/Admin/WithdrawBankDetailsForm";
+import SellMonthlyInterest from "./pages/SellMonthlyInterest";
 
 export default function App() {
   return (
@@ -60,6 +61,7 @@ export default function App() {
               <Route path="buy" element={<Buy />} />
               <Route path="admin-user" element={<h1>Admin User Page</h1>} />
               <Route path="rent" element={<RentContainer />} />
+               <Route path="sellMonthlyInterest" element={<SellMonthlyInterest />} />
                <Route path="sell" element={<SellContainer />} />
               <Route path="sell-request" element={<SellRequests />} />
               <Route path="deposit-approval" element={<SellRequests />} />

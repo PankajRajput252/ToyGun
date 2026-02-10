@@ -298,7 +298,7 @@ export default function RentContainer() {
         </section>
       )}
       {!isAddMode && (
-        <ComponentCard title="Available Containers">
+        <ComponentCard title="Rent Containers">
           <Table>
             <TableHeader>
               <TableRow className="text-white">
