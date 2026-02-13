@@ -59,7 +59,7 @@ export const isUserAdmin = (user: User | null): boolean => {
   // Check if user has ADMIN_USER role
   return user.roles?.some(role => role.name === "ADMIN_USER") || false;
 };
-
+console.log('qwertyuioplkjhgfdsazxcvbnm',isUserAdmin);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
