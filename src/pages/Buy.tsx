@@ -245,23 +245,75 @@ export default function Buy() {
     }
   };
 
+  // const fetchBankDetails = async () => {
+  //   try {
+  //     setLoadingBank(true);
+  //     user?.nodeId
+  //     const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
+  //   const data = res?.content?.data || res || [];
+  //     // 👉 adjust if API returns res.data or res.content.data
+  //     // setBankDetails(res?.content?.data || res || []);
+  //     setOpenBankModal(true);
+  //     // 👉 Filter only default accounts
+  //      // 👉 Filter only default accounts AND valid createdAt
+  //   const defaultAccounts = data.filter(
+  //     (item) => item.isDefault === true && item.createdAt
+  //   );
+
+  //   // 👉 Get latest created record safely
+  //   const latestDefaultAccount = defaultAccounts.sort(
+  //     (a, b) =>
+  //       new Date(b.createdAt ?? 0).getTime() -
+  //       new Date(a.createdAt ?? 0).getTime()
+  //   )[0];
+
+  //   setBankDetails(latestDefaultAccount ? [latestDefaultAccount] : []);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   finally {
+  //     setLoadingBank(false);
+  //   }
+  // };
+
   const fetchBankDetails = async () => {
     try {
       setLoadingBank(true);
-      user?.nodeId
-      const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
 
-      // 👉 adjust if API returns res.data or res.content.data
-      setBankDetails(res?.content?.data || res || []);
+      const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
+      const data = res?.content?.data || res || [];
+
+      console.log("BANK API DATA 👉", data);
+
+      // 👉 Filter default accounts
+      const defaultAccounts = data.filter(
+        (item) =>
+          item.isDefault === true ||
+          item.isDefault === "true" ||
+          item.isDefault === 1
+      );
+
+      if (defaultAccounts.length === 0) {
+        setBankDetails([]);
+        setOpenBankModal(true);
+        return;
+      }
+
+      // 👉 Get latest using highest PK ID
+      const latestDefaultAccount = defaultAccounts.sort(
+        (a, b) => b.withdrawRequestPkId - a.withdrawRequestPkId
+      )[0];
+
+      setBankDetails([latestDefaultAccount]);
       setOpenBankModal(true);
 
     } catch (error) {
       console.error(error);
-    }
-    finally {
+    } finally {
       setLoadingBank(false);
     }
   };
+
 
 
   /* =======================
