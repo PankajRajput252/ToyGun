@@ -360,7 +360,7 @@ export default function Buy() {
 
   useEffect(() => {
     fetchContainerData();
-  }, []);
+  }, [isAddMode]);
 
 
   return (
@@ -512,50 +512,49 @@ export default function Buy() {
                     <TableCell>{c.roiPercentage}%</TableCell>
                     <TableCell>{c.status}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        {/* <input
-                          type="file"
-                          accept="image/*,.pdf"
-                          className="hidden"
-                          id={`receipt-${c.investmentPkId}`}
-                          onChange={e =>
-                            handleFileChange(
-                              c.investmentPkId,
-                              e.target.files?.[0] || null
-                            )
-                          }
-                        /> */}
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="hidden"
-                          id="profile-image-input"
-                        />
-                        <label
-                          htmlFor="profile-image-input"
-                          className="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
-                        >
-                          Choose Image
-                        </label>
-                        {/* <label
-                          htmlFor={`receipt-${c.investmentPkId}`}
-                          className="cursor-pointer text-sm px-3 py-1 bg-gray-700 text-white rounded"
-                        >
-                          Choose
-                        </label> */}
+                      {c.imageUrl ? (
+                        <div className="flex flex-col items-start gap-2">
+                          <a
+                            href={c.imageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition duration-200"
+                          >
+                            👁 View Document
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageChange(e, c.investmentPkId)}
+                            className="hidden"
+                            id={`profile-image-input-${c.investmentPkId}`}
+                          />
 
-                        <Button
-                          size="sm"
-                          disabled={c.status === "APPROVED"}
-                          className="bg-orange-500 hover:bg-orange-600 text-white"
-                          onClick={() => handleImageUpload(c.investmentPkId, c.investedAmount, c.currency)}
-                        >
-                          Upload
-                        </Button>
-                      </div>
+                          <label
+                            htmlFor={`profile-image-input-${c.investmentPkId}`}
+                            className="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                          >
+                            Choose Image
+                          </label>
+
+                          <Button
+                            size="sm"
+                            disabled={c.status === "APPROVED"}
+                            className="bg-orange-500 hover:bg-orange-600 text-white"
+                            onClick={() =>
+                              handleImageUpload(c.investmentPkId, c.investedAmount, c.currency)
+                            }
+                          >
+                            Upload
+                          </Button>
+                        </div>
+                      )}
                     </TableCell>
+
                   </TableRow>
                 ))
               )}
