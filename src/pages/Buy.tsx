@@ -7,7 +7,7 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
-import api, { buyContainer, ContainerResponse, depositReceiptUploadApi } from "../services/api";
+import api, { BankApi, AddWithdrawRequest, WithdrawRequest, buyContainer, ContainerResponse, depositReceiptUploadApi } from "../services/api";
 import {
   Table,
   TableBody,
@@ -57,6 +57,9 @@ const CONTAINERS: Container[] = [
 
 
 export default function Buy() {
+  const [bankDetails, setBankDetails] = useState<WithdrawRequest[]>([]);
+  const [openBankModal, setOpenBankModal] = useState(false);
+  const [loadingBank, setLoadingBank] = useState(false);
   const [isAddMode, setIsAddMode] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [containerData, setContainerData] = useState<ContainerResponse[]>([]);
@@ -242,6 +245,25 @@ export default function Buy() {
     }
   };
 
+  const fetchBankDetails = async () => {
+    try {
+      setLoadingBank(true);
+      user?.nodeId
+      const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
+
+      // 👉 adjust if API returns res.data or res.content.data
+      setBankDetails(res?.content?.data || res || []);
+      setOpenBankModal(true);
+
+    } catch (error) {
+      console.error(error);
+    }
+    finally {
+      setLoadingBank(false);
+    }
+  };
+
+
   /* =======================
      Price Auto Calculation
   ======================= */
@@ -371,7 +393,16 @@ export default function Buy() {
         <PageBreadcrumb pageTitle="Buy Container" />
       </div>
 
+
       <div className="flex justify-end mb-4">
+        <div className="mr-4">
+          <Button
+            onClick={fetchBankDetails}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
+          >
+            View Admin Bank Detail
+          </Button>
+        </div>
         <Button
           onClick={() => setIsAddMode(!isAddMode)}
           className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
@@ -379,6 +410,7 @@ export default function Buy() {
           {isAddMode ? "View Containers" : "Buy Container"}
         </Button>
       </div>
+
 
       {/* Reminder */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex gap-3">
@@ -562,6 +594,50 @@ export default function Buy() {
           </Table>
         </ComponentCard>
       )}
+
+      {/* bank detail */}
+      {openBankModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+
+          <div className="bg-white rounded-2xl shadow-xl w-[500px] p-6 relative animate-fadeIn">
+
+            {/* CLOSE BUTTON */}
+            <button
+              onClick={() => setOpenBankModal(false)}
+              className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-lg"
+            >
+              ✖
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Admin Bank Details
+            </h2>
+
+            {loadingBank ? (
+              <p className="text-center">Loading...</p>
+            ) : bankDetails.length === 0 ? (
+              <p className="text-center text-gray-500">No Bank Details Found</p>
+            ) : (
+              bankDetails.map((bank, index) => (
+                <div
+                  key={index}
+                  className="border rounded-lg p-4 mb-3 bg-gray-50"
+                >
+                  <p><b>Account Holder:</b> {bank.accountHolderName}</p>
+                  <p><b>Bank Name:</b> {bank.bankName}</p>
+                  <p><b>Account No:</b> {bank.accountNumber}</p>
+                  <p><b>IFSC Code:</b> {bank.ifscCode}</p>
+                  {bank.upiId && (
+                    <p><b>UPI ID:</b> {bank.upiId}</p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+        </div>
+      )}
+
     </>
   );
 }
