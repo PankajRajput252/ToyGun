@@ -10,6 +10,8 @@ export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [name, setName] = useState("");
+  const [nationalIdType, setNationalIdType] = useState("");
+  const [nationalId, setNationalId] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,22 +41,17 @@ export default function SignUpForm() {
       return;
     }
 
-    if (!name || !email || !password || !mobile || !country) {
+    if (!name || !email || !password || !mobile || !country || !nationalId || !nationalIdType) {
       setError("Please fill in all required fields");
       return;
     }
 
-    if(!referralCode){
-      
-     setReferralCode("NODE24770625")
-     console.log("Please referal --->",referralCode);
-    }
 
     setIsLoading(true);
 
     try {
       console.log("Please referal  565--->",referralCode);
-      const result = await signUp(name, email, password, mobile, country, referralCode, position);
+      const result = await signUp(name, email, password, mobile, country, referralCode, position,nationalIdType,nationalId);
       if (result.success) {
         setSuccess(result.message || "Registration successful!");
         if (result.username) {
@@ -229,6 +226,42 @@ export default function SignUpForm() {
                         )}
                       </span>
                     </div>
+                  </div>
+                </div>
+
+                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                 
+                  <div>
+                    <Label>
+                      NationalId Type<span className="text-error-500">*</span>
+                    </Label>
+                    <select
+                      id="nationalIdType"
+                      name="nationalIdType"
+                      value={nationalIdType}
+                      onChange={(e) => setNationalIdType(e.target.value)}
+                      className="w-full px-4 py-3 text-sm font-normal text-gray-700 transition-colors bg-white border border-gray-300 rounded-lg focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:border-brand-400"
+                    >
+                      <option value="">Select NationalId Type--</option>
+                      <option value="Passport">Passport</option>
+                      <option value="AadharCard">Aadhar Card</option>
+                      <option value="PanCard">PAN Card</option>
+                      <option value="DrivingLincense">Driving Lincense</option>
+                    </select>
+                  </div>
+
+                   <div>
+                    <Label>
+                      National Id<span className="text-error-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      id="nationalId"
+                      name="nationalId"
+                      placeholder="Enter national Id"
+                      value={nationalId}
+                      onChange={(e) => setNationalId(e.target.value)}
+                    />
                   </div>
                 </div>
 

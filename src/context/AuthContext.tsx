@@ -37,6 +37,8 @@ interface User {
   recordStateCodeFkId?: string;
   createdDatetime?: string;
   lastModifiedDateTime?: string;
+  nationalIdType?:string;
+  nationalId?:string
 }
 
 interface AuthContextType {
@@ -45,7 +47,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAdmin: boolean;
   signIn: (username: string, password: string, keepLoggedIn?: boolean) => Promise<boolean>;
-  signUp: (name: string, email: string, password: string, mobile: string, country: string, referralCode?: string, position?: string) => Promise<{ success: boolean; username?: string; message?: string }>;
+  signUp: (name: string, email: string, password: string, mobile: string, country: string, referralCode?: string, position?: string,nationalIdType?:string, nationalId?:string) => Promise<{ success: boolean; username?: string; message?: string }>;
   signOut: () => void;
   updateUser: (updatedUser: User) => void;
 }
@@ -161,7 +163,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mobile: string,
     country: string,
     referralCode: string = "",
-    position: string = "Right"
+    position: string = "Right",
+    nationalIdType:string,
+    nationalId:string,
   ): Promise<{ success: boolean; username?: string; message?: string }> => {
     try {
       // In production, use relative URLs so Netlify proxy handles CORS
@@ -189,6 +193,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           mobile,
           referralCode,
           position,
+          nationalIdType,
+          nationalId
         }),
         signal: controller.signal,
       }).finally(() => clearTimeout(timeoutId));
