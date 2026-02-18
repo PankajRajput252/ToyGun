@@ -1268,6 +1268,7 @@ export interface ContainerResponse {
   currency: string;
   investedAmount: number | null,
   investmentPkId: number
+  imageUrl:string
 }
 
 // buy

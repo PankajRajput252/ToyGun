@@ -7,7 +7,7 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
-import api, { buyContainer, ContainerResponse, depositReceiptUploadApi } from "../services/api";
+import api, { BankApi, AddWithdrawRequest, WithdrawRequest, buyContainer, ContainerResponse, depositReceiptUploadApi } from "../services/api";
 import {
   Table,
   TableBody,
@@ -57,6 +57,9 @@ const CONTAINERS: Container[] = [
 
 
 export default function Buy() {
+  const [bankDetails, setBankDetails] = useState<WithdrawRequest[]>([]);
+  const [openBankModal, setOpenBankModal] = useState(false);
+  const [loadingBank, setLoadingBank] = useState(false);
   const [isAddMode, setIsAddMode] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [containerData, setContainerData] = useState<ContainerResponse[]>([]);
@@ -242,6 +245,77 @@ export default function Buy() {
     }
   };
 
+  // const fetchBankDetails = async () => {
+  //   try {
+  //     setLoadingBank(true);
+  //     user?.nodeId
+  //     const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
+  //   const data = res?.content?.data || res || [];
+  //     // 👉 adjust if API returns res.data or res.content.data
+  //     // setBankDetails(res?.content?.data || res || []);
+  //     setOpenBankModal(true);
+  //     // 👉 Filter only default accounts
+  //      // 👉 Filter only default accounts AND valid createdAt
+  //   const defaultAccounts = data.filter(
+  //     (item) => item.isDefault === true && item.createdAt
+  //   );
+
+  //   // 👉 Get latest created record safely
+  //   const latestDefaultAccount = defaultAccounts.sort(
+  //     (a, b) =>
+  //       new Date(b.createdAt ?? 0).getTime() -
+  //       new Date(a.createdAt ?? 0).getTime()
+  //   )[0];
+
+  //   setBankDetails(latestDefaultAccount ? [latestDefaultAccount] : []);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   finally {
+  //     setLoadingBank(false);
+  //   }
+  // };
+
+  const fetchBankDetails = async () => {
+    try {
+      setLoadingBank(true);
+
+      const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
+      const data = res?.content?.data || res || [];
+
+      console.log("BANK API DATA 👉", data);
+
+      // 👉 Filter default accounts
+      const defaultAccounts = data.filter(
+        (item) =>
+          item.isDefault === true ||
+          item.isDefault === "true" ||
+          item.isDefault === 1
+      );
+
+      if (defaultAccounts.length === 0) {
+        setBankDetails([]);
+        setOpenBankModal(true);
+        return;
+      }
+
+      // 👉 Get latest using highest PK ID
+      const latestDefaultAccount = defaultAccounts.sort(
+        (a, b) => b.withdrawRequestPkId - a.withdrawRequestPkId
+      )[0];
+
+      setBankDetails([latestDefaultAccount]);
+      setOpenBankModal(true);
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingBank(false);
+    }
+  };
+
+
+
   /* =======================
      Price Auto Calculation
   ======================= */
@@ -360,7 +434,7 @@ export default function Buy() {
 
   useEffect(() => {
     fetchContainerData();
-  }, []);
+  }, [isAddMode]);
 
 
   return (
@@ -371,7 +445,16 @@ export default function Buy() {
         <PageBreadcrumb pageTitle="Buy Container" />
       </div>
 
+
       <div className="flex justify-end mb-4">
+        <div className="mr-4">
+          <Button
+            onClick={fetchBankDetails}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
+          >
+            View Admin Bank Detail
+          </Button>
+        </div>
         <Button
           onClick={() => setIsAddMode(!isAddMode)}
           className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
@@ -379,6 +462,7 @@ export default function Buy() {
           {isAddMode ? "View Containers" : "Buy Container"}
         </Button>
       </div>
+
 
       {/* Reminder */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex gap-3">
@@ -512,50 +596,49 @@ export default function Buy() {
                     <TableCell>{c.roiPercentage}%</TableCell>
                     <TableCell>{c.status}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        {/* <input
-                          type="file"
-                          accept="image/*,.pdf"
-                          className="hidden"
-                          id={`receipt-${c.investmentPkId}`}
-                          onChange={e =>
-                            handleFileChange(
-                              c.investmentPkId,
-                              e.target.files?.[0] || null
-                            )
-                          }
-                        /> */}
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="hidden"
-                          id="profile-image-input"
-                        />
-                        <label
-                          htmlFor="profile-image-input"
-                          className="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
-                        >
-                          Choose Image
-                        </label>
-                        {/* <label
-                          htmlFor={`receipt-${c.investmentPkId}`}
-                          className="cursor-pointer text-sm px-3 py-1 bg-gray-700 text-white rounded"
-                        >
-                          Choose
-                        </label> */}
+                      {c.imageUrl ? (
+                        <div className="flex flex-col items-start gap-2">
+                          <a
+                            href={c.imageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition duration-200"
+                          >
+                            👁 View Document
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageChange(e, c.investmentPkId)}
+                            className="hidden"
+                            id={`profile-image-input-${c.investmentPkId}`}
+                          />
 
-                        <Button
-                          size="sm"
-                          disabled={c.status === "APPROVED"}
-                          className="bg-orange-500 hover:bg-orange-600 text-white"
-                          onClick={() => handleImageUpload(c.investmentPkId, c.investedAmount, c.currency)}
-                        >
-                          Upload
-                        </Button>
-                      </div>
+                          <label
+                            htmlFor={`profile-image-input-${c.investmentPkId}`}
+                            className="inline-block px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                          >
+                            Choose Image
+                          </label>
+
+                          <Button
+                            size="sm"
+                            disabled={c.status === "APPROVED"}
+                            className="bg-orange-500 hover:bg-orange-600 text-white"
+                            onClick={() =>
+                              handleImageUpload(c.investmentPkId, c.investedAmount, c.currency)
+                            }
+                          >
+                            Upload
+                          </Button>
+                        </div>
+                      )}
                     </TableCell>
+
                   </TableRow>
                 ))
               )}
@@ -563,6 +646,50 @@ export default function Buy() {
           </Table>
         </ComponentCard>
       )}
+
+      {/* bank detail */}
+      {openBankModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+
+          <div className="bg-white rounded-2xl shadow-xl w-[500px] p-6 relative animate-fadeIn">
+
+            {/* CLOSE BUTTON */}
+            <button
+              onClick={() => setOpenBankModal(false)}
+              className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-lg"
+            >
+              ✖
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Admin Bank Details
+            </h2>
+
+            {loadingBank ? (
+              <p className="text-center">Loading...</p>
+            ) : bankDetails.length === 0 ? (
+              <p className="text-center text-gray-500">No Bank Details Found</p>
+            ) : (
+              bankDetails.map((bank, index) => (
+                <div
+                  key={index}
+                  className="border rounded-lg p-4 mb-3 bg-gray-50"
+                >
+                  <p><b>Account Holder:</b> {bank.accountHolderName}</p>
+                  <p><b>Bank Name:</b> {bank.bankName}</p>
+                  <p><b>Account No:</b> {bank.accountNumber}</p>
+                  <p><b>IFSC Code:</b> {bank.ifscCode}</p>
+                  {bank.upiId && (
+                    <p><b>UPI ID:</b> {bank.upiId}</p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+        </div>
+      )}
+
     </>
   );
 }
