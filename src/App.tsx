@@ -65,6 +65,7 @@ export default function App() {
                <Route path="sell" element={<SellContainer />} />
               <Route path="sell-request" element={<SellRequests />} />
               <Route path="deposit-approval" element={<SellRequests />} />
+              <Route path="withdrawls" element={<SellRequests />} />
               <Route path="all-user" element={<AdminUsers />} />
               <Route path="active-user" element={<AdminUsers />} />
               <Route path="inactive-user" element={<AdminUsers />} />

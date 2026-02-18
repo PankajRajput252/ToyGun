@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { Modal } from "../components/ui/modal";
 import Button from "../components/ui/button/Button";
 import Label from "../components/form/Label";
-
+import { isUserAdmin } from "../context/AuthContext";
 interface FormData {
   category: string;
   priority: string;
@@ -41,7 +41,6 @@ export default function Support() {
     message: "",
     status: "",
   });
-
   // Fetch support tickets on component mount
   useEffect(() => {
     fetchSupportTickets();
@@ -368,7 +367,7 @@ export default function Support() {
       </div>
 
       {/* Fill Details Form */}
-      <div className="mb-8">
+      {!isUserAdmin(user) &&<div className="mb-8">
         <h3 className="font-bold text-white text-xl mb-6">
           Fill Details
         </h3>
@@ -552,7 +551,7 @@ export default function Support() {
             </div>
           </form>
         </div>
-      </div>
+      </div>}
 
       {/* All Tickets Table */}
       <div>

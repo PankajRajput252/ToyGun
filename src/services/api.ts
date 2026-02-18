@@ -1097,7 +1097,7 @@ export const supportTicketApi = {
     userNodeId?: string | null
   ): Promise<{ content: SupportTicket[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/individual/getSupportTicket?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`
+      `/api/container/getSupportTicket?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,
@@ -1106,19 +1106,19 @@ export const supportTicketApi = {
 
   // Add new support ticket
   add: (data: AddSupportTicketRequest): Promise<SupportTicket> =>
-    apiCall<any>(`/api/individual/addSupportTicket`, 'POST', data).then(
+    apiCall<any>(`/api/container/addSupportTicket`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
 
   // Update existing support ticket
   update: (id: number, data: Partial<SupportTicket>): Promise<SupportTicket> =>
-    apiCall<any>(`/api/individual/updateSupportTicket/${id}`, 'PUT', data).then(
+    apiCall<any>(`/api/container/updateSupportTicket/${id}`, 'PUT', data).then(
       (response) => response.data?.[0] || response
     ),
 
   // Delete support ticket
   delete: (id: number): Promise<void> =>
-    apiCall<void>(`/api/individual/deleteSupportTicket/${id}`, 'DELETE'),
+    apiCall<void>(`/api/container/deleteSupportTicket/${id}`, 'DELETE'),
 };
 
 // Withdrawal Request interfaces
