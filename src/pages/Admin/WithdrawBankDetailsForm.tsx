@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BankApi, AddWithdrawRequest, WithdrawRequest } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 const WithdrawBankDetailsForm = () => {
 
@@ -10,11 +11,11 @@ const WithdrawBankDetailsForm = () => {
   const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const textColor = isDarkMode ? "white" : "black";
   const bgColor = isDarkMode ? "#121212" : "white";
-
+  const { user } = useAuth();
   // Form State
   const [formData, setFormData] = useState<AddWithdrawRequest>({
     withdrawRequestPkId: null,
-    userFkId: "CONT66855610",
+    userFkId: user?.nodeId ?? "",
     accountType: "BANK",
     accountHolderName: null,
     bankName: null,
@@ -28,7 +29,8 @@ const WithdrawBankDetailsForm = () => {
   // Fetch Bank Details
   const fetchBankDetails = async () => {
     try {
-      const res = await BankApi.getAll(1, 25, "ACTIVE", "CONT66855610");
+      user?.nodeId
+      const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
 
       // 👉 adjust if API returns res.data or res.content.data
       setBankDetails(res?.content?.data || res || []);
@@ -69,8 +71,9 @@ const WithdrawBankDetailsForm = () => {
   };
 
   return (
-    <div style={{ padding: 30, backgroundColor: bgColor, minHeight: "100vh" ,position: "relative"
-      
+    <div style={{
+      padding: 30, backgroundColor: bgColor, minHeight: "100vh", position: "relative"
+
     }}>
 
       {/* Payment Toggle Button */}
@@ -211,17 +214,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 
   formOverlay: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: "rgba(0,0,0,0.5)",
-  zIndex: 10
-},
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 10
+  },
   container: {
     marginTop: 20,
     padding: 25,
