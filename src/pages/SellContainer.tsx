@@ -144,7 +144,8 @@ export default function SellContainer() {
       // TODO: POST to backend
       const depositResponse = await sellContainer.add(payload);
       console.log("investment value--->", depositResponse)
-
+      await fetchContainerData();
+      setIsAddMode(false);
 
 
       setSuccess(true);
@@ -302,7 +303,7 @@ export default function SellContainer() {
 
           {error && (
             <p className="mt-4 text-red-600 font-medium">
-              ❌ {error}
+               {error}
             </p>
           )}
 
@@ -312,7 +313,7 @@ export default function SellContainer() {
         <ComponentCard title="Sold Containers">
           <Table>
             <TableHeader>
-              <TableRow className="text-white">
+              <TableRow className="text-gray-800 dark:text-white">
                 <TableCell>User Id </TableCell>
                 <TableCell>Requested Id</TableCell>
                 <TableCell>Final Amount</TableCell>
@@ -322,14 +323,14 @@ export default function SellContainer() {
             </TableHeader>
             <TableBody>
               {containerData.length === 0 ? (
-                <TableRow className="text-white">
+                <TableRow className="text-gray-800 dark:text-white">
                   <TableCell colSpan={5} className="text-center py-6">
                     No Containers Found
                   </TableCell>
                 </TableRow>
               ) : (
                 containerData.map((c) => (
-                  <TableRow  className="text-white">
+                  <TableRow className="text-gray-800 dark:text-white">
                     <TableCell>{c.userFkId}</TableCell>
                     <TableCell>{c.requestedAt}</TableCell>
                     <TableCell>{c.final_amount}</TableCell>

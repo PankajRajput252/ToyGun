@@ -32,6 +32,7 @@ interface Container {
 
 const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
 const userNodeId = user?.nodeId;
+console.log("USER NODE ID shri", userNodeId);
 /* =======================
    Static Master Data
    (Later replace with API)
@@ -82,17 +83,7 @@ export default function Buy() {
     minShares: 0,
     currency: ''
   });
-  const handleFileChange = (
-    investmentPkId: number,
-    file: File | null
-  ) => {
-    if (!file) return;
 
-    setReceiptFiles(prev => ({
-      ...prev,
-      [investmentPkId]: file,
-    }));
-  };
   // Helper function to compress and resize image
   const compressImage = (file: File, maxWidth: number = 800, maxHeight: number = 800, quality: number = 0.8): Promise<File> => {
     return new Promise((resolve, reject) => {
@@ -245,37 +236,6 @@ export default function Buy() {
     }
   };
 
-  // const fetchBankDetails = async () => {
-  //   try {
-  //     setLoadingBank(true);
-  //     user?.nodeId
-  //     const res = await BankApi.getAll(1, 25, "ACTIVE", user?.nodeId);
-  //   const data = res?.content?.data || res || [];
-  //     // 👉 adjust if API returns res.data or res.content.data
-  //     // setBankDetails(res?.content?.data || res || []);
-  //     setOpenBankModal(true);
-  //     // 👉 Filter only default accounts
-  //      // 👉 Filter only default accounts AND valid createdAt
-  //   const defaultAccounts = data.filter(
-  //     (item) => item.isDefault === true && item.createdAt
-  //   );
-
-  //   // 👉 Get latest created record safely
-  //   const latestDefaultAccount = defaultAccounts.sort(
-  //     (a, b) =>
-  //       new Date(b.createdAt ?? 0).getTime() -
-  //       new Date(a.createdAt ?? 0).getTime()
-  //   )[0];
-
-  //   setBankDetails(latestDefaultAccount ? [latestDefaultAccount] : []);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   finally {
-  //     setLoadingBank(false);
-  //   }
-  // };
-
   const fetchBankDetails = async () => {
     try {
       setLoadingBank(true);
@@ -314,44 +274,6 @@ export default function Buy() {
     }
   };
 
-
-
-  /* =======================
-     Price Auto Calculation
-  ======================= */
-  // useEffect(() => {
-  //   if (!form.containerType || !form.ownershipType) return;
-
-  //   const config = CONTAINERS.find(
-  //     c =>
-  //       c.containerType === form.containerType &&
-  //       c.ownershipType === form.ownershipType
-  //   );
-
-  //   if (!config) return;
-
-  //   if (form.ownershipType === "SINGLE") {
-  //     setForm(prev => ({
-  //       ...prev,
-  //       priceUsd: config.priceUsd,
-  //       priceInr: config.priceInr,
-  //       shares: 1,
-  //       minShares: 1,
-  //       roi: config.roi,
-  //     }));
-  //   } else {
-  //     const shares = form.shares >= config.minShares ? form.shares : config.minShares;
-
-  //     setForm(prev => ({
-  //       ...prev,
-  //       priceUsd: 0,
-  //       priceInr: shares * config.priceInr,
-  //       shares,
-  //       minShares: config.minShares,
-  //       roi: config.roi,
-  //     }));
-  //   }
-  // }, [form.containerType, form.ownershipType, form.shares]);
   useEffect(() => {
     if (!form.containerType || !form.ownershipType) return;
 
@@ -387,8 +309,8 @@ export default function Buy() {
     }
   }, [form.containerType, form.ownershipType, form.shares]);
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("Pankaj")
     e.preventDefault();
+
     let investedAmount: number | null = null;
 
     if (form.currency === "USD") {
@@ -396,7 +318,6 @@ export default function Buy() {
     } else if (form.currency === "INR") {
       investedAmount = form.priceInr;
     } else if (form.currency === "AED") {
-      // Example conversion (replace with live FX later)
       investedAmount = Math.round(form.priceUsd * 3.67);
     }
 
@@ -408,14 +329,19 @@ export default function Buy() {
       currency: form.currency,
       investedAmount: investedAmount,
       userFkId: userNodeId,
-      status: 'ACTIVE'
+      status: "ACTIVE",
     };
 
-    console.log("BUY PAYLOAD 👉", payload);
-    // TODO: POST to backend
-    const depositResponse = await buyContainer.add(payload);
-    console.log("investment value--->", depositResponse)
+    try {
+      const depositResponse = await buyContainer.add(payload);
+      console.log("investment value--->", depositResponse);
 
+      await fetchContainerData();
+      setIsAddMode(false);
+
+    } catch (error) {
+      console.error("Error buying container:", error);
+    }
   };
 
 
@@ -434,7 +360,7 @@ export default function Buy() {
 
   useEffect(() => {
     fetchContainerData();
-  }, [isAddMode]);
+  }, []);
 
 
   return (
@@ -569,7 +495,7 @@ export default function Buy() {
         <ComponentCard title="Available Containers">
           <Table>
             <TableHeader>
-              <TableRow className="text-white">
+              <TableRow className="text-gray-800 dark:text-white">
                 <TableCell>#</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Ownership</TableCell>
@@ -581,14 +507,14 @@ export default function Buy() {
             </TableHeader>
             <TableBody>
               {containerData.length === 0 ? (
-                <TableRow className="text-white">
+                <TableRow className="text-gray-800 dark:text-white">
                   <TableCell colSpan={5} className="text-center py-6">
                     No Containers Found
                   </TableCell>
                 </TableRow>
               ) : (
                 containerData.map((c) => (
-                  <TableRow key={c.investmentPkId} className="text-white">
+                  <TableRow key={c.investmentPkId} className="text-gray-800 dark:text-white">
                     <TableCell>{c.investmentPkId}</TableCell>
                     <TableCell>{c.containerType}</TableCell>
                     <TableCell>{c.ownershipType}</TableCell>

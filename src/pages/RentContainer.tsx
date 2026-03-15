@@ -163,7 +163,8 @@ export default function RentContainer() {
       // TODO: POST API
       const depositResponse = await rentContainer.add(payload);
       console.log("investment value--->", depositResponse)
-
+       await fetchContainerData();
+       setIsAddMode(false);
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -301,7 +302,7 @@ export default function RentContainer() {
         <ComponentCard title="Rent Containers">
           <Table>
             <TableHeader>
-              <TableRow className="text-white">
+              <TableRow className="text-gray-800 dark:text-white">
                 <TableCell>User Id </TableCell>
                 <TableCell>Rent Start Date</TableCell>
                 <TableCell>Currency</TableCell>
@@ -313,14 +314,14 @@ export default function RentContainer() {
             </TableHeader>
             <TableBody>
               {containerData.length === 0 ? (
-                <TableRow className="text-white">
+                <TableRow className="text-gray-800 dark:text-white">
                   <TableCell colSpan={5} className="text-center py-6">
                     No Containers Found
                   </TableCell>
                 </TableRow>
               ) : (
                 containerData.map((c) => (
-                  <TableRow className="text-white">
+                  <TableRow className="text-gray-800 dark:text-white">
                     <TableCell>{c.userFkId}</TableCell>
                     <TableCell>{c.rentStartDate}</TableCell>
                     <TableCell>{c.currency}</TableCell>
