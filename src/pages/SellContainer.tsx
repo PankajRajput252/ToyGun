@@ -303,7 +303,7 @@ export default function SellContainer() {
 
           {error && (
             <p className="mt-4 text-red-600 font-medium">
-               {error}
+              {error}
             </p>
           )}
 
@@ -330,11 +330,21 @@ export default function SellContainer() {
                 </TableRow>
               ) : (
                 containerData.map((c) => (
+                  console.log("cccc", c),
                   <TableRow className="text-gray-800 dark:text-white">
                     <TableCell>{c.userFkId}</TableCell>
                     <TableCell>{c.requestedAt}</TableCell>
                     <TableCell>{c.final_amount}</TableCell>
-                    <TableCell>{c.status}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-block px-3 py-1 my-1 rounded-lg text-white text-sm font-medium ${c.status === "APPROVED"
+                            ? "bg-green-600"
+                            : "bg-red-600"
+                          }`}
+                      >
+                        {c.status}
+                      </span>
+                    </TableCell>
                   </TableRow>
                 ))
               )}

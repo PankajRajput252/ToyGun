@@ -223,6 +223,7 @@ export interface WithdrawalType {
 export interface SellRequestUser {
   sellRequestPkId: number;
   investmentFkId: number;
+  investmentPkId: number;
   userFkId: string;
   requestedAt: string;
   approvedAt: string | null;
@@ -230,7 +231,7 @@ export interface SellRequestUser {
   marketMarginPercentage: number | null;
   final_amount: number;
   status: string;
-  user: number;
+  user: string;
   investment: number;
   createdDatetime?: string;
 }

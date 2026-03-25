@@ -297,7 +297,7 @@ export default function SellRequests() {
                                                     </td>
                                                     <td className="py-4 px-6">
                                                         <div className="flex items-center gap-2">
-                                                            <button
+                                                            {withdrawal?.status==="REQUESTED" &&<button
                                                                 onClick={() => handlePaymentAction(withdrawal?.sellRequestPkId, 'APPROVED')}
                                                                 className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                                                             >
@@ -305,8 +305,8 @@ export default function SellRequests() {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                                                 </svg>
                                                                 Approve
-                                                            </button>
-                                                            <button
+                                                            </button>}
+                                                            {withdrawal?.status==="REQUESTED" &&<button
                                                                 onClick={() => handlePaymentAction(withdrawal?.sellRequestPkId, 'REJECTED')}
                                                                 className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
                                                             >
@@ -314,16 +314,7 @@ export default function SellRequests() {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                                                 </svg>
                                                                 Reject
-                                                            </button>
-                                                            {/* <button
-                                                                onClick={() => handleEditWithdrawal(withdrawal)}
-                                                                className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 rounded-lg transition-colors"
-                                                                title="Edit"
-                                                            >
-                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                                </svg>
-                                                            </button> */}
+                                                            </button>}
                                                         </div>
                                                     </td>
                                                 </tr>
