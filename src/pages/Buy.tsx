@@ -216,6 +216,7 @@ export default function Buy() {
         // Update user context with new image URL (store in both fields for compatibility)
 
         alert('Image uploaded successfully!');
+        await fetchContainerData();
       } else {
         console.warn('Image upload response:', response);
         alert('Image uploaded but URL not received. Please refresh the page.');
