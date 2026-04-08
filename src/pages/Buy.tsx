@@ -505,14 +505,14 @@ export default function Buy() {
 
 
       <div className="flex justify-end mb-4">
-        <div className="mr-4">
+        {/* <div className="mr-4">
           <Button
             onClick={fetchBankDetails}
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
           >
             View Admin Bank Detail
           </Button>
-        </div>
+        </div> */}
         <Button
           onClick={() => setIsAddMode(!isAddMode)}
           className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2"
@@ -612,7 +612,7 @@ export default function Buy() {
 
             <div className="bg-gray-50 rounded-lg p-4 text-sm">
               <p><b>Monthly ROI:</b> {form.roi}%</p>
-              <p><b>Minimum Contract:</b> 15 Months</p>
+              <p><b>Minimum Contract:</b> 36 Months</p>
             </div>
 
             <div className="flex justify-end">
@@ -634,7 +634,7 @@ export default function Buy() {
                 <TableCell>USD</TableCell>
                 <TableCell>ROI %</TableCell>
                 <TableCell>STATUS</TableCell>
-                <TableCell>UPLOAD RECEIPT</TableCell>
+                {/* <TableCell>UPLOAD RECEIPT</TableCell> */}
                 <TableCell>DOWNLOAD RECEIPT</TableCell>
               </TableRow>
             </TableHeader>
@@ -654,7 +654,7 @@ export default function Buy() {
                     <TableCell>${c.investedAmount}</TableCell>
                     <TableCell>{c.roiPercentage}%</TableCell>
                     <TableCell>{c.status}</TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {c.imageUrl ? (
                         <div className="flex flex-col items-start gap-2">
                           <a
@@ -696,7 +696,7 @@ export default function Buy() {
                           </Button>
                         </div>
                       )}
-                    </TableCell>
+                    </TableCell> */}
 
                     <TableCell>
                       {c.status === "APPROVED" || c.status === "SUCCESS" ? (
