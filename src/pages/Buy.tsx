@@ -7,7 +7,8 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
-import api, { BankApi, AddWithdrawRequest, WithdrawRequest, buyContainer, ContainerResponse, depositReceiptUploadApi ,depositApi} from "../services/api";
+import jsPDF from "jspdf";
+import api, { BankApi, AddWithdrawRequest, WithdrawRequest, buyContainer, ContainerResponse, depositReceiptUploadApi, depositApi } from "../services/api";
 import {
   Table,
   TableBody,
@@ -16,10 +17,10 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { useNavigate } from "react-router-dom";
- import axios from "axios";
+import axios from "axios";
 
 
-  
+
 /* =======================
    Container Entity
 ======================= */
@@ -73,7 +74,7 @@ const CONTAINERS: Container[] = [
 
 export default function Buy() {
 
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [bankDetails, setBankDetails] = useState<WithdrawRequest[]>([]);
   const [openBankModal, setOpenBankModal] = useState(false);
@@ -89,7 +90,7 @@ export default function Buy() {
   const [compressedFile, setCompressedFile] = useState<File | null>(null);
   const hasFetchedRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-     const [payment, setPayment] = useState<PaymentResponse | null>(null);
+  const [payment, setPayment] = useState<PaymentResponse | null>(null);
   const [qrCode, setQrCode] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -104,8 +105,24 @@ export default function Buy() {
     currency: ''
   });
 
- const createDeposit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const generateReceiptPDF = (payment: PaymentResponse, amount: number) => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("Payment Receipt", 20, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Payment ID: ${payment.payment_id}`, 20, 40);
+    doc.text(`Amount: ${amount} ${payment.pay_currency}`, 20, 50);
+    doc.text(`Wallet Address: ${payment.pay_address}`, 20, 60);
+    doc.text(`Status: SUCCESS`, 20, 70);
+    doc.text(`Date: ${new Date().toLocaleString()}`, 20, 80);
+
+    doc.save(`receipt-${payment.payment_id}.pdf`);
+  };
+
+  const createDeposit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       setIsLoading(true);
 
@@ -116,24 +133,24 @@ export default function Buy() {
       else if (form.currency === "AED") investedAmount = Math.round(form.priceUsd * 3.67);
 
       if (!form.containerType) {
-  alert("Please select container type");
-  return;
-}
+        alert("Please select container type");
+        return;
+      }
 
-if (!form.ownershipType) {
-  alert("Please select ownership type");
-  return;
-}
+      if (!form.ownershipType) {
+        alert("Please select ownership type");
+        return;
+      }
 
-if (!form.currency) {
-  alert("Please select currency");
-  return;
-}
+      if (!form.currency) {
+        alert("Please select currency");
+        return;
+      }
 
-if (!form.priceUsd && !form.priceInr) {
-  alert("Invalid price. Please reselect container");
-  return;
-}
+      if (!form.priceUsd && !form.priceInr) {
+        alert("Invalid price. Please reselect container");
+        return;
+      }
 
       if (!investedAmount || investedAmount <= 0) {
         alert("Please select container and currency properly");
@@ -146,20 +163,20 @@ if (!form.priceUsd && !form.priceInr) {
       };
 
       const paymentResponse = await depositApi.add(depositRequest);
-      console.log("paymentResponse--->",paymentResponse)
+      console.log("paymentResponse--->", paymentResponse)
 
       setPayment(paymentResponse);
       // setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse.pay_address}`);
 
       pollPaymentStatus(paymentResponse.payment_id);
-        navigate("/containerShipment/depositConfirmation", {
-          state: {
-            paymentResponse: paymentResponse,
-            amount: investedAmount,
-            currency:form.currency,
-            paymentIdValueForPoll: paymentResponse.payment_id
-          },
-        });
+      navigate("/containerShipment/depositConfirmation", {
+        state: {
+          paymentResponse: paymentResponse,
+          amount: investedAmount,
+          currency: form.currency,
+          paymentIdValueForPoll: paymentResponse.payment_id
+        },
+      });
     } catch (err) {
       console.error(err);
       alert("Error creating deposit");
@@ -618,6 +635,7 @@ if (!form.priceUsd && !form.priceInr) {
                 <TableCell>ROI %</TableCell>
                 <TableCell>STATUS</TableCell>
                 <TableCell>UPLOAD RECEIPT</TableCell>
+                <TableCell>DOWNLOAD RECEIPT</TableCell>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -677,6 +695,27 @@ if (!form.priceUsd && !form.priceInr) {
                             Upload
                           </Button>
                         </div>
+                      )}
+                    </TableCell>
+
+                    <TableCell>
+                      {c.status === "APPROVED" || c.status === "SUCCESS" ? (
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() =>
+                            generateReceiptPDF({
+                              payment_id: String(c.investmentPkId),
+                              pay_amount: c.investedAmount,
+                              pay_currency: c.currency,
+                              pay_address: "N/A",
+                            }, c.investedAmount)
+                          }
+                        >
+                          Download
+                        </Button>
+                      ) : (
+                        <span className="text-gray-400 text-sm">Not Available</span>
                       )}
                     </TableCell>
 
