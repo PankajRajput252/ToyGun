@@ -7,7 +7,7 @@ import Input from "../components/form/input/InputField";
 import Label from "../components/form/Label";
 import Select from "../components/form/Select";
 import { InfoIcon } from "../icons";
-import api, { BankApi, AddWithdrawRequest, WithdrawRequest, buyContainer, ContainerResponse, depositReceiptUploadApi } from "../services/api";
+import api, { BankApi, AddWithdrawRequest, WithdrawRequest, buyContainer, ContainerResponse, depositReceiptUploadApi ,depositApi} from "../services/api";
 import {
   Table,
   TableBody,
@@ -15,8 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
+import { useNavigate } from "react-router-dom";
+ import axios from "axios";
 
 
+  
 /* =======================
    Container Entity
 ======================= */
@@ -29,6 +32,17 @@ interface Container {
   roi: number;
 }
 
+interface PaymentResponse {
+  pay_address: string;
+  pay_amount: number;
+  pay_currency: string;
+  payment_id: string;
+}
+
+interface HistoryItem {
+  paymentId: string;
+  paymentStatus: string;
+}
 
 const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
 const userNodeId = user?.nodeId;
@@ -58,6 +72,9 @@ const CONTAINERS: Container[] = [
 
 
 export default function Buy() {
+
+   const navigate = useNavigate();
+
   const [bankDetails, setBankDetails] = useState<WithdrawRequest[]>([]);
   const [openBankModal, setOpenBankModal] = useState(false);
   const [loadingBank, setLoadingBank] = useState(false);
@@ -72,6 +89,9 @@ export default function Buy() {
   const [compressedFile, setCompressedFile] = useState<File | null>(null);
   const hasFetchedRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+     const [payment, setPayment] = useState<PaymentResponse | null>(null);
+  const [qrCode, setQrCode] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const [form, setForm] = useState({
     containerType: "" as "20FT" | "40FT" | "",
@@ -83,6 +103,100 @@ export default function Buy() {
     minShares: 0,
     currency: ''
   });
+
+ const createDeposit = async (e: React.FormEvent) => {
+  e.preventDefault();
+    try {
+      setIsLoading(true);
+
+      let investedAmount = 0;
+
+      if (form.currency === "USD") investedAmount = form.priceUsd;
+      else if (form.currency === "INR") investedAmount = form.priceInr;
+      else if (form.currency === "AED") investedAmount = Math.round(form.priceUsd * 3.67);
+
+      if (!form.containerType) {
+  alert("Please select container type");
+  return;
+}
+
+if (!form.ownershipType) {
+  alert("Please select ownership type");
+  return;
+}
+
+if (!form.currency) {
+  alert("Please select currency");
+  return;
+}
+
+if (!form.priceUsd && !form.priceInr) {
+  alert("Invalid price. Please reselect container");
+  return;
+}
+
+      if (!investedAmount || investedAmount <= 0) {
+        alert("Please select container and currency properly");
+        return;
+      }
+
+      const depositRequest = {
+        userNodeId,
+        amount: investedAmount,
+      };
+
+      const paymentResponse = await depositApi.add(depositRequest);
+      console.log("paymentResponse--->",paymentResponse)
+
+      setPayment(paymentResponse);
+      // setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse.pay_address}`);
+
+      pollPaymentStatus(paymentResponse.payment_id);
+        navigate("/containerShipment/depositConfirmation", {
+          state: {
+            paymentResponse: paymentResponse,
+            amount: investedAmount,
+            currency:form.currency,
+            paymentIdValueForPoll: paymentResponse.payment_id
+          },
+        });
+    } catch (err) {
+      console.error(err);
+      alert("Error creating deposit");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const intervalRef = useRef<any>(null);
+
+  const pollPaymentStatus = (paymentId: string) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(async () => {
+      try {
+        const res = await axios.get(
+          `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
+        );
+
+        const record = res.data.data.find((x: HistoryItem) => x.paymentId === paymentId);
+
+        if (record?.paymentStatus === "SUCCESS") {
+          clearInterval(intervalRef.current);
+          setSuccess(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, 4000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
 
   // Helper function to compress and resize image
   const compressImage = (file: File, maxWidth: number = 800, maxHeight: number = 800, quality: number = 0.8): Promise<File> => {
@@ -401,7 +515,7 @@ export default function Buy() {
 
       {isAddMode && (
         <ComponentCard title="Buy Container">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={createDeposit} className="space-y-6">
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
