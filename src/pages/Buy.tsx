@@ -571,7 +571,7 @@ export default function Buy() {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <Label>Payment Through</Label>
                 <Select
                   options={[
@@ -579,7 +579,7 @@ export default function Buy() {
                   ]}
                   onChange={v => setForm({ ...form })}
                 />
-              </div>
+              </div> */}
             </div>
 
             {form.ownershipType === "SHARED" && (

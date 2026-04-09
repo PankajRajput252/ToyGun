@@ -1454,3 +1454,50 @@ export const rentContainer = {
     apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
  
 };
+
+export interface WithdrawRequestData {
+  withdrawRequestPkId:number;
+  userFkId: string;
+  investmentFkId: number;
+  requestAmount: number;
+  currency: string;
+  withdrawalMethod: string;
+  status: "AVAILABLE" | "WITHDRAWN" | "PENDING";
+  requestedAt: string;
+  approvedAt: string;
+  paidAt: string;
+  adminRemark: string;
+}
+
+// buy
+export const sellMonthlyInterest = {
+  getAll: (
+    page: number = 0,
+    size: number = 25,
+    filterBy: string = 'ACTIVE',
+    userNodeId?: string | null
+  ): Promise<{ content: WithdrawRequestData[]; totalElements: number; count?: number }> =>
+    apiCall<any>(
+      `/api/container/getWithdrawRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+    ).then((response) => ({
+      content: response.data || [],
+      totalElements: response.count || 0,
+      count: response.count,
+    })),
+
+  add: (data: WithdrawRequestData): Promise<WithdrawRequestData> =>
+    apiCall<any>(`/api/container/addWithdrawRequest`, 'POST', data).then(
+      (response) => response.data?.[0] || response
+    ),
+
+  update: (id: number, data: Partial<DepositFundItem>): Promise<DepositFundItem> =>
+    apiCall<any>(`/api/individual/updateDepositFund/${id}`, 'PUT', data).then(
+      (response) => response.data?.[0] || response
+    ),
+
+  delete: (id: number): Promise<void> =>
+    apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
+ 
+};
+
+
