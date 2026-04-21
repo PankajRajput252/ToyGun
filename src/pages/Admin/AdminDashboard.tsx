@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
-import { User, WalletData, usersApi, walletDataApi, ieDataApi, DataApi, containerPaymentApiData, PaymentUser } from '../../services/api';
+import { User,  usersApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 

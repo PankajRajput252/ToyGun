@@ -103,12 +103,7 @@ export default function App() {
             <Route path="/bandookwale/admin" element={<AppLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
-              <Route path="ranks" element={<ManageRankReward />} />
-              <Route path="income-types" element={<ManageIncomeType />} />
               <Route path="subscription" element={<ManageSubscription />} />
-              <Route path="withdrawal" element={<SellRequests />} />
-              <Route path="deposits" element={<AdminDeposits />} />
-              <Route path="wallet-transactions" element={<AdminWalletTransactions />} />
             </Route>
           </Route>
 
