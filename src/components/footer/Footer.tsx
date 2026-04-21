@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="w-full mt-10">
       
       {/* Top Section */}
-      <div className="bg-[#f7f8f9] py-10">
+      <div className="bg-gradient-to-r from-black to-yellow-500 py-10">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-sm">
 
           {/* Popular Locations */}
@@ -75,7 +75,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom Blue Section */}
-      <div className="bg-[#002f6c] text-white py-6">
+      <div className="bg-gradient-to-r from-black to-yellow-500 py-6">
         <div className="max-w-7xl mx-auto px-6">
 
           {/* Logos */}

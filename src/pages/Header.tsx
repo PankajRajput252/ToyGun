@@ -2,7 +2,7 @@ import { Heart, User, Search, MapPin, ChevronDown, Plus } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-[#f7f8f9] border-b">
+    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         {/* Logo */}

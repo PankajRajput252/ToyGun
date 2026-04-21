@@ -40,7 +40,7 @@ export default function SellMonthlyInterest() {
   const fetchRoi = async () => {
     try {
       const res = await fetch(
-        `http://containershipment-app-env.eba-p7ijagki.ap-south-1.elasticbeanstalk.com/api/container/getRoiTransaction?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=${userFkId}`
+        `http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com/api/container/getRoiTransaction?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=${userFkId}`
       );
       const data = await res.json();
       setRoiList(data.data || []);
@@ -91,7 +91,7 @@ export default function SellMonthlyInterest() {
   //   try {
   //     setLoadingId(roi.roiTxnPkId);
 
-  //     await fetch("http://containershipment-app-env.eba-p7ijagki.ap-south-1.elasticbeanstalk.com/api/container/addWithdrawRequest", {
+  //     await fetch("http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com/api/container/addWithdrawRequest", {
   //       method: "POST",
   //       headers: {
   //         "Content-Type": "application/json",

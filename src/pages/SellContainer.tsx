@@ -57,7 +57,7 @@ export default function SellContainer() {
   ============================== */
   useEffect(() => {
     fetch(
-      "http://containershipment-app-env.eba-p7ijagki.ap-south-1.elasticbeanstalk.com/api/container/getInvestment?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=CONT66855610",
+      "http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com/api/container/getInvestment?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=CONT66855610",
       {
         headers: {
           Authorization: `Bearer YOUR_TOKEN_HERE`,
