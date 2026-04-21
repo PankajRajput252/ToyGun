@@ -1,66 +1,104 @@
-import React from "react";
-import "../footer/Footer.css";
-import containerLogo from "../images/ContainerLog.png"
-
-const Footer: React.FC = () => {
+export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className="w-full mt-10">
+      
       {/* Top Section */}
-      <div className="footer-top">
-        {/* Logo */}
-        <div className="footer-brand">
-          <img
-            src={containerLogo}
-            alt="Buy To Let"
-            className="footer-logo"
-          />
+      <div className="bg-[#f7f8f9] py-10">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-sm">
 
-          <p className="footer-tagline">
-            Buy-To-Let is a fully owned subsidiary of Foundation Capital Limited.
-          </p>
-        </div>
-        {/* Social Icons */}
-        <div className="footer-social">
-          <a href="#" aria-label="Telegram" className="telegram">
-            <i className="fab fa-telegram-plane"></i>
-          </a>
-          <a href="#" aria-label="LinkedIn" className="linkedin">
-            <i className="fab fa-linkedin-in"></i>
-          </a>
-          <a href="#" aria-label="Facebook" className="facebook">
-            <i className="fab fa-facebook-f"></i>
-          </a>
-          <a href="#" aria-label="YouTube" className="youtube">
-            <i className="fab fa-youtube"></i>
-          </a>
-          <a href="#" aria-label="X" className="twitter">
-            <i className="fab fa-x-twitter"></i>
-          </a>
-        </div>
+          {/* Popular Locations */}
+          <div>
+            <h3 className="font-bold mb-3 text-gray-600">POPULAR LOCATIONS</h3>
+            <ul className="space-y-1 text-gray-400">
+              <li>Kolkata</li>
+              <li>Mumbai</li>
+              <li>Chennai</li>
+              <li>Pune</li>
+            </ul>
+          </div>
 
-        {/* Contact Info */}
-        <div className="footer-contact">
-          <span><strong>W:</strong> buy-to-let.co</span>
-          <span className="divider">|</span>
-          <span><strong>E:</strong> info@buy-to-let.co</span>
-          <span className="divider">|</span>
-          <span><strong>P:</strong> +852.3001.11.11</span>
-        </div>
+          {/* Trending Locations */}
+          <div>
+            <h3 className="font-bold mb-3 text-gray-600">TRENDING LOCATIONS</h3>
+            <ul className="space-y-1 text-gray-400">
+              <li>Bhubaneshwar</li>
+              <li>Hyderabad</li>
+              <li>Chandigarh</li>
+              <li>Nashik</li>
+            </ul>
+          </div>
 
-        {/* Links */}
-        <div className="footer-links">
-          <a href="#">Why Container Investment</a>
-          <a href="#">How It Works</a>
+          {/* About */}
+          <div>
+            <h3 className="font-bold mb-3 text-gray-600">ABOUT US</h3>
+            <ul className="space-y-1 text-gray-400">
+              <li>About BandookWale</li>
+              <li>Tech@BandookWale</li>
+              <li>Careers</li>
+            </ul>
+          </div>
+
+          {/* BandookWale */}
+          <div>
+            <h3 className="font-bold mb-3 text-gray-600">BandookWale</h3>
+            <ul className="space-y-1 text-gray-400">
+              <li>Blog</li>
+              <li>Help</li>
+              <li>Sitemap</li>
+              <li>Legal & Privacy information</li>
+              <li>Vulnerability Disclosure Program</li>
+            </ul>
+          </div>
+
+          {/* Follow Us */}
+          <div>
+            <h3 className="font-bold mb-3 text-gray-600">FOLLOW US</h3>
+
+            {/* Social Icons */}
+            <div className="flex gap-3 mb-4 text-gray-400">
+              <span>📘</span>
+              <span>📸</span>
+              <span>▶️</span>
+              <span>❌</span>
+              <span>💬</span>
+              <span>🔗</span>
+            </div>
+
+            {/* App Buttons */}
+            <div className="space-y-2">
+              <img src="/playstore.png" alt="Google Play" className="h-10" />
+              <img src="/appstore.png" alt="App Store" className="h-10" />
+            </div>
+          </div>
+
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="footer-bottom">
-        <span>© 2024 Buy-To-Let. All rights reserved.</span>
-        <a href="#">Privacy</a>
+      {/* Bottom Blue Section */}
+      <div className="bg-[#002f6c] text-white py-6">
+        <div className="max-w-7xl mx-auto px-6">
+
+          {/* Logos */}
+          <div className="flex flex-wrap items-center justify-between gap-6 border-b border-white/30 pb-6">
+            <h2 className="text-lg font-semibold">Luthra Gun House Private limited</h2>
+            <div className="flex gap-8 flex-wrap text-sm opacity-90">
+              <span>BandookWale</span>
+              <span>CarWale</span>
+              <span>BikeWale</span>
+              <span>CarTrade</span>
+              <span>Mobility Outlook</span>
+            </div>
+          </div>
+
+          {/* Bottom Row */}
+          <div className="flex flex-col md:flex-row justify-between items-center mt-4 text-sm opacity-80">
+            <p>Help - Sitemap</p>
+            <p>All rights reserved © 2000-2030 BandookWale</p>
+          </div>
+
+        </div>
       </div>
+
     </footer>
   );
-};
-
-export default Footer;
+}

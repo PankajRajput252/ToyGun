@@ -72,7 +72,7 @@ export default function SignInForm() {
               Sign In
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Access the Container Shipment panel using your userId and passcode!
+              Access the product  using your userId and passcode!
             </p>
           </div>
           <div>

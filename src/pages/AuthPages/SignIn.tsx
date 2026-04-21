@@ -14,8 +14,8 @@ export default function SignIn() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <PageMeta
-        title="StyloCoin Dashboard"
-        description="StyloCoin Dashboard"
+        title="BandookWale - Sign In"
+        description="BandookWale Sign In"
       />
 
       {/* MAIN AUTH AREA */}

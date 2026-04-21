@@ -1,4 +1,5 @@
 import Container from "../images/Container.jpg";
+import HeroBanner from "../../pages/HeroBanner";
 export default function GridShape() {
   return (
     <>
@@ -15,12 +16,14 @@ export default function GridShape() {
           -translate-y-32
           -translate-x-10
         "
+        style={{"marginTop":"-250px"}}
       >
-        <img
-          src={Container}
+        {/* <img
+          src={HeroBanner}
           alt="grid"
           className="w-full h-auto object-contain"
-        />
+        /> */}
+        <HeroBanner/>
       </div>
     </>
   );
