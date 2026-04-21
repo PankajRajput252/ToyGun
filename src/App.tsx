@@ -45,15 +45,15 @@ export default function App() {
         <ScrollToTop />
         <Routes>
           {/* Redirect root to sign-in */}
-          <Route path="/" element={<Navigate to="/StyloCoin/signin" replace />} />
+          <Route path="/" element={<Navigate to="/bandookwale/signin" replace />} />
 
           {/* Auth Layout */}
-          <Route path="/StyloCoin/signin" element={<SignIn />} />
-          <Route path="/StyloCoin/signup" element={<SignUp />} />
+          <Route path="/bandookwale/signin" element={<SignIn />} />
+          <Route path="/bandookwale/signup" element={<SignUp />} />
 
           {/* Protected Dashboard Layout */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/containerShipment/" element={<AppLayout />}>
+            <Route path="/bandookwale/" element={<AppLayout />}>
               <Route index element={<ConditionalHome />} />
               <Route path="dashboard" element={<Home />} />
 
@@ -100,7 +100,7 @@ export default function App() {
 
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
-            <Route path="/containerShipment/admin" element={<AppLayout />}>
+            <Route path="/bandookwale/admin" element={<AppLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="ranks" element={<ManageRankReward />} />

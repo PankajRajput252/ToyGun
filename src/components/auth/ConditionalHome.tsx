@@ -6,5 +6,5 @@ export default function ConditionalHome() {
   const { isAdmin } = useAuth();
   
   // Redirect admin users to admin dashboard, regular users to regular dashboard
-  return isAdmin ? <Navigate to="/containerShipment/admin" replace /> : <Navigate to="/containerShipment/dashboard" replace />;
+  return isAdmin ? <Navigate to="/bandookwale/admin" replace /> : <Navigate to="/bandookwale/dashboard" replace />;
 }

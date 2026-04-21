@@ -43,7 +43,7 @@ export default function SignInForm() {
     try {
       const success = await signIn(username, password, isChecked);
       if (success) {
-        navigate("/containerShipment/");
+        navigate("/bandookwale/");
       } else {
         setError("Login failed. Please check your credentials and try again. If the problem persists, contact support.");
       }
