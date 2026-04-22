@@ -6,7 +6,7 @@ const SupportIcon: React.FC = () => {
 
     return (
         <button
-            onClick={() => navigate("/containerShipment/support")}
+            onClick={() => navigate("/bandookwale/support")}
             className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         >
             <svg

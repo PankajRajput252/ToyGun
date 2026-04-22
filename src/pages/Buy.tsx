@@ -169,7 +169,7 @@ export default function Buy() {
       // setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse.pay_address}`);
 
       pollPaymentStatus(paymentResponse.payment_id);
-      navigate("/containerShipment/depositConfirmation", {
+      navigate("/bandookwale/depositConfirmation", {
         state: {
           paymentResponse: paymentResponse,
           amount: investedAmount,
