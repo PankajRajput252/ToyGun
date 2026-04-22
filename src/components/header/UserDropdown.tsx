@@ -20,13 +20,13 @@ export default function UserDropdown() {
   function handleSignOut() {
     signOut();
     closeDropdown();
-    navigate("/containerShipment/signin");
+    navigate("/bandookwale/signin");
   }
 
   if (!isAuthenticated) {
     return (
       <Link
-        to="/containerShipment/signin"
+        to="/bandookwale/signin"
         className="px-4 py-2 text-sm font-medium text-white transition rounded-lg bg-brand-500 hover:bg-brand-600"
       >
         Sign In
@@ -105,7 +105,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/containerShipment/profile"
+              to="/bandookwale/profile"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg

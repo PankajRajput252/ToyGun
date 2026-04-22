@@ -23,7 +23,6 @@ import Support from "./pages/Support";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminRoute from "./components/auth/AdminRoute";
 import ConditionalHome from "./components/auth/ConditionalHome";
-import ManageRankReward from "./pages/Admin/ManageRankReward";
 import ManageIncomeType from "./pages/Admin/ManageIncomeType";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminUsers from "./pages/Admin/AdminUsers";
@@ -31,11 +30,8 @@ import AdminDeposits from "./pages/Admin/AdminDeposits";
 import AdminWalletTransactions from "./pages/Admin/AdminWalletTransactions";
 import ManageSubscription from "./pages/Admin/ManageSubscription";
 import SellRequests from "./pages/Admin/ManageWithdrawal";
-import Sell from "./pages/SellContainer"
 import RentContainer from "./pages/RentContainer";
-import SellContainer from "./pages/SellContainer";
 import WithdrawBankDetailsForm from "./pages/Admin/WithdrawBankDetailsForm";
-import SellMonthlyInterest from "./pages/SellMonthlyInterest";
 import DepositConfirmation from "./pages/DepositConfirmation";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import HeroImg from "./components/images/HeroIMG.jpg"
@@ -77,8 +73,7 @@ export default function App() {
                <Route path="depositConfirmation" element={<DepositConfirmation />} />
               <Route path="admin-user" element={<h1>Admin User Page</h1>} />
               <Route path="rent" element={<RentContainer />} />
-               <Route path="sellMonthlyInterest" element={<SellMonthlyInterest />} />
-               <Route path="sell" element={<SellContainer />} />
+            
               <Route path="sell-request" element={<SellRequests />} />
               <Route path="deposit-approval" element={<SellRequests />} />
               <Route path="withdrawls" element={<SellRequests />} />
@@ -117,12 +112,7 @@ export default function App() {
             <Route path="/bandookwale/admin" element={<AppLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
-              <Route path="ranks" element={<ManageRankReward />} />
-              <Route path="income-types" element={<ManageIncomeType />} />
               <Route path="subscription" element={<ManageSubscription />} />
-              <Route path="withdrawal" element={<SellRequests />} />
-              <Route path="deposits" element={<AdminDeposits />} />
-              <Route path="wallet-transactions" element={<AdminWalletTransactions />} />
             </Route>
           </Route>
 
