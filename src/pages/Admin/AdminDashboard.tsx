@@ -168,12 +168,12 @@ export default function AdminDashboard() {
 
         {/* Dashboard Overview */}
         <div className="mb-8">
-          <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
+          {/* <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
             <svg className="w-6 h-6 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
             </svg>
             Dashboard Overview
-          </h3>
+          </h3> */}
 
 
         </div>

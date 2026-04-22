@@ -46,45 +46,43 @@ const AppHeader: React.FC = () => {
     <>
       {isUserAdmin(user) ?
         <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
-          <div className="flex flex-col items-center justify-between flex-grow lg:flex-row">
+          <div className="flex items-center justify-between px-6 py-3">
 
-            {/* LEFT SECTION */}
-            <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 lg:border-b-0 lg:px-0 lg:py-4">
+            {/* LEFT: LOGO + NAV */}
+            <div className="flex items-center gap-10">
 
-              <div className="flex items-center w-full pl-12">
+              {/* LOGO */}
+              <div className="text-xl font-semibold text-gray-800 cursor-pointer">
+                AdminPanel
+              </div>
 
-                {/* LOGO */}
-                {/* <img
-              src={navbarLogo}
-              className="h-14 w-auto object-contain cursor-pointer"
-              alt="Logo"
-            /> */}
+              {/* NAV LINKS */}
+              <nav className="hidden lg:flex items-center gap-6">
 
-                {/* DESKTOP NAV */}
-                <nav className="hidden lg:flex items-center gap-8 ml-12">
-
-                  {isUserAdmin(user) && <Link
-                    to="/bandookwale/dashboard"
-                    className="text-white text-sm font-medium hover:text-blue-400 transition whitespace-nowrap"
+                {isUserAdmin(user) && (
+                  <Link
+                    to="/bandookwale/admin"
+                    className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
                   >
-                    Home
-                  </Link>}
+                    Dashboard
+                  </Link>
+                )}
 
-
-                  {/* USERS DROPDOWN */}
-                  {isUserAdmin(user) && <div className="relative">
+                {/* USERS DROPDOWN */}
+                {isUserAdmin(user) && (
+                  <div className="relative">
                     <button
                       onClick={() => setIsUsersOpen(!isUsersOpen)}
-                      className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
+                      className="flex items-center gap-1 text-gray-600 hover:text-blue-600 text-sm font-medium transition"
                     >
                       Users
-                      <span className={`text-xs transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
+                      <span className={`transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
                         ▼
                       </span>
                     </button>
 
                     {isUsersOpen && (
-                      <div className="absolute left-0 mt-2 w-42 bg-white rounded-md shadow-lg py-2 z-50">
+                      <div className="absolute top-10 left-0 w-48 bg-white border rounded-lg shadow-lg py-2">
                         <Link
                           to="/bandookwale/all-user"
                           onClick={() => setIsUsersOpen(false)}
@@ -118,25 +116,28 @@ const AppHeader: React.FC = () => {
                         </Link>
                       </div>
                     )}
-
-                  </div>}
-
-                </nav>
-
-              </div>
+                  </div>
+                )}
+              </nav>
             </div>
 
-            {/* RIGHT SECTION */}
-            <div
-              className={`${isApplicationMenuOpen ? "flex" : "hidden"
-                } items-center justify-between w-full gap-4 px-5 py-4 lg:flex lg:justify-end lg:px-0`}
-            >
+            {/* RIGHT: ACTIONS */}
+            <div className="flex items-center gap-4">
 
+              {/* SEARCH (Optional) */}
+              <input
+                type="text"
+                placeholder="Search..."
+                className="hidden lg:block px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              {/* SUPPORT */}
               <SupportSidebar />
-              <div className="flex items-center gap-3">
-                <ThemeToggleButton />
-              </div>
 
+              {/* THEME */}
+              <ThemeToggleButton />
+
+              {/* USER */}
               <UserDropdown />
             </div>
           </div>
