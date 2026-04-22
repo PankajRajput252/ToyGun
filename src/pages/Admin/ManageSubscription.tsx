@@ -241,8 +241,8 @@ export default function ManageSubscription() {
                       <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
                       <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Subscription Type</th>
                       <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Amount</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Start Date</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">End Date</th>
+                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Created Date</th>
+                      {/* <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">End Date</th> */}
                       <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
@@ -263,11 +263,11 @@ export default function ManageSubscription() {
                             ${subscriptionTypes.subscriptionAmount?.toLocaleString() ?? '—'}
                           </td>
                           <td className="py-4 px-6 text-gray-300 font-mono">
-                            {formatDate(subscriptionTypes.subscriptionStartDateTime)}
+                            {formatDate(subscriptionTypes.createdDatetime)}
                           </td>
-                          <td className="py-4 px-6 text-gray-300 font-mono">
+                          {/* <td className="py-4 px-6 text-gray-300 font-mono">
                             {formatDate(subscriptionTypes.subscriptionEndDateTime)}
-                          </td>
+                          </td> */}
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-2">
                               <button

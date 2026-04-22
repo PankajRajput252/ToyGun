@@ -170,7 +170,7 @@ export default function AdminDashboard() {
         <div className="mb-15">
 
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 m-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
           <div onClick={() => handleCardClick('totalUsers')} className="group cursor-pointer p-[2px] rounded-xl bg-gradient-to-r from-black to-yellow-800 
                  bg-[length:200%_200%] bg-left transition-all duration-500 
                  hover:bg-right m-10 ">
