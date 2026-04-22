@@ -9,10 +9,16 @@ import { useAuth } from "../context/AuthContext";
 import { DropdownItem } from "../components/ui/dropdown/DropdownItem";
 import SupportSidebar from "../components/ui/support/SupportSidebar";
 import Header from "../pages/Header";
+
+
 const AppHeader: React.FC = () => {
+
+
+  const usersRef = useRef(null);
+  const manageUsersRef = useRef(null);
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [isUsersOpen, setIsUsersOpen] = useState(false);
-  const [isWithDrawlOpen, setIsWithDrawlOpen] = useState(false);
+  const [isManageUserOpen, setIsManageUserOpen] = useState(false);
   const [withdrawl, setWithdrawl] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +46,38 @@ const AppHeader: React.FC = () => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (usersRef.current && !usersRef.current.contains(target)) {
+        setIsUsersOpen(false);
+      }
+
+      if (manageUsersRef.current && !manageUsersRef.current.contains(target)) {
+        setIsManageUserOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsUsersOpen(false);
+        setIsManageUserOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
   }, []);
 
   return (
@@ -70,7 +108,7 @@ const AppHeader: React.FC = () => {
 
                 {/* USERS DROPDOWN */}
                 {isUserAdmin(user) && (
-                  <div className="relative">
+                  <div className="relative" ref={usersRef}>
                     <button
                       onClick={() => setIsUsersOpen(!isUsersOpen)}
                       className="flex items-center gap-1 text-gray-600 hover:text-blue-600 text-sm font-medium transition"
@@ -116,6 +154,48 @@ const AppHeader: React.FC = () => {
                         </Link>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* MANAGE USER */}
+                {isUserAdmin(user) && (
+                  <div className="relative" ref={manageUsersRef}>
+                    <button
+                      onClick={() => {
+                        setIsManageUserOpen(!isManageUserOpen);
+                        setIsUsersOpen(false);
+                      }}
+                      className="flex items-center gap-1 text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                    >
+                      Manage Users
+                      <span className={`transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
+                        ▼
+                      </span>
+                    </button>
+
+                    {isManageUserOpen && (
+                      <div className="absolute top-10 left-0 w-48 bg-white border rounded-lg shadow-lg py-2">
+                        <Link
+                          to="/bandookwale/admin/subscription"
+                          onClick={() => setIsManageUserOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Subscription
+                        </Link>
+
+                        {/* <Link
+                          to="/bandookwale/active-user"
+                          onClick={() => setIsManageUserOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Active Users
+                        </Link> */}
+
+                      </div>
+                    )}
+
+
+
                   </div>
                 )}
               </nav>
