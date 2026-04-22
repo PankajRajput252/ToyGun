@@ -359,9 +359,9 @@ export default function Support() {
         </h2>
         <nav>
           <ol className="flex items-center gap-2">
-            <li><a className="font-medium text-gray-300 hover:text-white" href="/">Home /</a></li>
-            <li><a className="font-medium text-gray-300 hover:text-white" href="/">Support /</a></li>
-            <li className="font-medium text-gray-300">Create Ticket</li>
+            {/* <li><a className="font-medium text-gray-300 hover:text-white" href="/">Home /</a></li> */}
+            {/* <li><a className="font-medium text-gray-300 hover:text-white" href="/">Support /</a></li> */}
+            {/* <li className="font-medium text-gray-300">Create Ticket</li> */}
           </ol>
         </nav>
       </div>
