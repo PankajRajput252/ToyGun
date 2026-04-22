@@ -5,8 +5,6 @@ import HeroImg from "../components/images/HeroImg.jpg"
 import Mossberry from "../components/images/Mossbery 590.jpg"
 import Gork from "../components/images/Glock 19.jpg"
 import Desert from "../components/images/Desert_Eagle.jpg"
-import Sig_saul from "../components/images/Sig_Saul.jpg"
-import shortgun from "../components/images/42345.jpg"
 import close_up from "../components/images/close_up_rifle.jpg"
 import wooden_wall from "../components/images/wooden_wall.jpg"
 import thomas from "../components/images/thomas-tucker.jpg"
@@ -40,13 +38,16 @@ export default function CategoryGrid() {
               className="flex flex-col items-center text-center cursor-pointer group"
             >
               {/* Image Box */}
-              <div className="w-40 h-28 bg-gray-100 rounded-2xl flex items-center justify-center mb-3 group-hover:shadow-md transition">
-                <img
-                  src={item.img}
-                  alt={item.name}
-                  className="w-full h-full object-contain p-4"
-                />
-              </div>
+              <div className="p-[2px] rounded-2xl bg-gradient-to-r from-black to-yellow-500 
+  hover:from-yellow-500 hover:to-black transition duration-300">
+  <div className="w-40 h-28 bg-[#1A1A1A] rounded-2xl flex items-center justify-center">
+    <img
+      src={item.img}
+      alt={item.name}
+      className="w-full h-full object-contain p-4"
+    />
+  </div>
+</div>
 
               {/* Title */}
               <p className="text-sm font-medium text-gray-800 group-hover:text-blue-600">

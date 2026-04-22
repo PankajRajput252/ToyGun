@@ -33,8 +33,21 @@ import SellRequests from "./pages/Admin/ManageWithdrawal";
 import RentContainer from "./pages/RentContainer";
 import WithdrawBankDetailsForm from "./pages/Admin/WithdrawBankDetailsForm";
 import DepositConfirmation from "./pages/DepositConfirmation";
-
+import ProductDetailsPage from "./pages/ProductDetailsPage";
+import HeroImg from "./components/images/HeroIMG.jpg"
 export default function App() {
+  const products = [
+    {
+      image: HeroImg,
+      price: "9500",
+    title: "Samsung Galaxy Z Fold 4",
+    location: "Samudrapur",
+    date: "Today",
+    brand: "Samsung",
+    description: "All kit. Good condition",
+    sellerName: "OLX User",
+    },
+  ];
   return (
     <>
       <Router>
@@ -55,6 +68,7 @@ export default function App() {
 
               {/* Others Page */}
               <Route path="profile" element={<UserProfiles />} />
+              <Route path="productdetails" element={<ProductDetailsPage />} />
               <Route path="buy" element={<Buy />} />
                <Route path="depositConfirmation" element={<DepositConfirmation />} />
               <Route path="admin-user" element={<h1>Admin User Page</h1>} />

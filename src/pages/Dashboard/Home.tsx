@@ -108,7 +108,7 @@ export default function Home() {
 
         <main >
           <div >
-            <HeroBanner />
+            {/* <HeroBanner /> */}
             <CategoryGrid />
             {/* <EarningsSection /> */}
             {/* <WorldTradeSection />
