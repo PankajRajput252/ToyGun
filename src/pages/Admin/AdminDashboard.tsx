@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
-import { User,  usersApi } from '../../services/api';
+import { User, usersApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 
@@ -167,28 +167,27 @@ export default function AdminDashboard() {
         </div>
 
         {/* Dashboard Overview */}
-        <div className="mb-8">
-          {/* <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
-            <svg className="w-6 h-6 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-            </svg>
-            Dashboard Overview
-          </h3> */}
-
+        <div className="mb-15">
 
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div onClick={() => handleCardClick('totalUsers')} className="bg-gray-800 p-6 rounded cursor-pointer">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 m-10">
+          <div onClick={() => handleCardClick('totalUsers')} className="group cursor-pointer p-[2px] rounded-xl bg-gradient-to-r from-black to-yellow-800 
+                 bg-[length:200%_200%] bg-left transition-all duration-500 
+                 hover:bg-right m-10 ">
             <h4 className="text-gray-400">Total Users</h4>
             <p className="text-2xl text-white">{dashboardData.totalUsers}</p>
           </div>
 
-          <div onClick={() => handleCardClick('activeUsers')} className="bg-gray-800 p-6 rounded cursor-pointer">
+          <div onClick={() => handleCardClick('activeUsers')} className="group cursor-pointer p-[2px] rounded-xl bg-gradient-to-r from-black to-yellow-800 
+                 bg-[length:200%_200%] bg-left transition-all duration-500 
+                 hover:bg-right m-10 " >
             <h4 className="text-gray-400">Active Users</h4>
             <p className="text-2xl text-green-400">{dashboardData.activeUsers}</p>
           </div>
 
-          <div onClick={() => handleCardClick('inactiveUsers')} className="bg-gray-800 p-6 rounded cursor-pointer">
+          <div onClick={() => handleCardClick('inactiveUsers')} className="group cursor-pointer p-[2px] rounded-xl bg-gradient-to-r from-black to-yellow-800 
+                 bg-[length:200%_200%] bg-left transition-all duration-500 
+                 hover:bg-right m-10 ">
             <h4 className="text-gray-400">Inactive Users</h4>
             <p className="text-2xl text-red-400">{dashboardData.inactiveUsers}</p>
           </div>
