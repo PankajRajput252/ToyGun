@@ -40,12 +40,19 @@ export default function App() {
     {
       image: HeroImg,
       price: "9500",
-    title: "Samsung Galaxy Z Fold 4",
-    location: "Samudrapur",
-    date: "Today",
-    brand: "Samsung",
-    description: "All kit. Good condition",
-    sellerName: "OLX User",
+      title: "Samsung Galaxy Z Fold 4",
+      location: "Samudrapur",
+      date: "Today",
+      brand: "Samsung",
+      description: `Get Exciting Offers!!
+      TVS Ntorq 125 - TVS Ntorq 125 – Ride Ahead with Power, Style, and Technology!
+      The Ntorq 125 is one of the most value for money scooters in the market. The scooter offers some outstanding features, and performance for a price that makes it an enticing scooter. But the best aspect is its sport styling that many young Indians relate to. Engine Capacity: 124.8 cc
+      Mileage - ARAI: 48.5 kmpl
+      Kerb Weight: 118 kg
+      Seat Height: 770 mm
+      Fuel Tank Capacity: 5.8 litres
+      Max Power: 9.25 bhp`,
+      sellerName: "OLX User",
     },
   ];
   return (
@@ -70,17 +77,17 @@ export default function App() {
               <Route path="profile" element={<UserProfiles />} />
               <Route path="productdetails" element={<ProductDetailsPage />} />
               <Route path="buy" element={<Buy />} />
-               <Route path="depositConfirmation" element={<DepositConfirmation />} />
+              <Route path="depositConfirmation" element={<DepositConfirmation />} />
               <Route path="admin-user" element={<h1>Admin User Page</h1>} />
               <Route path="rent" element={<RentContainer />} />
-            
+
               <Route path="sell-request" element={<SellRequests />} />
               <Route path="deposit-approval" element={<SellRequests />} />
               <Route path="withdrawls" element={<SellRequests />} />
               <Route path="all-user" element={<AdminUsers />} />
               <Route path="active-user" element={<AdminUsers />} />
               <Route path="inactive-user" element={<AdminUsers />} />
-              <Route path="bank-details" element={<WithdrawBankDetailsForm  />} />
+              <Route path="bank-details" element={<WithdrawBankDetailsForm />} />
 
 
               <Route path="withdrawFund" element={<WithdrawFund />} />

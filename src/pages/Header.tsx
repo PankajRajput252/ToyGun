@@ -1,6 +1,7 @@
 import { Heart, User, Search, MapPin, ChevronDown, Plus } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 export default function Header() {
+  const navigate = useNavigate();
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
@@ -39,7 +40,10 @@ export default function Header() {
           </div>
 
           {/* Login */}
-          <div className="flex flex-col items-center text-sm cursor-pointer">
+          <div
+            onClick={() => navigate("/bandookwale/signin")} // ✅ route here
+            className="flex flex-col items-center text-sm cursor-pointer"
+          >
             <User className="w-5 h-5" />
             <span>Login</span>
           </div>
