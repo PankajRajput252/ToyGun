@@ -69,41 +69,45 @@ export default function SignUpForm() {
     }
   };
 
-  return (
-    <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
-   
-      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
-        <div>
-          <div className="mb-5 sm:mb-8">
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign Up for Bandookwale
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Create your account to get started!
-            </p>
-            {error && (
-              <div className="p-3 mt-3 text-sm text-red-800 bg-red-100 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
-                {error}
+ return (
+  <div className="flex items-center justify-center min-h-screen px-6 sm:px-10 lg:px-16">
+
+    {/* Gradient Border */}
+    <div className="w-full max-w-2xl p-[2px] rounded-2xl bg-gradient-to-r from-white to-yellow-500">
+
+      {/* Inner Card */}
+      <div className="w-full px-8 py-8 rounded-2xl bg-white dark:bg-gray-900">
+
+        <div className="mb-1 sm:mb-3 text-center sm:text-left">
+          {/* <h6 className=" text-title-sm dark:text-white/90 sm:text-title-md"> */}
+            {/* Sign Up for Bandookwale */}
+          {/* </h6> */}
+          {/* <p className="text-sm text-gray-500 dark:text-gray-400">
+            Create your account to get started!
+          </p> */}
+
+          {error && (
+            <div className="p-3 mt-3 text-sm text-red-800 bg-red-100 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="p-3 mt-3 text-sm text-green-800 bg-green-100 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-800 dark:text-green-400">
+              {success}
+            </div>
+          )}
+
+          {generatedUsername && (
+            <div className="p-4 mt-3 text-sm text-blue-800 bg-blue-100 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400">
+              <div className="font-semibold mb-2">Your Login Credentials:</div>
+              <div className="space-y-1">
+                <div><strong>Username:</strong> <span className="font-mono bg-white/50 px-2 py-1 rounded">{generatedUsername}</span></div>
+                <div><strong>Password:</strong> <span className="font-mono bg-white/50 px-2 py-1 rounded">[The password you entered]</span></div>
               </div>
-            )}
-            {success && (
-              <div className="p-3 mt-3 text-sm text-green-800 bg-green-100 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-800 dark:text-green-400">
-                {success}
-              </div>
-            )}
-            {generatedUsername && (
-              <div className="p-4 mt-3 text-sm text-blue-800 bg-blue-100 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400">
-                <div className="font-semibold mb-2">Your Login Credentials:</div>
-                <div className="space-y-1">
-                  <div><strong>Username:</strong> <span className="font-mono bg-white/50 px-2 py-1 rounded">{generatedUsername}</span></div>
-                  <div><strong>Password:</strong> <span className="font-mono bg-white/50 px-2 py-1 rounded">[The password you entered]</span></div>
-                </div>
-                <div className="mt-3 text-xs text-blue-600 dark:text-blue-300">
-                  Please save these credentials. You'll need them to sign in.
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
           <div>
          
             <form onSubmit={handleSubmit}>

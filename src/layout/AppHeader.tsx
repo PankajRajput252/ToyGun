@@ -22,15 +22,18 @@ const AppHeader: React.FC = () => {
   const [withdrawl, setWithdrawl] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  // const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { user } = useAuth();
-  const handleToggle = () => {
-    if (window.innerWidth >= 991) {
-      toggleSidebar();
-    } else {
-      toggleMobileSidebar();
-    }
-  };
+
+  const isAdmin = user && isUserAdmin(user);
+
+  // const handleToggle = () => {
+  //   if (window.innerWidth >= 991) {
+  //     toggleSidebar();
+  //   } else {
+  //     toggleMobileSidebar();
+  //   }
+  // };
   function closeDropdown() {
     setIsOpen(false);
   }
@@ -81,8 +84,11 @@ const AppHeader: React.FC = () => {
   }, []);
 
   return (
-    <>
-      {isUserAdmin(user) ?
+    <>{console.log("user datga --->", user)}
+
+      {!user ? (
+        <Header />
+      ) : isAdmin ? (
         <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
           <div className="flex items-center justify-between px-6 py-3">
 
@@ -93,12 +99,12 @@ const AppHeader: React.FC = () => {
               {/* <div className="text-xl font-semibold text-gray-800 cursor-pointer">
                 AdminPanel
               </div> */}
-                <Link
-                    to="/bandookwale"
-                    className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
-                  >
-                     AdminPanel
-                  </Link>
+              <Link
+                to="/bandookwale"
+                className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+              >
+                AdminPanel
+              </Link>
 
               {/* NAV LINKS */}
               <nav className="hidden lg:flex items-center gap-6">
@@ -227,8 +233,9 @@ const AppHeader: React.FC = () => {
               <UserDropdown />
             </div>
           </div>
-        </header> :
-        <Header />}
+        </header>) : (
+        <Header />
+      )}
     </>
   );
 };

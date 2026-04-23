@@ -1,6 +1,11 @@
 import { Heart, User, Search, MapPin, ChevronDown, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import UserDropdown from "../components/header/UserDropdown";
+
 export default function Header() {
+    const { isAuthenticated } = useAuth();
+
   const navigate = useNavigate();
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
@@ -39,20 +44,25 @@ export default function Header() {
             <span>Wishlist</span>
           </div>
 
+           {/* Sell Button */}
+          <button className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold border-2 border-yellow-400 bg-white shadow-md">
+            <Plus className="w-5 h-5" />
+            SELL
+          </button>
+
           {/* Login */}
-          <div
+          {
+             isAuthenticated ?   <UserDropdown />:<div
             onClick={() => navigate("/bandookwale/signin")} // ✅ route here
             className="flex flex-col items-center text-sm cursor-pointer"
           >
             <User className="w-5 h-5" />
             <span>Login</span>
           </div>
+          }
+          
 
-          {/* Sell Button */}
-          <button className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold border-2 border-yellow-400 bg-white shadow-md">
-            <Plus className="w-5 h-5" />
-            SELL
-          </button>
+         
 
         </div>
       </div>

@@ -35,6 +35,7 @@ import WithdrawBankDetailsForm from "./pages/Admin/WithdrawBankDetailsForm";
 import DepositConfirmation from "./pages/DepositConfirmation";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import HeroImg from "./components/images/HeroIMG.jpg"
+import AppHeader from "./layout/AppHeader";
 export default function App() {
   const products = [
     {
@@ -59,9 +60,12 @@ export default function App() {
     <>
       <Router>
         <ScrollToTop />
+
+        <AppHeader />
         <Routes>
           {/* Redirect root to sign-in */}
-          <Route path="/" element={<Navigate to="/bandookwale/signin" replace />} />
+          {/* <Route path="/" element={<Navigate to="/bandookwale/signin" replace />} /> */}
+          <Route path="/" element={<Home />} />
 
           {/* Auth Layout */}
           <Route path="/bandookwale/signin" element={<SignIn />} />
