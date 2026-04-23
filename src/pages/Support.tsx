@@ -351,7 +351,7 @@ export default function Support() {
   };
 
   return (
-    <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen">
+    <div className="bg-[rgb(16_16_16_/1)] mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10  min-h-screen">
       {/* Breadcrumb */}
       <div className="mb-6">
         <h2 className="text-title-md2 font-semibold text-white mb-2">
