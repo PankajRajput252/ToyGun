@@ -45,6 +45,14 @@ export default function ProductDetailsPage() {
           </div>
 
           <h2 className="text-xl font-semibold mt-4">Description</h2>
+          <h4 className="text-xl font-semibold mt-4">"Get Exciting Offers!!
+          TVS Ntorq 125 - TVS Ntorq 125 – Ride Ahead with Power, Style, and Technology!
+          The Ntorq 125 is one of the most value for money scooters in the market. The scooter offers some outstanding features, and performance for a price that makes it an enticing scooter. But the best aspect is its sport styling that many young Indians relate to. Engine Capacity: 124.8 cc
+          Mileage - ARAI: 48.5 kmpl
+          Kerb Weight: 118 kg
+          S         eat Height: 770 mm
+          Fuel Tank Capacity: 5.8 litres
+          Max Power: 9.25 bhp"</h4>
           <p className="text-gray-700 mt-2">{item.description}</p>
         </div>
       </div>

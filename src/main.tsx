@@ -8,12 +8,14 @@ import { AppWrapper } from "./components/common/PageMeta.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import Footer from "./components/footer/Footer.tsx";
+import HeroBanner from "./pages/HeroBanner.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
         <AppWrapper>
+          {/* <HeroBanner /> */}
           <App />
           {/* <Footer/> */}
         </AppWrapper>
