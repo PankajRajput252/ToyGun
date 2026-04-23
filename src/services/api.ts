@@ -432,22 +432,22 @@ export const businessApi = {
 export const subscriptionIncomeTypeApi = {
   // Get all subscription types with pagination and filtering
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: SubscriptionType[], totalElements: number }> =>
-    apiCall<any>(`/api/admin/getSubscriptionDefinition?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`).then(response => ({
+    apiCall<any>(`/api/users/getSubscriptionDefinition?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`).then(response => ({
       content: response.data || [],
       totalElements: response.count || 0
     })),
 
   // Add new subscription type
   add: (data: AddSubscriptionTypeRequest): Promise<SubscriptionType> =>
-    apiCall<any>('/api/admin/addSubscriptionDefinition', 'POST', data).then(response => response.data?.[0] || response),
+    apiCall<any>('/api/users/addSubscriptionDefinition', 'POST', data).then(response => response.data?.[0] || response),
 
   // Update existing subscription type
   update: (id: number, data: Partial<SubscriptionType>): Promise<SubscriptionType> =>
-    apiCall<any>(`/api/admin/updateSubscriptionDefinition/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
+    apiCall<any>(`/api/users/updateSubscriptionDefinition/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
 
   // Delete subscription type
   delete: (id: number): Promise<void> =>
-    apiCall<void>(`/api/admin/deleteSubscriptionDefinition/${id}`, 'DELETE')
+    apiCall<void>(`/api/users/deleteSubscriptionDefinition/${id}`, 'DELETE')
 };
 export const manageWithdrawalApi = {
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: WithdrawalType[], totalElements: number }> =>
@@ -1098,7 +1098,7 @@ export const supportTicketApi = {
     userNodeId?: string | null
   ): Promise<{ content: SupportTicket[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/container/getSupportTicket?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`
+      `/api/users/getSupportTicket?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,
@@ -1107,19 +1107,19 @@ export const supportTicketApi = {
 
   // Add new support ticket
   add: (data: AddSupportTicketRequest): Promise<SupportTicket> =>
-    apiCall<any>(`/api/container/addSupportTicket`, 'POST', data).then(
+    apiCall<any>(`/api/users/addSupportTicket`, 'POST', data).then(
       (response) => response.data?.[0] || response
     ),
 
   // Update existing support ticket
   update: (id: number, data: Partial<SupportTicket>): Promise<SupportTicket> =>
-    apiCall<any>(`/api/container/updateSupportTicket/${id}`, 'PUT', data).then(
+    apiCall<any>(`/api/users/updateSupportTicket/${id}`, 'PUT', data).then(
       (response) => response.data?.[0] || response
     ),
 
   // Delete support ticket
   delete: (id: number): Promise<void> =>
-    apiCall<void>(`/api/container/deleteSupportTicket/${id}`, 'DELETE'),
+    apiCall<void>(`/api/users/deleteSupportTicket/${id}`, 'DELETE'),
 };
 
 // Withdrawal Request interfaces

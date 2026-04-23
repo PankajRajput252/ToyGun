@@ -90,9 +90,15 @@ const AppHeader: React.FC = () => {
             <div className="flex items-center gap-10">
 
               {/* LOGO */}
-              <div className="text-xl font-semibold text-gray-800 cursor-pointer">
+              {/* <div className="text-xl font-semibold text-gray-800 cursor-pointer">
                 AdminPanel
-              </div>
+              </div> */}
+                <Link
+                    to="/bandookwale"
+                    className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                  >
+                     AdminPanel
+                  </Link>
 
               {/* NAV LINKS */}
               <nav className="hidden lg:flex items-center gap-6">

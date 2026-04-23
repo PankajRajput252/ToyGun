@@ -49,7 +49,7 @@ export default function Support() {
   const fetchSupportTickets = async () => {
     setTicketsLoading(true);
     try {
-      const response = await supportTicketApi.getAll(0, 25, 'ACTIVE',  null);
+      const response = await supportTicketApi.getAll(0, 25, 'ACTIVE', null);
       setSupportTickets(response.content || []);
     } catch (err) {
       console.error("Failed to fetch support tickets:", err);
@@ -176,7 +176,7 @@ export default function Support() {
         oneTimePassword: "",
       });
       setIsOtpSent(false);
-      
+
       // Refresh tickets list
       await fetchSupportTickets();
     } catch (err) {
@@ -284,13 +284,13 @@ export default function Support() {
     setEditingTicket(ticket);
     // Map API values back to form values
     const categoryValue = ticket.category === "DEPOSIT" ? "payment" :
-                         ticket.category === "WITHDRAWAL" ? "withdrawal" :
-                         ticket.category === "CLOSING" ? "other" : "other";
-    
+      ticket.category === "WITHDRAWAL" ? "withdrawal" :
+        ticket.category === "CLOSING" ? "other" : "other";
+
     const priorityValue = ticket.priority === "NORMAL" ? "Normal/Minor impact" :
-                          ticket.priority === "URGENT" ? "Urgent" :
-                          ticket.priority === "HIGH" ? "High" :
-                          ticket.priority === "LOW" ? "Low/Informational" : "Normal/Minor impact";
+      ticket.priority === "URGENT" ? "Urgent" :
+        ticket.priority === "HIGH" ? "High" :
+          ticket.priority === "LOW" ? "Low/Informational" : "Normal/Minor impact";
 
     setEditFormData({
       category: categoryValue,
@@ -359,19 +359,19 @@ export default function Support() {
         </h2>
         <nav>
           <ol className="flex items-center gap-2">
-            <li><a className="font-medium text-gray-300 hover:text-white" href="/">Home /</a></li>
-            <li><a className="font-medium text-gray-300 hover:text-white" href="/">Support /</a></li>
-            <li className="font-medium text-gray-300">Create Ticket</li>
+            {/* <li><a className="font-medium text-gray-300 hover:text-white" href="/">Home /</a></li> */}
+            {/* <li><a className="font-medium text-gray-300 hover:text-white" href="/">Support /</a></li> */}
+            {/* <li className="font-medium text-gray-300">Create Ticket</li> */}
           </ol>
         </nav>
       </div>
 
       {/* Fill Details Form */}
-      {!isUserAdmin(user) &&<div className="mb-8">
+      {!isUserAdmin(user) && <div className="mb-8">
         <h3 className="font-bold text-white text-xl mb-6">
           Fill Details
         </h3>
-        
+
         <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm">
           <form onSubmit={handleSubmit}>
             <div className="p-8">
@@ -412,7 +412,7 @@ export default function Support() {
                     <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g opacity="0.8">
-                          <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF"/>
+                          <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF" />
                         </g>
                       </svg>
                     </span>
@@ -438,7 +438,7 @@ export default function Support() {
                     <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g opacity="0.8">
-                          <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF"/>
+                          <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF" />
                         </g>
                       </svg>
                     </span>
@@ -475,8 +475,8 @@ export default function Support() {
                   />
                   <span className="absolute left-4 top-1/2 -translate-y-1/2">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
                   <button
@@ -509,8 +509,8 @@ export default function Support() {
                     />
                     <span className="absolute left-4 top-1/2 -translate-y-1/2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </span>
                   </div>
@@ -556,7 +556,7 @@ export default function Support() {
       {/* All Tickets Table */}
       <div>
         <h3 className="font-bold text-white text-xl mb-6">All Tickets</h3>
-        
+
         <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm">
           <div className="p-8">
             <div className="overflow-x-auto">
@@ -564,7 +564,7 @@ export default function Support() {
                 <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
                   <tr>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
-                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">UserNodeId</th>
+                    <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">UserNodeId</th>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Subject</th>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Message</th>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Priority</th>
@@ -601,7 +601,7 @@ export default function Support() {
                         <td className="py-4 px-6 text-white font-medium">
                           {ticket.supportTicketPkId || index + 1}
                         </td>
-                         <td className="py-4 px-6 text-white font-medium">
+                        <td className="py-4 px-6 text-white font-medium">
                           {mapCategoryToDisplay(ticket.userNodeId)}
                         </td>
                         <td className="py-4 px-6 text-white font-medium">
@@ -650,7 +650,7 @@ export default function Support() {
                                 )}
                               </button>
                             )}
-                            
+
                             {/* Delete Button */}
                             <button
                               onClick={() => handleDeleteTicket(ticket.supportTicketPkId)}
@@ -677,136 +677,134 @@ export default function Support() {
       </div>
 
       {/* Edit Ticket Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} className="max-w-[700px] m-4">
-        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-          <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        className="max-w-[700px] m-4"
+      >
+        <div className="w-full max-w-[700px] rounded-3xl bg-white dark:bg-gray-900 overflow-hidden">
+
+          {/* Header */}
+          <div className="flex flex-col px-6 py-5 bg-gradient-to-r from-black to-yellow-500">
+            <h4 className="text-2xl font-semibold text-white">
               Edit Support Ticket
             </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+            <p className="text-sm text-gray-200 mt-1">
               Update the support ticket details.
             </p>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-900/40 to-red-800/30 p-4 shadow-lg">
-              <p className="text-sm text-red-200 font-medium">{error}</p>
-            </div>
-          )}
+          <div className="p-6">
 
-          {/* Success Message */}
-          {success && (
-            <div className="mb-6 rounded-lg border border-green-500/30 bg-gradient-to-r from-green-900/40 to-green-800/30 p-4 shadow-lg">
-              <p className="text-sm text-green-200 font-medium">{success}</p>
-            </div>
-          )}
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 rounded-lg border border-red-500/30 bg-red-900/40 p-3">
+                <p className="text-sm text-red-200">{error}</p>
+              </div>
+            )}
 
-          <form onSubmit={handleEditSubmit} className="flex flex-col">
-            <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-              <div className="mt-7">
-                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
+            {/* Success Message */}
+            {success && (
+              <div className="mb-4 rounded-lg border border-green-500/30 bg-green-900/40 p-3">
+                <p className="text-sm text-green-200">{success}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleEditSubmit} className="flex flex-col">
+
+              {/* Scrollable Form */}
+              <div className="max-h-[420px] overflow-y-auto pr-2">
+
+                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white">
                   Ticket Details
                 </h5>
 
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div className="col-span-2 lg:col-span-1">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+                  {/* Category */}
+                  <div>
                     <Label>Category</Label>
-                    <div className="relative z-20">
-                      <select
-                        name="category"
-                        value={editFormData.category}
-                        onChange={handleEditInputChange}
-                        className="relative z-20 w-full appearance-none rounded-lg border-2 border-gray-600 bg-gray-700 py-4 px-6 text-white outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 hover:border-gray-500"
-                      >
-                        <option value="" className="bg-gray-700">Select Category--</option>
-                        <option value="technical" className="bg-gray-700">Technical Support</option>
-                        <option value="account" className="bg-gray-700">Account Issues</option>
-                        <option value="payment" className="bg-gray-700">Payment Problems</option>
-                        <option value="withdrawal" className="bg-gray-700">Withdrawal Issues</option>
-                        <option value="general" className="bg-gray-700">General Inquiry</option>
-                        <option value="other" className="bg-gray-700">Other</option>
-                      </select>
-                      <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <g opacity="0.8">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF"/>
-                          </g>
-                        </svg>
-                      </span>
-                    </div>
+                    <select
+                      name="category"
+                      value={editFormData.category}
+                      onChange={handleEditInputChange}
+                      className="w-full rounded-lg border-2 border-gray-600 bg-gray-700 py-3 px-4 text-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                    >
+                      <option value="">Select Category</option>
+                      <option value="technical">Technical Support</option>
+                      <option value="account">Account Issues</option>
+                      <option value="payment">Payment Problems</option>
+                      <option value="withdrawal">Withdrawal Issues</option>
+                      <option value="general">General Inquiry</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
 
-                  <div className="col-span-2 lg:col-span-1">
+                  {/* Priority */}
+                  <div>
                     <Label>Priority</Label>
-                    <div className="relative z-20">
-                      <select
-                        name="priority"
-                        value={editFormData.priority}
-                        onChange={handleEditInputChange}
-                        className="relative z-20 w-full appearance-none rounded-lg border-2 border-gray-600 bg-gray-700 py-4 px-6 text-white outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 hover:border-gray-500"
-                      >
-                        <option value="Normal/Minor impact" className="bg-gray-700">Normal/Minor impact</option>
-                        <option value="Urgent" className="bg-gray-700">Urgent</option>
-                        <option value="High" className="bg-gray-700">High</option>
-                        <option value="Low/Informational" className="bg-gray-700">Low/Informational</option>
-                      </select>
-                      <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <g opacity="0.8">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF"/>
-                          </g>
-                        </svg>
-                      </span>
-                    </div>
+                    <select
+                      name="priority"
+                      value={editFormData.priority}
+                      onChange={handleEditInputChange}
+                      className="w-full rounded-lg border-2 border-gray-600 bg-gray-700 py-3 px-4 text-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                    >
+                      <option value="Normal/Minor impact">Normal/Minor impact</option>
+                      <option value="Urgent">Urgent</option>
+                      <option value="High">High</option>
+                      <option value="Low/Informational">Low/Informational</option>
+                    </select>
                   </div>
 
-                  <div className="col-span-2">
+                  {/* Status */}
+                  <div className="lg:col-span-2">
                     <Label>Status</Label>
-                    <div className="relative z-20">
-                      <select
-                        name="status"
-                        value={editFormData.status}
-                        onChange={handleEditInputChange}
-                        className="relative z-20 w-full appearance-none rounded-lg border-2 border-gray-600 bg-gray-700 py-4 px-6 text-white outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 hover:border-gray-500"
-                      >
-                        <option value="OPEN" className="bg-gray-700">Open</option>
-                        <option value="IN_PROGRESS" className="bg-gray-700">In Progress</option>
-                        <option value="CLOSED" className="bg-gray-700">Closed</option>
-                      </select>
-                      <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <g opacity="0.8">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF"/>
-                          </g>
-                        </svg>
-                      </span>
-                    </div>
+                    <select
+                      name="status"
+                      value={editFormData.status}
+                      onChange={handleEditInputChange}
+                      className="w-full rounded-lg border-2 border-gray-600 bg-gray-700 py-3 px-4 text-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                    >
+                      <option value="OPEN">Open</option>
+                      <option value="IN_PROGRESS">In Progress</option>
+                      <option value="CLOSED">Closed</option>
+                    </select>
                   </div>
 
-                  <div className="col-span-2">
+                  {/* Message */}
+                  <div className="lg:col-span-2">
                     <Label>Message</Label>
                     <textarea
                       name="message"
                       value={editFormData.message}
                       onChange={handleEditInputChange}
-                      rows={6}
+                      rows={5}
                       placeholder="Type message"
-                      className="w-full rounded-lg border-2 border-gray-600 bg-gray-700 py-4 px-6 text-white font-medium outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 hover:border-gray-500 placeholder-gray-400 resize-none"
+                      className="w-full rounded-lg border-2 border-gray-600 bg-gray-700 py-3 px-4 text-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none"
                     />
                   </div>
+
                 </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-              <Button size="sm" variant="outline" onClick={() => setIsEditModalOpen(false)} disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button size="sm" type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
-              </Button>
-            </div>
-          </form>
+
+              {/* Footer Buttons */}
+              <div className="flex justify-end gap-3 mt-6">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+
+                <Button size="sm" type="submit" disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+
+            </form>
+          </div>
         </div>
       </Modal>
     </div>
