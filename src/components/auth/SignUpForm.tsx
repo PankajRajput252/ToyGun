@@ -324,7 +324,7 @@ export default function SignUpForm() {
                     <div className="space-y-3">
                       <button 
                         type="button"
-                        onClick={() => navigate("/StyloCoin/signin")}
+                        onClick={() => navigate("/bandookwale/signin")}
                         className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-green-500 shadow-theme-xs hover:bg-green-600"
                       >
                         Continue to Sign In
@@ -358,7 +358,7 @@ export default function SignUpForm() {
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Already have an account? {" "}
                 <Link
-                  to="/StyloCoin/signin"
+                  to="/bandookwale/signin"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Sign In

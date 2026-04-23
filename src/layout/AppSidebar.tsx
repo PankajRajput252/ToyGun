@@ -557,7 +557,7 @@ const AppSidebar: React.FC = () => {
                   <button
                     onClick={() => {
                       signOut();
-                      navigate("/StyloCoin/signin");
+                      navigate("/bandookwale/signin");
                     }}
                     className="menu-item group menu-item-inactive w-full"
                   >

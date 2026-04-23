@@ -100,7 +100,7 @@ json-server --watch db.json --port 8080
 ```
 
 3. **Test the authentication:**
-- Go to `http://localhost:5173/StyloCoin/signin`
+- Go to `http://localhost:5173/bandookwale/signin`
 - Use test credentials: `NODE53530916` / `123456789`
 - Or register a new user
 
