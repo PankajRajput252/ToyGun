@@ -40,7 +40,7 @@ export default function Home() {
       image: g2,
       price: "6,000",
       title: "Blackmagic UltraStudio",
-      location: "Bangalore",
+      location: "17 2nd cross, sidhartha calony madiwala,behind Ganesh Temple banglore 560068",
       date: "3 days ago",
       featured: true,
     },

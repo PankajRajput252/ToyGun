@@ -46,6 +46,8 @@ import ConditionalHome from "./components/auth/ConditionalHome";
 
 // Fallback
 import NotFound from "./pages/OtherPage/NotFound";
+import WishlistPage from "./pages/WishlistPage";
+import SellProductPage from "./pages/SellProductPage";
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -83,6 +85,8 @@ export default function AppRoutes() {
               {/* USER FEATURES */}
               <Route path="profile" element={<UserProfiles />} />
               <Route path="productdetails" element={<ProductDetailsPage />} />
+              <Route path="wishlistPage" element={<WishlistPage/>}/>
+              <Route path="sellProductPage" element={<SellProductPage/>}/>
               <Route path="buy" element={<Buy />} />
               <Route path="depositConfirmation" element={<DepositConfirmation />} />
               <Route path="rent" element={<RentContainer />} />

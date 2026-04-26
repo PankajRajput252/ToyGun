@@ -21,7 +21,7 @@ export default function ProductDetailsPage() {
 
   if (!item) return <div>No product found</div>;
   return (
-    <div className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="max-w-7xl mt-20 mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
 
       {/* LEFT SECTION */}
       <div className="md:col-span-2">
@@ -46,13 +46,13 @@ export default function ProductDetailsPage() {
 
           <h2 className="text-xl font-semibold mt-4">Description</h2>
           <h4 className="text-xl font-semibold mt-4">"Get Exciting Offers!!
-          TVS Ntorq 125 - TVS Ntorq 125 – Ride Ahead with Power, Style, and Technology!
-          The Ntorq 125 is one of the most value for money scooters in the market. The scooter offers some outstanding features, and performance for a price that makes it an enticing scooter. But the best aspect is its sport styling that many young Indians relate to. Engine Capacity: 124.8 cc
-          Mileage - ARAI: 48.5 kmpl
-          Kerb Weight: 118 kg
-          S         eat Height: 770 mm
-          Fuel Tank Capacity: 5.8 litres
-          Max Power: 9.25 bhp"</h4>
+            TVS Ntorq 125 - TVS Ntorq 125 – Ride Ahead with Power, Style, and Technology!
+            The Ntorq 125 is one of the most value for money scooters in the market. The scooter offers some outstanding features, and performance for a price that makes it an enticing scooter. But the best aspect is its sport styling that many young Indians relate to. Engine Capacity: 124.8 cc
+            Mileage - ARAI: 48.5 kmpl
+            Kerb Weight: 118 kg
+            S         eat Height: 770 mm
+            Fuel Tank Capacity: 5.8 litres
+            Max Power: 9.25 bhp"</h4>
           <p className="text-gray-700 mt-2">{item.description}</p>
         </div>
       </div>
@@ -105,9 +105,33 @@ export default function ProductDetailsPage() {
           <p className="text-gray-600">{item.location}</p>
 
           {/* MAP PLACEHOLDER */}
-          <div className="mt-3 h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+          {/* <div className="mt-3 h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
             Map View
-          </div>
+          </div> */}
+          {/* <div className="mt-3 h-48 rounded-lg overflow-hidden">
+            <iframe
+              width="100%"
+              height="100%"
+              loading="lazy"
+              style={{ border: 0 }}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(item.location)}&output=embed`}
+            ></iframe>
+          </div> */}
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="mt-3 h-48 rounded-lg overflow-hidden cursor-pointer">
+              <iframe
+                width="100%"
+                height="100%"
+                loading="lazy"
+                style={{ border: 0 }}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(item.location)}&output=embed`}
+              ></iframe>
+            </div>
+          </a>
         </div>
 
         {/* FOOTER */}

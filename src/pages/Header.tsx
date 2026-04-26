@@ -39,13 +39,14 @@ export default function Header() {
         <div className="flex items-center gap-6 ml-4">
 
           {/* Wishlist */}
-          <div className="flex flex-col items-center text-sm cursor-pointer">
+          <div className="flex flex-col items-center text-sm cursor-pointer" onClick={() => navigate("/bandookwale/wishlistPage")} >
             <Heart className="w-5 h-5" />
             <span>Wishlist</span>
           </div>
 
            {/* Sell Button */}
-          <button className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold border-2 border-yellow-400 bg-white shadow-md">
+          <button className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold border-2 border-yellow-400 bg-white shadow-md"
+           onClick={() => navigate("/bandookwale/sellProductPage")}>
             <Plus className="w-5 h-5" />
             SELL
           </button>
