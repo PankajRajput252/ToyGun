@@ -143,19 +143,19 @@ export const rankRewardApi = {
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteRankAndReward/${id}`, 'DELETE')
 };
-export const BankApi ={
+export const BankApi = {
   //get Bank Details
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: WithdrawRequest[], totalElements: number }> =>
-    apiCall<any>(`/api/container/getWithdrawalAccount?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`).then(response => 
-      ({
-        
+    apiCall<any>(`/api/container/getWithdrawalAccount?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`).then(response =>
+    ({
+
       content: response || [],
       totalElements: response.count || 0
     })),
   //Add bank details
   add: (data: AddWithdrawRequest): Promise<WithdrawRequest> =>
     apiCall<any>('/api/container/addWithdrawalAccount', 'POST', data).then(response => response.data?.[0] || response),
- 
+
 }
 
 // Income Type API functions
@@ -463,13 +463,13 @@ export const manageWithdrawalApi = {
   reject: (withdrawalRequestPkId: number | null): Promise<SubscriptionType> =>
     apiCall<any>(`/api/withdraw/reject/${withdrawalRequestPkId}`, 'PUT').then(response => response.data?.[0] || response),
 }
-export const sellRequestApi ={
+export const sellRequestApi = {
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: SellRequestUser[], totalElements: number }> =>
     apiCall<any>(`/api/container/getSellRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`).then(response => ({
       content: response.data || [],
       totalElements: response.count || 0
     })),
-    update: (id: number, data: Partial<SellRequestUser>,): Promise<SellRequestUser> =>
+  update: (id: number, data: Partial<SellRequestUser>,): Promise<SellRequestUser> =>
     apiCall<any>(`/api/container/updateSellRequest/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
 }
 
@@ -507,13 +507,13 @@ export const containerPaymentApiData = {
       content: response.data || [],
       totalElements: response.count || 0
     })),
-    update: (id: number, data: Partial<PaymentUser>,): Promise<PaymentUser> =>
+  update: (id: number, data: Partial<PaymentUser>,): Promise<PaymentUser> =>
     apiCall<any>(`/api/container/updatePayment/${id}`, 'PUT', data).then(response => response.data?.[0] || response),
- 
-   
+
+
 };
-export const incomeStreamsApi ={
-  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{content: IncomeStreams[],totalElements: number }> =>
+export const incomeStreamsApi = {
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: IncomeStreams[], totalElements: number }> =>
     apiCall<any>(`/api/individual/getIndividualIncomeSummary?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`).then(response => ({
       content: response.data || [],
       totalElements: response.count || 0
@@ -1269,7 +1269,7 @@ export interface ContainerResponse {
   currency: string;
   investedAmount: number | null,
   investmentPkId: number
-  imageUrl:string
+  imageUrl: string
 }
 
 // buy
@@ -1308,28 +1308,28 @@ export const buyContainer = {
     ),
 
   depositAmountImg: (
-  formData: FormData,
-  investmentPkId: number,
-  userNodeId?: string | null,
-  investedAmount?: number,
-  currency?: string
-): Promise<void> =>
-  apiCall<void>(
-    `/api/image/depositAmount?userNodeId=${userNodeId}&investmentId=${investmentPkId}&transactionId=null&amount=${investedAmount}&currency=${currency}&paidAt=null`,
-    'POST',
-    formData // ✅ BODY GOES HERE
-  ),
+    formData: FormData,
+    investmentPkId: number,
+    userNodeId?: string | null,
+    investedAmount?: number,
+    currency?: string
+  ): Promise<void> =>
+    apiCall<void>(
+      `/api/image/depositAmount?userNodeId=${userNodeId}&investmentId=${investmentPkId}&transactionId=null&amount=${investedAmount}&currency=${currency}&paidAt=null`,
+      'POST',
+      formData // ✅ BODY GOES HERE
+    ),
 
 
 
- 
+
 };
 
 
 
 export const depositReceiptUploadApi = {
   // Upload user image
-  uploadUserImage: (userNodeId: string, file: File,investmentPkId:number,investedAmount?: number, currency?: string): Promise<ImageUploadResponse> => {
+  uploadUserImage: (userNodeId: string, file: File, investmentPkId: number, investedAmount?: number, currency?: string): Promise<ImageUploadResponse> => {
     const url = `${API_BASE_URL}/api/image/depositAmount?userNodeId=${userNodeId}&investmentId=${investmentPkId}&transactionId=null&amount=${investedAmount}&currency=${currency}&paidAt=null`;
     const formData = new FormData();
     formData.append('file', file);
@@ -1365,21 +1365,21 @@ export const depositReceiptUploadApi = {
   },
 };
 
- export interface SellContainerData {
-  investmentFkId:number;
-  requestedAt:string;
+export interface SellContainerData {
+  investmentFkId: number;
+  requestedAt: string;
   status: string;
   userFkId: string;
   sellAmount: number | null;
   sellingChargePercentage: number | null
-  final_amount:number| null;
-  holdingDays:number|null;
+  final_amount: number | null;
+  holdingDays: number | null;
 }
-   
-        
-        
-      
-  
+
+
+
+
+
 
 // buy
 export const sellContainer = {
@@ -1409,23 +1409,23 @@ export const sellContainer = {
 
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
- 
+
 };
 
 
- export interface RentContainerData {
-  investmentFkId:number;
-  contractMonth:number;
+export interface RentContainerData {
+  investmentFkId: number;
+  contractMonth: number;
   rentStartDate: string;
-  currency:string;
+  currency: string;
   userFkId: string;
   creditedAt: string
-  monthlyPayout:number| null;
-  roiPercentage:number|null;
-  totalContractReturn:number|null;
+  monthlyPayout: number | null;
+  roiPercentage: number | null;
+  totalContractReturn: number | null;
 }
- 
-    
+
+
 
 // buy
 export const rentContainer = {
@@ -1448,15 +1448,15 @@ export const rentContainer = {
       (response) => response.data?.[0] || response
     ),
 
- 
+
 
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
- 
+
 };
 
 export interface WithdrawRequestData {
-  withdrawRequestPkId:number;
+  withdrawRequestPkId: number;
   userFkId: string;
   investmentFkId: number;
   requestAmount: number;
@@ -1497,7 +1497,97 @@ export const sellMonthlyInterest = {
 
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/individual/deleteDepositFund/${id}`, 'DELETE'),
- 
+
 };
 
+export interface ProductResponse {
+  productPkId: number;
+  title: string;
+  description: string;
+  categoryId: number
+  subcategoryId: number;
+  price: number;
+  isNegotiable: boolean;
+  sellerId: string
+  location: string
+  city: string
+  state: string
+  zipCode: string
+  country: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  latitude: string
+  longitude: string
+  isDeleted?: boolean;
+  isGenericFlag?: boolean;
+  notesG11nBigTxt?: string | null;
+  effectiveDateTime?: string;
+  saveStateCodeFkId?: string;
+  activeStateCodeFkId?: string;
+  recordStateCodeFkId?: string;
+  createdDatetime?: string;
+  lastModifiedDateTime?: string;
+}
 
+export interface ProductImageItem {
+  productImageId: string;
+  productFkId: null;
+  profileImageUrl: string;
+}
+
+export interface ProductReq {
+  title: string;
+  description: string;
+  categoryId: number;
+  subcategoryId: number;
+  price: number;
+  isNegotiable: boolean;
+  sellerId: string
+  location: string
+  city: string
+  state: string
+  zipCode: string
+  country: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  latitude: number
+  longitude: number,
+  productImageList: ProductImageItem[];  // ← was missing
+
+
+}
+ 
+
+
+// sellProduct
+export const sellProductApi = {
+  getAll: (
+    page: number = 0,
+    size: number = 25,
+    filterBy: string = 'ACTIVE',
+    userNodeId?: string | null
+  ): Promise<{ content: ProductResponse[]; totalElements: number; count?: number }> =>
+    apiCall<any>(
+      `/api/users/getProduct?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+    ).then((response) => ({
+      content: response.data || [],
+      totalElements: response.count || 0,
+      count: response.count,
+    })),
+
+  add: (data: ProductReq): Promise<ProductReq> =>
+    apiCall<any>(`/api/users/addProduct`, 'POST', data).then(
+      (response) => response.data?.[0] || response
+    ),
+
+  update: (id: number, data: Partial<DepositFundItem>): Promise<DepositFundItem> =>
+    apiCall<any>(`/api/users/updateProduct/${id}`, 'PUT', data).then(
+      (response) => response.data?.[0] || response
+    ),
+
+  delete: (id: number): Promise<void> =>
+    apiCall<void>(`/api/users/deleteProduct/${id}`, 'DELETE'),
+
+};

@@ -1,66 +1,103 @@
-import { Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-type Product = {
-  image: string;
-  price: string | number;
+export interface Product {
+  images: string[];
+  price: number;
   title: string;
   location: string;
   date: string;
-  featured?: boolean;
-};
-
+}
 type Props = {
   item: Product;
 };
 
 export default function ProductCard({ item }: Props) {
   const navigate = useNavigate();
+  const [index, setIndex] = useState(0);
+
+  const images = item.images.length
+    ? item.images
+    : ["https://via.placeholder.com/300"];
+
+  const nextImage = (e: any) => {
+    e.stopPropagation();
+    setIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = (e: any) => {
+    e.stopPropagation();
+    setIndex((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
 
   return (
     <div
       onClick={() =>
         navigate("/bandookwale/productdetails", { state: item })
       }
-      className="group cursor-pointer p-[2px] rounded-xl bg-gradient-to-r from-black to-yellow-500 
-                 bg-[length:200%_200%] bg-left transition-all duration-500 
-                 hover:bg-right"
+      className="group cursor-pointer p-[2px] rounded-xl bg-gradient-to-r from-black to-yellow-500"
     >
-      <div className="bg-white rounded-xl overflow-hidden relative 
-                      group-hover:shadow-xl transition duration-300">
+      <div className="bg-white rounded-xl overflow-hidden relative">
 
+        {/* IMAGE SECTION */}
         <div className="relative">
           <img
-            src={item.image}
+            src={images[index]}
             alt={item.title}
-            className="w-full h-48 object-cover group-hover:scale-105 transition duration-300"
+            className="w-full h-48 object-cover"
+            onError={(e) => {
+              e.currentTarget.src = "https://via.placeholder.com/300";
+            }}
           />
 
-          {/* ❤️ Prevent navigation when clicking heart */}
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="absolute top-3 right-3 bg-black p-2 rounded-full shadow cursor-pointer"
-          >
-            <Heart className="w-5 h-5 text-white group-hover:text-yellow-400 transition" />
-          </div>
+          {/* LEFT BUTTON */}
+          {images.length > 1 && (
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 rounded"
+            >
+              ‹
+            </button>
+          )}
 
-          {item.featured && (
-            <span className="absolute bottom-2 left-2 bg-yellow-400 text-xs px-2 py-1 rounded">
-              FEATURED
-            </span>
+          {/* RIGHT BUTTON */}
+          {images.length > 1 && (
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 rounded"
+            >
+              ›
+            </button>
+          )}
+
+          {/* DOTS */}
+          {images.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+              {images.map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-2 h-2 rounded-full ${i === index ? "bg-yellow-400" : "bg-white"
+                    }`}
+                />
+              ))}
+            </div>
           )}
         </div>
 
+        {/* CONTENT */}
         <div className="p-3">
           <h3 className="font-bold text-lg">₹ {item.price}</h3>
-          <p className="text-gray-700 text-sm truncate">{item.title}</p>
+          <p className="text-gray-700 text-sm truncate">
+            {item.title}
+          </p>
 
           <div className="flex justify-between text-xs text-gray-500 mt-2">
             <span>{item.location}</span>
             <span>{item.date}</span>
           </div>
         </div>
-
       </div>
     </div>
   );
