@@ -19,8 +19,8 @@ export default function ProductDetailsPage() {
     item.images?.length > 0
       ? item.images
       : item.image
-      ? [item.image]
-      : ["https://via.placeholder.com/300"];
+        ? [item.image]
+        : ["https://via.placeholder.com/300"];
 
   const prevImage = () =>
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -84,9 +84,8 @@ export default function ProductDetailsPage() {
                 <button
                   key={i}
                   onClick={() => setCurrentIndex(i)}
-                  className={`w-2 h-2 rounded-full ${
-                    i === currentIndex ? "bg-yellow-400" : "bg-white/60"
-                  }`}
+                  className={`w-2 h-2 rounded-full ${i === currentIndex ? "bg-yellow-400" : "bg-white/60"
+                    }`}
                 />
               ))}
             </div>
@@ -102,9 +101,8 @@ export default function ProductDetailsPage() {
                 src={img}
                 alt={`thumb-${i}`}
                 onClick={() => setCurrentIndex(i)}
-                className={`w-16 h-16 object-cover rounded-lg cursor-pointer border-2 flex-shrink-0 ${
-                  i === currentIndex ? "border-yellow-400" : "border-transparent"
-                }`}
+                className={`w-16 h-16 object-cover rounded-lg cursor-pointer border-2 flex-shrink-0 ${i === currentIndex ? "border-yellow-400" : "border-transparent"
+                  }`}
                 onError={(e) => {
                   e.currentTarget.src = "https://via.placeholder.com/300";
                 }}
@@ -199,7 +197,22 @@ export default function ProductDetailsPage() {
               <p className="text-xs text-gray-500">Member since Today</p>
             </div>
           </div>
-          <button className="mt-4 w-full border-2 border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition">
+          {/* <button className="mt-4 w-full border-2 border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition">
+            Chat with seller
+          </button> */}
+          <button
+            onClick={() =>
+              navigate("bandookwale/chat", {
+                state: {
+                  productId: item.id,
+                  sellerId: item.sellerId || "seller1", // adjust
+                  buyerId: "loggedInUserId", // from auth
+                  productTitle: item.title,
+                },
+              })
+            }
+            className="mt-4 w-full border-2 border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition"
+          >
             Chat with seller
           </button>
         </div>
