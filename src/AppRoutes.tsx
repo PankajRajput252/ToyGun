@@ -48,6 +48,8 @@ import ConditionalHome from "./components/auth/ConditionalHome";
 import NotFound from "./pages/OtherPage/NotFound";
 import WishlistPage from "./pages/WishlistPage";
 import SellProductPage from "./pages/SellProductPage";
+import SellerStorePage from "./pages/Sellerstorepage";
+import CartPage from "./pages/Cartpage";
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -68,71 +70,72 @@ export default function AppRoutes() {
       {!shouldHideHeader && <AppHeader />}
 
       {/* PAGE CONTENT */}
-      
-        <Routes>
-          {/* PUBLIC ROUTES */}
-          <Route path="/" element={<Home />} />
 
-          <Route path="/bandookwale/signin" element={<SignIn />} />
-          <Route path="/bandookwale/signup" element={<SignUp />} />
+      <Routes>
+        {/* PUBLIC ROUTES */}
+        <Route path="/" element={<Home />} />
 
-          {/* PROTECTED ROUTES */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/bandookwale/" element={<AppLayout />}>
-              <Route index element={<ConditionalHome />} />
-              <Route path="dashboard" element={<Home />} />
+        <Route path="/bandookwale/signin" element={<SignIn />} />
+        <Route path="/bandookwale/signup" element={<SignUp />} />
 
-              {/* USER FEATURES */}
-              <Route path="profile" element={<UserProfiles />} />
-              <Route path="productdetails" element={<ProductDetailsPage />} />
-              <Route path="wishlistPage" element={<WishlistPage/>}/>
-              <Route path="sellProductPage" element={<SellProductPage/>}/>
-              <Route path="buy" element={<Buy />} />
-              <Route path="depositConfirmation" element={<DepositConfirmation />} />
-              <Route path="rent" element={<RentContainer />} />
-              <Route path="withdrawFund" element={<WithdrawFund />} />
-              <Route path="support" element={<Support />} />
-              <Route path="wallet" element={<UserWallet />} />
+        {/* PROTECTED ROUTES */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/bandookwale/" element={<AppLayout />}>
+            <Route index element={<ConditionalHome />} />
+            <Route path="dashboard" element={<Home />} />
+            <Route path="/bandookwale/store" element={<SellerStorePage />} />
+            <Route path="/bandookwale/cart" element={<CartPage />} />
+            {/* USER FEATURES */}
+            <Route path="profile" element={<UserProfiles />} />
+            <Route path="productdetails" element={<ProductDetailsPage />} />
+            <Route path="wishlistPage" element={<WishlistPage />} />
+            <Route path="sellProductPage" element={<SellProductPage />} />
+            <Route path="buy" element={<Buy />} />
+            <Route path="depositConfirmation" element={<DepositConfirmation />} />
+            <Route path="rent" element={<RentContainer />} />
+            <Route path="withdrawFund" element={<WithdrawFund />} />
+            <Route path="support" element={<Support />} />
+            <Route path="wallet" element={<UserWallet />} />
 
-              {/* ADMIN-LIKE (inside dashboard) */}
-              <Route path="sell-request" element={<SellRequests />} />
-              <Route path="deposit-approval" element={<SellRequests />} />
-              <Route path="withdrawls" element={<SellRequests />} />
-              <Route path="all-user" element={<AdminUsers />} />
-              <Route path="active-user" element={<AdminUsers />} />
-              <Route path="inactive-user" element={<AdminUsers />} />
-              <Route path="bank-details" element={<WithdrawBankDetailsForm />} />
+            {/* ADMIN-LIKE (inside dashboard) */}
+            <Route path="sell-request" element={<SellRequests />} />
+            <Route path="deposit-approval" element={<SellRequests />} />
+            <Route path="withdrawls" element={<SellRequests />} />
+            <Route path="all-user" element={<AdminUsers />} />
+            <Route path="active-user" element={<AdminUsers />} />
+            <Route path="inactive-user" element={<AdminUsers />} />
+            <Route path="bank-details" element={<WithdrawBankDetailsForm />} />
 
-              {/* UI */}
-              <Route path="alerts" element={<Alerts />} />
-              <Route path="avatars" element={<Avatars />} />
-              <Route path="badge" element={<Badges />} />
-              <Route path="buttons" element={<Buttons />} />
-              <Route path="images" element={<Images />} />
-              <Route path="videos" element={<Videos />} />
+            {/* UI */}
+            <Route path="alerts" element={<Alerts />} />
+            <Route path="avatars" element={<Avatars />} />
+            <Route path="badge" element={<Badges />} />
+            <Route path="buttons" element={<Buttons />} />
+            <Route path="images" element={<Images />} />
+            <Route path="videos" element={<Videos />} />
 
-              {/* Charts */}
-              <Route path="line-chart" element={<LineChart />} />
-              <Route path="bar-chart" element={<BarChart />} />
+            {/* Charts */}
+            <Route path="line-chart" element={<LineChart />} />
+            <Route path="bar-chart" element={<BarChart />} />
 
-              {/* Tables & Forms */}
-              <Route path="basic-tables" element={<BasicTables />} />
-              <Route path="form-elements" element={<FormElements />} />
-            </Route>
+            {/* Tables & Forms */}
+            <Route path="basic-tables" element={<BasicTables />} />
+            <Route path="form-elements" element={<FormElements />} />
           </Route>
+        </Route>
 
-          {/* ADMIN ROUTES (STRICT ADMIN ONLY) */}
-          <Route element={<AdminRoute />}>
-            <Route path="/bandookwale/admin" element={<AppLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="subscription" element={<ManageSubscription />} />
-            </Route>
+        {/* ADMIN ROUTES (STRICT ADMIN ONLY) */}
+        <Route element={<AdminRoute />}>
+          <Route path="/bandookwale/admin" element={<AppLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="subscription" element={<ManageSubscription />} />
           </Route>
+        </Route>
 
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
 
     </>
   );

@@ -2,9 +2,12 @@ import { Heart, User, Search, MapPin, ChevronDown, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import UserDropdown from "../components/header/UserDropdown";
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "./Cartcontext ";
 
 export default function Header() {
-    const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { totalItems } = useCart();
 
   const navigate = useNavigate();
   return (
@@ -43,27 +46,40 @@ export default function Header() {
             <Heart className="w-5 h-5" />
             <span>Wishlist</span>
           </div>
+          <button onClick={() => navigate("/bandookwale/cart")} className="relative">
+  <ShoppingCart className="w-6 h-6" />
+  {totalItems > 0 && (
+    <span className="absolute -top-2 -right-2 bg-yellow-500 text-white 
+                     text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+      {totalItems}
+    </span>
+  )}
+</button>
 
-           {/* Sell Button */}
+          {/* Sell Button */}
           <button className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold border-2 border-yellow-400 bg-white shadow-md"
-           onClick={() => navigate("/bandookwale/sellProductPage")}>
+            onClick={() => navigate("/bandookwale/sellProductPage")}>
             <Plus className="w-5 h-5" />
             SELL
           </button>
 
+          <button onClick={() => navigate("/bandookwale/store")}>
+             Store
+          </button>
+
           {/* Login */}
           {
-             isAuthenticated ?   <UserDropdown />:<div
-            onClick={() => navigate("/bandookwale/signin")} // ✅ route here
-            className="flex flex-col items-center text-sm cursor-pointer"
-          >
-            <User className="w-5 h-5" />
-            <span>Login</span>
-          </div>
+            isAuthenticated ? <UserDropdown /> : <div
+              onClick={() => navigate("/bandookwale/signin")} // ✅ route here
+              className="flex flex-col items-center text-sm cursor-pointer"
+            >
+              <User className="w-5 h-5" />
+              <span>Login</span>
+            </div>
           }
-          
 
-         
+
+
 
         </div>
       </div>

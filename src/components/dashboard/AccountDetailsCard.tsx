@@ -132,7 +132,7 @@ const AccountDetailsCard: React.FC = () => {
       {/* Edit Profile Link */}
       <div className="text-right mb-4">
         <a
-          href="/StyloCoin/profile"
+          href="/bandookwale/profile"
           className="text-blue-500 dark:text-blue-400 text-sm hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-medium"
         >
           Edit profile →
