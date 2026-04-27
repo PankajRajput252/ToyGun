@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import UserDropdown from "../components/header/UserDropdown";
 import { ShoppingCart } from "lucide-react";
-import { useCart } from "./Cartcontext ";
+import { useCart } from "./Cartcontext";
 
 export default function Header() {
   const { isAuthenticated } = useAuth();

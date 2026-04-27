@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Heart, Share2, ShoppingCart, CheckCircle } from "lucide-react";
-import { useCart } from "./Cartcontext ";
+import { useCart } from "./Cartcontext";
 
 export default function ProductDetailsPage() {
   const { state } = useLocation();

@@ -50,6 +50,8 @@ import WishlistPage from "./pages/WishlistPage";
 import SellProductPage from "./pages/SellProductPage";
 import SellerStorePage from "./pages/Sellerstorepage";
 import CartPage from "./pages/Cartpage";
+import MyOrdersPage from "./pages/Myorderspage";
+import OrderDetailPage from "./pages/Orderdetailpage";
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -85,6 +87,9 @@ export default function AppRoutes() {
             <Route path="dashboard" element={<Home />} />
             <Route path="/bandookwale/store" element={<SellerStorePage />} />
             <Route path="/bandookwale/cart" element={<CartPage />} />
+            <Route path="/bandookwale/cart" element={<CartPage />} />
+            <Route path="/bandookwale/orders" element={<MyOrdersPage />} />
+            <Route path="/bandookwale/orders/:orderId" element={<OrderDetailPage />} />
             {/* USER FEATURES */}
             <Route path="profile" element={<UserProfiles />} />
             <Route path="productdetails" element={<ProductDetailsPage />} />
