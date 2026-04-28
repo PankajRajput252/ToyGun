@@ -1591,3 +1591,7 @@ export const sellProductApi = {
     apiCall<void>(`/api/users/deleteProduct/${id}`, 'DELETE'),
 
 };
+
+
+export const WS_URL = "http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com/ws"; // ← update to your backend URL
+export const API_URL = "http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com";

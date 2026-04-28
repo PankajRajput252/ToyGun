@@ -12,6 +12,11 @@ export interface Product {
   location: string,
   date: string,
   isNegotiable: boolean,
+   id?: string | number;
+  sellerId?: string;
+  sellerName?: string;
+  description?: string;
+  brand?: string;
 }
 export default function Home() {
 
@@ -24,21 +29,31 @@ const [products, setProducts] = useState<Product[]>([]);
     setIsLoading(true);
 
     const response = await sellProductApi.getAll(0, 25, 'ACTIVE', null);
+console.log("Raw API item[0]:", JSON.stringify(response.content[0]));
 
     const mappedProducts = response.content.map((item: any) => ({
-      images:
-        item.productImageList?.length > 0
-          ? item.productImageList.map((img: any) => img.profileImageUrl)
-          : ["https://via.placeholder.com/300"],
+  images:
+    item.productImageList?.length > 0
+      ? item.productImageList
+          .map((img: any) => img.profileImageUrl)
+          .filter(Boolean)
+      : ["https://via.placeholder.com/300"],
 
-      price: item.price,
-      title: item.title,
-      location: `${item.city}, ${item.state}`,
-      date: item.createdDatetime
-        ? new Date(item.createdDatetime).toLocaleDateString()
-        : "Today",
-        isNegotiable:item.isNegotiable
-    }));
+  id: item.productPkId,                    // ← "productPkId": 223
+  sellerId: item.sellerId,                 // ← "sellerId": "CONT66855610"
+  sellerName: item.sellerId,               // ← no sellerName in API, use sellerId for now
+  description: item.description,
+  brand: item.brand || "",
+  isNegotiable: item.negotiable,           // ← "negotiable": false (not isNegotiable)
+
+  price: item.price,
+  title: item.title,
+  location: item.location ||
+    `${item.city || ""}, ${item.state || ""}`.replace(/^,\s*/, ""),
+  date: item.createdDatetime
+    ? new Date(item.createdDatetime).toLocaleDateString()
+    : "Today",
+}));
 
     setProducts(mappedProducts);
 

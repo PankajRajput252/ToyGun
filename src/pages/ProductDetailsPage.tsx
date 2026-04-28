@@ -4,11 +4,13 @@ import { Heart, Share2, ShoppingCart, CheckCircle } from "lucide-react";
 import { useCart } from "./Cartcontext";
 
 export default function ProductDetailsPage() {
+  const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+  const userNodeId = user?.nodeId;
+  console.log("USER NODE ID shri", userNodeId);
   const { state } = useLocation();
   const navigate = useNavigate();
   const { addToCart, cartItems } = useCart();
   const item = state;
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
 
@@ -60,6 +62,7 @@ export default function ProductDetailsPage() {
               e.currentTarget.src = "https://via.placeholder.com/300";
             }}
           />
+
 
           {images.length > 1 && (
             <>
@@ -200,7 +203,7 @@ export default function ProductDetailsPage() {
           {/* <button className="mt-4 w-full border-2 border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition">
             Chat with seller
           </button> */}
-          <button
+          {/* <button
             onClick={() =>
               navigate("bandookwale/chat", {
                 state: {
@@ -212,6 +215,32 @@ export default function ProductDetailsPage() {
               })
             }
             className="mt-4 w-full border-2 border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition"
+          >
+            Chat with seller
+          </button> */}
+
+
+          <button
+            className="mt-4 w-full border-2 border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-600 hover:text-white transition"
+
+            onClick={() => {
+              console.log("Navigating with:", {    // ← debug log
+                productId: item.id,
+                sellerId: item.sellerId,
+                buyerId: user?.nodeId,
+              });
+              navigate("/bandookwale/chat", {
+                state: {
+                  productId: item.id?.toString() || item.productId?.toString(),
+                  productTitle: item.title,
+                  productImage: images[0],
+                  sellerId: item.sellerId,
+                  sellerName: item.sellerName || "Seller",
+                  buyerId: user?.nodeId,      // ← real userId from localStorage
+                  buyerName: user?.name || "Me",
+                }
+              });
+            }}
           >
             Chat with seller
           </button>

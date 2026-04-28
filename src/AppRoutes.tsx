@@ -91,7 +91,7 @@ export default function AppRoutes() {
             <Route path="/bandookwale/cart" element={<CartPage />} />
             <Route path="/bandookwale/orders" element={<MyOrdersPage />} />
             <Route path="/bandookwale/orders/:orderId" element={<OrderDetailPage />} />
-            <Route path="/bandookwale/productdetails/bandookwale/chat" element={<ChatPage />} />
+            <Route path="/bandookwale/chat" element={<ChatPage />} />
             {/* USER FEATURES */}
             <Route path="profile" element={<UserProfiles />} />
             <Route path="productdetails" element={<ProductDetailsPage />} />
