@@ -7,7 +7,7 @@ import { Product } from "./ProductCard";
  import storeLogo from "../components/images/storeLogo.png"// adjust path
 import bgImage from "../components/images/bg-gun2.jpeg"// adjust path
 
-export default function SellerStorePage() {
+export default function AdminSellerStorePage() {
   const navigate = useNavigate();
   const { sellerId: sellerIdFromUrl } = useParams<{ sellerId: string }>();
 
@@ -31,32 +31,29 @@ export default function SellerStorePage() {
     if (!sellerId) return;
     try {
       setIsLoading(true);
-      const response = await sellProductApi.getAll(0, 50, "ACTIVE", null);
+      const response = await sellProductApi.getAll(0, 50, "ACTIVE", sellerId);
 
-    const mapped: Product[] = response.content
-  .filter((item: any) => item.isStoreProduct === true)  // ← only store products
-  .map((item: any) => ({
-    id: item.productPkId,
-    images:
-      item.productImageList?.length > 0
-        ? item.productImageList
-            .map((img: any) => img.profileImageUrl)
-            .filter(Boolean)
-        : ["https://via.placeholder.com/300"],
-    price: item.price,
-    title: item.title,
-    location: item.location ||
-      `${item.city || ""}, ${item.state || ""}`.replace(/^,\s*/, ""),
-    date: item.createdDatetime
-      ? new Date(item.createdDatetime).toLocaleDateString()
-      : "Today",
-    description: item.description,
-    brand: item.brand || "",
-    sellerId: item.sellerId,
-    sellerName: item.sellerName || item.sellerId || "Seller",
-    isNegotiable: item.negotiable,
-    isStoreProduct: true,  // ← always true on store page
-  }));
+      const mapped: Product[] = response.content.map((item: any) => ({
+        id: item.productPkId,
+        images:
+          item.productImageList?.length > 0
+            ? item.productImageList
+                .map((img: any) => img.profileImageUrl)
+                .filter(Boolean)
+            : ["https://via.placeholder.com/300"],
+        price: item.price,
+        title: item.title,
+        location: item.location || `${item.city || ""}, ${item.state || ""}`.replace(/^,\s*/, ""),
+        date: item.createdDatetime
+          ? new Date(item.createdDatetime).toLocaleDateString()
+          : "Today",
+        description: item.description,
+        brand: item.brand || "",
+        sellerId: item.sellerId,
+        sellerName: item.sellerName || item.sellerId || "Seller",
+        isNegotiable: item.negotiable,
+        isStoreProduct: true,  // ← ALL products in store page are store products
+      }));
 
       setProducts(mapped);
       setTotalCount(response.totalElements || mapped.length);
@@ -112,15 +109,15 @@ export default function SellerStorePage() {
           </div>
 
           {/* Post new ad — own store only */}
-          {/* {isOwnStore && (
+          {isOwnStore && (
             <button
-              onClick={() => navigate("/bandookwale/sell")}
+              onClick={() => navigate("/bandookwale/admin/sellProductPage")}
               className="ml-auto bg-white text-black font-semibold px-4 py-2 rounded-lg
                          hover:bg-yellow-100 transition text-sm flex items-center gap-2 flex-shrink-0"
             >
-              <Plus className="w-4 h-4" /> Post New Ad
+              <Plus className="w-4 h-4" /> Post New Item
             </button>
-          )} */}
+          )}
         </div>
       </div>
 
@@ -147,7 +144,7 @@ export default function SellerStorePage() {
                   Post your first product to start selling.
                 </p>
                 <button
-                  onClick={() => navigate("/bandookwale/sell")}
+                  onClick={() => navigate("//bandookwale/admin/sellProductPage")}
                   className="bg-gradient-to-r from-black to-yellow-500 text-white
                              px-6 py-3 rounded-xl font-medium hover:opacity-90 transition
                              flex items-center gap-2"

@@ -53,6 +53,8 @@ import CartPage from "./pages/Cartpage";
 import MyOrdersPage from "./pages/Myorderspage";
 import OrderDetailPage from "./pages/Orderdetailpage";
 import ChatPage from "./pages/ChatPage";
+import AdminSellerStorePage from "./pages/AdminSellerStorePage";
+import AdminSellProductPage from "./pages/AdminSellProductPage";
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -138,6 +140,8 @@ export default function AppRoutes() {
         {/* ADMIN ROUTES (STRICT ADMIN ONLY) */}
         <Route element={<AdminRoute />}>
           <Route path="/bandookwale/admin" element={<AppLayout />}>
+          <Route path="store" element={<AdminSellerStorePage />} />
+            <Route path="sellProductPage" element={<AdminSellProductPage />} />
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="subscription" element={<ManageSubscription />} />

@@ -195,6 +195,13 @@ const AppHeader: React.FC = () => {
                           Subscription
                         </Link>
 
+                        <Link
+                          to="/bandookwale/admin/store"
+                          onClick={() => setIsManageUserOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Add Store Items
+                        </Link>
                         {/* <Link
                           to="/bandookwale/active-user"
                           onClick={() => setIsManageUserOpen(false)}

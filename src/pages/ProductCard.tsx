@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { ShoppingCart, MessageCircle } from "lucide-react";
 
 export interface Product {
   images: string[];
@@ -7,7 +8,15 @@ export interface Product {
   title: string;
   location: string;
   date: string;
+  id?: number;
+  sellerId?: string;
+  sellerName?: string;
+  description?: string;
+  brand?: string;
+  isNegotiable?: boolean;
+  isStoreProduct?: boolean;
 }
+
 type Props = {
   item: Product;
 };
@@ -16,20 +25,18 @@ export default function ProductCard({ item }: Props) {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
 
-  const images = item.images.length
+  const images = item.images?.length
     ? item.images
     : ["https://via.placeholder.com/300"];
 
-  const nextImage = (e: any) => {
+  const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIndex((prev) => (prev + 1) % images.length);
   };
 
-  const prevImage = (e: any) => {
+  const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIndex((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
+    setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
   return (
@@ -51,6 +58,33 @@ export default function ProductCard({ item }: Props) {
               e.currentTarget.src = "https://via.placeholder.com/300";
             }}
           />
+
+          {/* ── STORE / MARKETPLACE BADGE ── */}
+          <div className="absolute top-2 left-2">
+            {item.isStoreProduct ? (
+              <span className="flex items-center gap-1 bg-yellow-500 text-white
+                               text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                <ShoppingCart className="w-2.5 h-2.5" />
+                Store
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 bg-blue-500 text-white
+                               text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                <MessageCircle className="w-2.5 h-2.5" />
+                Listing
+              </span>
+            )}
+          </div>
+
+          {/* Negotiable badge */}
+          {item.isNegotiable && (
+            <div className="absolute top-2 right-2">
+              <span className="bg-green-500 text-white text-[10px] font-bold
+                               px-2 py-0.5 rounded-full shadow">
+                Negotiable
+              </span>
+            </div>
+          )}
 
           {/* LEFT BUTTON */}
           {images.length > 1 && (
@@ -78,8 +112,9 @@ export default function ProductCard({ item }: Props) {
               {images.map((_, i) => (
                 <div
                   key={i}
-                  className={`w-2 h-2 rounded-full ${i === index ? "bg-yellow-400" : "bg-white"
-                    }`}
+                  className={`w-2 h-2 rounded-full ${
+                    i === index ? "bg-yellow-400" : "bg-white"
+                  }`}
                 />
               ))}
             </div>
@@ -88,14 +123,22 @@ export default function ProductCard({ item }: Props) {
 
         {/* CONTENT */}
         <div className="p-3">
-          <h3 className="font-bold text-lg">₹ {item.price}</h3>
-          <p className="text-gray-700 text-sm truncate">
-            {item.title}
-          </p>
+          <h3 className="font-bold text-lg">₹ {Number(item.price).toLocaleString()}</h3>
+          <p className="text-gray-700 text-sm truncate">{item.title}</p>
 
           <div className="flex justify-between text-xs text-gray-500 mt-2">
             <span>{item.location}</span>
             <span>{item.date}</span>
+          </div>
+
+          {/* Bottom action hint */}
+          <div className={`mt-2 text-[10px] font-medium flex items-center gap-1
+            ${item.isStoreProduct ? "text-yellow-600" : "text-blue-500"}`}>
+            {item.isStoreProduct ? (
+              <><ShoppingCart className="w-3 h-3" /> Add to cart & buy</>
+            ) : (
+              <><MessageCircle className="w-3 h-3" /> Chat with seller</>
+            )}
           </div>
         </div>
       </div>
