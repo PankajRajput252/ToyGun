@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com/api/:splat"
+  to = "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com/api/:splat"
   status = 200
   force = true
 

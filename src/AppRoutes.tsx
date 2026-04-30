@@ -84,6 +84,10 @@ export default function AppRoutes() {
         {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
           <Route path="/bandookwale/" element={<AppLayout />}>
+            // Own store
+            <Route path="/bandookwale/store" element={<SellerStorePage />} />
+            // Any seller's store (from ProductDetailsPage "View Store" button)
+            <Route path="/bandookwale/store/:sellerId" element={<SellerStorePage />} />
             <Route index element={<ConditionalHome />} />
             <Route path="dashboard" element={<Home />} />
             <Route path="/bandookwale/store" element={<SellerStorePage />} />

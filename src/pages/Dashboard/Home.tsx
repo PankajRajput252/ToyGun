@@ -6,65 +6,76 @@ import ProductCard from "../ProductCard";
 import { sellProductApi, ProductResponse } from "../../services/api"
 
 export interface Product {
-    images: string[];
+  images: string[];
   price: number,
   title: string,
   location: string,
   date: string,
   isNegotiable: boolean,
-   id?: string | number;
+  id?: number;
   sellerId?: string;
   sellerName?: string;
   description?: string;
   brand?: string;
+  isStoreProduct?: boolean;
 }
 export default function Home() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const STORE_SELLER_ID = "NODE71747238"; // ← update this to your store owner's nodeId
 
 
   const fetchProductData = async () => {
-  try {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    const response = await sellProductApi.getAll(0, 25, 'ACTIVE', null);
-console.log("Raw API item[0]:", JSON.stringify(response.content[0]));
+      const response = await sellProductApi.getAll(0, 25, 'ACTIVE', null);
+      console.log("Raw API item[0]:", JSON.stringify(response.content[0]));
 
-    const mappedProducts = response.content.map((item: any) => ({
-  images:
-    item.productImageList?.length > 0
-      ? item.productImageList
-          .map((img: any) => img.profileImageUrl)
-          .filter(Boolean)
-      : ["https://via.placeholder.com/300"],
+      const mappedProducts = response.content.map((item: any) => ({
+        id: item.productPkId,                          // ← productPkId: 223
+        images:
+          item.productImageList?.length > 0
+            ? item.productImageList
+              .map((img: any) => img.profileImageUrl)
+              .filter(Boolean)
+            : ["https://via.placeholder.com/300"],
 
-  id: item.productPkId,                    // ← "productPkId": 223
-  sellerId: item.sellerId,                 // ← "sellerId": "CONT66855610"
-  sellerName: item.sellerId,               // ← no sellerName in API, use sellerId for now
-  description: item.description,
-  brand: item.brand || "",
-  isNegotiable: item.negotiable,           // ← "negotiable": false (not isNegotiable)
+        price: item.price,
+        title: item.title,
+        location:
+          item.location ||
+          `${item.city || ""}, ${item.state || ""}`.replace(/^,\s*/, ""),
+        date: item.createdDatetime
+          ? new Date(item.createdDatetime).toLocaleDateString()
+          : "Today",
 
-  price: item.price,
-  title: item.title,
-  location: item.location ||
-    `${item.city || ""}, ${item.state || ""}`.replace(/^,\s*/, ""),
-  date: item.createdDatetime
-    ? new Date(item.createdDatetime).toLocaleDateString()
-    : "Today",
-}));
+        // ─── Seller info ─────────────────────────────────────────────────────
+        sellerId: item.sellerId,
+        sellerName: item.sellerName || item.sellerId || "Seller",
 
-    setProducts(mappedProducts);
+        // ─── Product details ──────────────────────────────────────────────────
+        description: item.description,
+        brand: item.brand || "",
+        isNegotiable: item.negotiable,
 
-    console.log("Mapped Products -->", mappedProducts);
+        // ─── KEY FLAG: store product vs marketplace product ───────────────────
+        // Products sold by the store owner = store products (cart + pay)
+        // Products sold by other users = marketplace (chat only)
+        isStoreProduct: item.sellerId === STORE_SELLER_ID,
+      }));
 
-  } catch (error) {
-    console.error("Error fetching products:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      setProducts(mappedProducts);
+
+      console.log("Mapped Products -->", mappedProducts);
+
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchProductData();

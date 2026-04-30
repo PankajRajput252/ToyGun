@@ -94,7 +94,7 @@ export default function AdminUsers() {
       let page = 0;
       let size = 100;
 
-      const url = `http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=25&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
+      const url = `http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=25&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
       const response = await fetch(url);
       const data = await response.json();
 
@@ -124,7 +124,7 @@ export default function AdminUsers() {
         setUsers([]); // <- Important
       }
 
-      const walletUrl = `http://bandookwala-env.eba-bih9jrqy.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
+      const walletUrl = `http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
       const walletResponse = await fetch(walletUrl);
       const walletDdata = await walletResponse.json();
 

@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import UserDropdown from "../components/header/UserDropdown";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "./Cartcontext";
+import { FaStore } from "react-icons/fa";
+
 
 export default function Header() {
   const { isAuthenticated } = useAuth();
@@ -64,7 +66,7 @@ export default function Header() {
           </button>
 
           <button onClick={() => navigate("/bandookwale/store")}>
-             Store
+           <FaStore />
           </button>
 
           {/* Login */}
