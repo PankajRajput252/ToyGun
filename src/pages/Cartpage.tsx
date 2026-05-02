@@ -79,7 +79,7 @@ export default function CartPage() {
       // STEP 3: Open Razorpay checkout
       const razorpayOptions = {
         // ── Replace with your actual Razorpay Key ID from dashboard ──────────
-        key: "rzp_test_REPLACE_WITH_YOUR_KEY",
+        key: "rzp_test_Sk36cjHZNLcY5o",
         amount: totalPrice * 100,         // in paise
         currency: "INR",
         name: "Bandookwale",
