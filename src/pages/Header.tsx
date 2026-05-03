@@ -5,6 +5,9 @@ import UserDropdown from "../components/header/UserDropdown";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { FaStore } from "react-icons/fa";
+import navbarBg from "../components/images/bg-gun2.jpeg"// adjust path
+
+
 
 
 export default function Header() {
@@ -13,7 +16,11 @@ export default function Header() {
 
   const navigate = useNavigate();
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
+    // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
+      <header
+  className="fixed top-0 left-0 w-full z-50 border-b bg-cover bg-center"
+  style={{ backgroundImage: `url(${navbarBg})` }}
+>
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         {/* Logo */}
@@ -49,14 +56,14 @@ export default function Header() {
             <span>Wishlist</span>
           </div>
           <button onClick={() => navigate("/bandookwale/cart")} className="relative">
-  <ShoppingCart className="w-6 h-6" />
-  {totalItems > 0 && (
-    <span className="absolute -top-2 -right-2 bg-yellow-500 text-white 
+            <ShoppingCart className="w-6 h-6" />
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-yellow-500 text-white 
                      text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-      {totalItems}
-    </span>
-  )}
-</button>
+                {totalItems}
+              </span>
+            )}
+          </button>
 
           {/* Sell Button */}
           <button className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold border-2 border-yellow-400 bg-white shadow-md"
@@ -66,7 +73,7 @@ export default function Header() {
           </button>
 
           <button onClick={() => navigate("/bandookwale/store")}>
-           <FaStore />
+            <FaStore />
           </button>
 
           {/* Login */}
