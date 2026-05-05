@@ -23,7 +23,7 @@ type Category = {
     categoryName: string;
 };
 
-const API_URL = "http://localhost:5000"; // ← update if different
+const API_URL = "http://bandookwale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com"; // ← update if different
 
 export default function SellProductPage() {
     const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");

@@ -55,6 +55,8 @@ import OrderDetailPage from "./pages/Orderdetailpage";
 import ChatPage from "./pages/ChatPage";
 import AdminSellerStorePage from "./pages/AdminSellerStorePage";
 import AdminSellProductPage from "./pages/AdminSellProductPage";
+import { WishlistProvider } from "./pages/Wishlistcontext";
+
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -82,6 +84,11 @@ export default function AppRoutes() {
 
         <Route path="/bandookwale/signin" element={<SignIn />} />
         <Route path="/bandookwale/signup" element={<SignUp />} />
+        <Route path="wishlistPage" element={
+  <WishlistProvider>
+    <WishlistPage />
+  </WishlistProvider>
+} />
 
         {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>

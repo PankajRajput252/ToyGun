@@ -1558,7 +1558,7 @@ export interface ProductReq {
 
 
 }
- 
+
 
 
 // sellProduct
@@ -1595,3 +1595,34 @@ export const sellProductApi = {
 
 export const WS_URL = "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com/ws"; // ← update to your backend URL
 export const API_URL = "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com";
+
+export type Favorite = {
+  favoritesPkId: number;
+  userFkId: string;
+  productFkId: number;
+  createdAt: string | null;
+};
+
+
+export const favoriteApi = {
+  add: (
+    userFkId: string,
+    productFkId: number
+  ): Promise<Favorite> =>
+    apiCall<any>(`/api/users/postFavorites`, "POST", {
+      userFkId,
+      productFkId,
+      createdAt: "",
+    }).then((response) => response.data?.[0] || response),
+
+
+  getByUser: (userFkId: string): Promise<Favorite[]> =>
+    apiCall<any>(`/api/users/getFavorites?userFkId=${userFkId}`).then(
+      (response) => response.data || []
+    ),
+
+  delete: (id: number): Promise<void> =>
+    apiCall<void>(`/api/users/deleteFavorites?favoritePkId=${id}`, "DELETE")
+
+
+};

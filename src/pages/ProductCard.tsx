@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, MessageCircle } from "lucide-react";
+import { ShoppingCart, MessageCircle, Heart, Loader2 } from "lucide-react";
+import { useWishlist } from "./Wishlistcontext";
 
 export interface Product {
   images: string[];
@@ -24,6 +25,7 @@ type Props = {
 export default function ProductCard({ item }: Props) {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
+  const { toggleFavorite, isFavorited, isLoading,isInitialized  } = useWishlist();
 
   const images = item.images?.length
     ? item.images
@@ -38,6 +40,17 @@ export default function ProductCard({ item }: Props) {
     e.stopPropagation();
     setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent card navigation
+    if (item.id != null) {
+      toggleFavorite(item.id);
+    }
+  };
+
+  const favorited = item.id != null ? isFavorited(item.id) : false;
+  const loading   = item.id != null ? isLoading(item.id)   : false;
+  
 
   return (
     <div
@@ -76,9 +89,33 @@ export default function ProductCard({ item }: Props) {
             )}
           </div>
 
-          {/* Negotiable badge */}
+          {/* ── WISHLIST HEART BUTTON ── */}
+          {item.id != null && (
+            <button
+              onClick={handleWishlistClick}
+                disabled={!isInitialized || loading}
+              className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5
+                         rounded-full shadow-md hover:scale-110 transition-transform
+                         disabled:opacity-60"
+              title={favorited ? "Remove from wishlist" : "Add to wishlist"}
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+              ) : (
+                <Heart
+                  className={`w-4 h-4 transition-colors ${
+                    favorited
+                      ? "fill-red-500 text-red-500"
+                      : "text-gray-400 hover:text-red-400"
+                  }`}
+                />
+              )}
+            </button>
+          )}
+
+          {/* Negotiable badge — shift down if heart is present */}
           {item.isNegotiable && (
-            <div className="absolute top-2 right-2">
+            <div className={`absolute ${item.id != null ? "top-10" : "top-2"} right-2`}>
               <span className="bg-green-500 text-white text-[10px] font-bold
                                px-2 py-0.5 rounded-full shadow">
                 Negotiable

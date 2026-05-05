@@ -16,15 +16,12 @@ export default function Header() {
 
   const navigate = useNavigate();
   return (
-    // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
-      <header
-  className="fixed top-0 left-0 w-full z-50 border-b bg-cover bg-center"
-  style={{ backgroundImage: `url(${navbarBg})` }}
->
+     <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
+  
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         {/* Logo */}
-        <div className="text-3xl font-bold text-[#002f34]">
+        <div className="text-3xl font-bold text-[#002f34]" onClick={() => navigate("/bandookwale/")}>
           BandookWale
         </div>
 
