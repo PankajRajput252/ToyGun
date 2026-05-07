@@ -4,6 +4,7 @@ import CategoryFilterBar from "../CategoryFilterBar";
 import CategoryGrid from "../CategoryGrid";
 import ProductCard from "../ProductCard";
 import { sellProductApi } from "../../services/api";
+import { useFilter } from "../Filtercontext";
 import { ShoppingCart, MessageCircle, LayoutGrid } from "lucide-react";
 
 export interface Product {
@@ -27,13 +28,16 @@ const API_URL = "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [allProducts, setAllProducts] = useState<Product[]>([]); // raw full list
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
   const [showGrid, setShowGrid] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("all");
 
-  // ─── Map raw API item → Product ───────────────────────────────────────────────
+  // ── Pull search & city from shared context (set by Navbar) ──────────────────
+  const { searchQuery, selectedCity } = useFilter();
+
+  // ─── Map raw API item → Product ─────────────────────────────────────────────
   const mapProduct = (item: any): Product => ({
     id: item.productPkId,
     images:
@@ -58,7 +62,7 @@ export default function Home() {
     isStoreProduct: item.isStoreProduct,
   });
 
-  // ─── Fetch ALL products ───────────────────────────────────────────────────────
+  // ─── Fetch ALL products ──────────────────────────────────────────────────────
   const fetchAllProducts = async () => {
     try {
       setIsLoading(true);
@@ -71,7 +75,7 @@ export default function Home() {
     }
   };
 
-  // ─── Fetch products by CATEGORY ──────────────────────────────────────────────
+  // ─── Fetch products by CATEGORY ─────────────────────────────────────────────
   const fetchByCategory = async (categoryId: number) => {
     try {
       setIsLoading(true);
@@ -95,18 +99,39 @@ export default function Home() {
     }
   };
 
-  // ─── Tab filter applied on top of allProducts ─────────────────────────────────
+  // ─── Apply tab + search + city filters on top of allProducts ────────────────
   const filteredProducts = useMemo(() => {
-    if (activeTab === "store") return allProducts.filter((p) => p.isStoreProduct === true);
-    if (activeTab === "listing") return allProducts.filter((p) => p.isStoreProduct !== true);
-    return allProducts;
-  }, [allProducts, activeTab]);
+    let list = allProducts;
 
-  // ─── Tab counts ───────────────────────────────────────────────────────────────
+    // 1. Tab filter
+    if (activeTab === "store")   list = list.filter((p) => p.isStoreProduct === true);
+    if (activeTab === "listing") list = list.filter((p) => p.isStoreProduct !== true);
+
+    // 2. Search filter — match title, brand, or description (case-insensitive)
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.title?.toLowerCase().includes(q) ||
+          p.brand?.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q)
+      );
+    }
+
+    // 3. City filter — match location field (case-insensitive)
+    if (selectedCity) {
+      const city = selectedCity.toLowerCase();
+      list = list.filter((p) => p.location?.toLowerCase().includes(city));
+    }
+
+    return list;
+  }, [allProducts, activeTab, searchQuery, selectedCity]);
+
+  // ─── Tab counts (after tab filter only, so badge reflects what's in that tab) ─
   const storeCount   = allProducts.filter((p) => p.isStoreProduct === true).length;
   const listingCount = allProducts.filter((p) => p.isStoreProduct !== true).length;
 
-  // ─── Handle category selection ────────────────────────────────────────────────
+  // ─── Handle category selection ───────────────────────────────────────────────
   const handleSelectCategory = (categoryId: number | null, categoryName?: string) => {
     setSelectedCategoryId(categoryId);
     setSelectedCategoryName(categoryName || "");
@@ -123,30 +148,24 @@ export default function Home() {
     fetchAllProducts();
   }, []);
 
-  // ─── Tab config ───────────────────────────────────────────────────────────────
+  // ─── Tab config ─────────────────────────────────────────────────────────────
   const tabs: { key: Tab; label: string; icon: React.ReactNode; count: number }[] = [
-    {
-      key: "all",
-      label: "All",
-      icon: <LayoutGrid className="w-3.5 h-3.5" />,
-      count: allProducts.length,
-    },
-    {
-      key: "store",
-      label: "Store",
-      icon: <ShoppingCart className="w-3.5 h-3.5" />,
-      count: storeCount,
-    },
-    {
-      key: "listing",
-      label: "Listings",
-      icon: <MessageCircle className="w-3.5 h-3.5" />,
-      count: listingCount,
-    },
+    { key: "all",     label: "All",      icon: <LayoutGrid className="w-3.5 h-3.5" />,     count: allProducts.length },
+    { key: "store",   label: "Store",    icon: <ShoppingCart className="w-3.5 h-3.5" />,   count: storeCount },
+    { key: "listing", label: "Listings", icon: <MessageCircle className="w-3.5 h-3.5" />,  count: listingCount },
   ];
 
+  // ─── Active filter summary label ────────────────────────────────────────────
+  const filterLabel = [
+    selectedCategoryName,
+    selectedCity ? `📍 ${selectedCity}` : "",
+    searchQuery   ? `🔍 "${searchQuery}"` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ") || "All Products";
+
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-50 to-gray-100
+    <div style={{"marginTop":"10px"}} className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-50 to-gray-100
                     dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white">
 
       {/* Category Filter Bar */}
@@ -169,13 +188,11 @@ export default function Home() {
           <div className="mx-8 my-8">
 
             {/* ── TABS + HEADING ROW ── */}
-            <div style={{"marginTop":"100px"}} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div style={{ marginTop: "100px" }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
 
               {/* Section heading */}
               <h2 className="text-base font-semibold text-gray-700 dark:text-gray-200">
-                {selectedCategoryId && selectedCategoryName
-                  ? `${selectedCategoryName}`
-                  : "All Products"}
+                {filterLabel}
                 <span className="ml-2 text-sm font-normal text-gray-400">
                   ({filteredProducts.length})
                 </span>
@@ -252,23 +269,29 @@ export default function Home() {
             {!isLoading && filteredProducts.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <p className="text-4xl mb-3">
-                  {activeTab === "store" ? "🛒" : activeTab === "listing" ? "💬" : "🔍"}
+                  {searchQuery ? "🔍" : selectedCity ? "📍" : activeTab === "store" ? "🛒" : activeTab === "listing" ? "💬" : "📭"}
                 </p>
                 <p className="text-gray-500 text-base font-medium">
-                  {activeTab === "store"
+                  {searchQuery
+                    ? `No results for "${searchQuery}"`
+                    : selectedCity
+                    ? `No products in ${selectedCity}`
+                    : activeTab === "store"
                     ? "No store products found"
                     : activeTab === "listing"
                     ? "No marketplace listings found"
                     : `No products found${selectedCategoryName ? ` in "${selectedCategoryName}"` : ""}`}
                 </p>
                 <p className="text-gray-400 text-sm mt-1">
-                  {activeTab !== "all"
-                    ? "Try switching to the \"All\" tab"
+                  {searchQuery || selectedCity
+                    ? "Try adjusting your search or location filter"
+                    : activeTab !== "all"
+                    ? 'Try switching to the "All" tab'
                     : selectedCategoryId
                     ? "Try a different category"
                     : ""}
                 </p>
-                <div className="flex gap-2 mt-4">
+                <div className="flex gap-2 mt-4 flex-wrap justify-center">
                   {activeTab !== "all" && (
                     <button
                       onClick={() => setActiveTab("all")}
