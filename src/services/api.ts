@@ -1626,3 +1626,43 @@ export const favoriteApi = {
 
 
 };
+
+export interface Review {
+  userReviewPkId?: number;
+  userFkId: string;
+  userName?: string;
+  rating: number;
+  comment: string;
+  createdAt?: string;
+}
+
+export const reviewApi = {
+  getByProduct: (productId: number): Promise<Review[]> =>
+    apiCall<any>(
+      `/api/users/getUserReview?userReviewPkId=null&userFkId=null&productFkId=${productId}`
+    ).then((response) => response.data || []),
+
+  post: (payload: {
+    productFkId: number;
+    userFkId: string;
+    rating: number;
+    comment: string;
+  }): Promise<Review> =>
+    apiCall<any>(`/api/users/postUserReview`, "POST", payload).then(
+      (response) => response.data?.[0] || response
+    ),
+};
+
+export const viewApi = {
+  increment: (productId: number): Promise<void> =>
+    apiCall<void>(`/api/users/postUserVisit`, "POST"),
+
+  getCount: (productId: number): Promise<number> =>
+    apiCall<any>(`/api/users/getUserVisit?userVisitPkId=null&userFkId=null&productFkId=${productId}`).then((response) => {
+      const data = response.data || response;
+
+      return typeof data === "number"
+        ? data
+        : data.count ?? data.viewCount ?? 0;
+    }),
+};
