@@ -6,8 +6,9 @@ import UserDropdown from "../components/header/UserDropdown";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { FaStore } from "react-icons/fa";
-import bandookwaleImage from "../components/images/BackgroundImage.png";
+// import bandookwaleImage from "../components/images/BackgroundImage.png";
 import { useFilter } from "./Filtercontext";
+import bandookwaleImage from "../components/images/BandookwaleLogo.jpeg";
 
 // Popular Indian cities
 const INDIAN_CITIES = [
@@ -54,7 +55,7 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
+    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-[#D4A017] via-[#3B2A00] to-[#071426] border-b">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         {/* Logo */}
@@ -65,9 +66,10 @@ export default function Header() {
           <img
             src={bandookwaleImage}
             alt="Store Logo"
-            className="w-full h-full object-cover"
+           className="w-full h-full object-contain"
           />
         </div>
+        
 
         {/* ── Location Dropdown ── */}
         <div ref={dropdownRef} className="relative flex-shrink-0">
