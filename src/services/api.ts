@@ -1653,16 +1653,18 @@ export const reviewApi = {
     ),
 };
 
+   export interface userVist {
+      userFkId: string;
+      productFkId: number
+    };
+
 export const viewApi = {
-  increment: (productId: number): Promise<void> =>
-    apiCall<void>(`/api/users/postUserVisit`, "POST"),
 
-  getCount: (productId: number): Promise<number> =>
-    apiCall<any>(`/api/users/getUserVisit?userVisitPkId=null&userFkId=null&productFkId=${productId}`).then((response) => {
-      const data = response.data || response;
+    add: (data: userVist): Promise<userVist> =>
+    apiCall<any>(`/api/users/postUserVisit`, 'POST', data).then(
+      (response) => response.data?.[0] || response
+    ),
 
-      return typeof data === "number"
-        ? data
-        : data.count ?? data.viewCount ?? 0;
-    }),
+  get: (productId: number): Promise<userVist[]> =>
+    apiCall<any>(`/api/users/getUserVisit?userVisitPkId=null&userFkId=null&productFkId=${productId}`).then((response) => response.data || []),
 };

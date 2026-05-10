@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { useWishlist } from "./Wishlistcontext";
-import { viewApi, reviewApi} from "../services/api";
+import { viewApi, reviewApi } from "../services/api";
 
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -81,8 +81,8 @@ export default function ProductDetailsPage() {
     item.images?.length > 0
       ? item.images
       : item.image
-      ? [item.image]
-      : ["https://via.placeholder.com/300"];
+        ? [item.image]
+        : ["https://via.placeholder.com/300"];
 
   const isStoreProduct = item.isStoreProduct === true;
   const cartId = item.id?.toString() || `${item.title}-${item.location}`;
@@ -93,20 +93,35 @@ export default function ProductDetailsPage() {
   // ── On mount: increment view + fetch count + fetch reviews ─────────────
   useEffect(() => {
     if (!item.id) return;
+    const userVist = {
+      userFkId: user?.nodeId,
+      productFkId: item.id
+    };
 
     // Increment view count silently
-    viewApi.increment(item.id).catch(console.error);
+    viewApi.add(userVist).catch(console.error);
 
     // Fetch view count
-    viewApi.getCount(item.id)
-      .then(setViewCount)
-      .catch(console.error);
-
+    // viewApi.getCount(item.id)
+    //   .then((response) => {
+    //     setViewCount(response.data.length);
+    //   })
+    //   .catch(console.error);
     // Fetch reviews
     reviewApi.getByProduct(item.id)
       .then(setReviews)
       .catch(console.error)
       .finally(() => setReviewsLoading(false));
+  }, [item.id]);
+
+
+
+  useEffect(() => {
+    viewApi.get(item.id)
+      .then((response) => {
+        setViewCount(response.length || 0);
+      })
+      .catch(console.error);
   }, [item.id]);
 
   // ── Helpers ────────────────────────────────────────────────────────────
@@ -200,13 +215,13 @@ export default function ProductDetailsPage() {
           </div>
 
           {/* ── VIEW COUNT BADGE ── */}
-          {viewCount !== null && (
+          {/* {viewCount !== null && (
             <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600
                              text-xs font-medium px-3 py-1 rounded-full border border-gray-200">
               <Eye className="w-3.5 h-3.5" />
               {viewCount.toLocaleString()} {viewCount === 1 ? "view" : "views"}
             </span>
-          )}
+          )} */}
         </div>
 
         {/* Image Carousel */}
@@ -251,6 +266,13 @@ export default function ProductDetailsPage() {
 
         {/* Details */}
         <div className="bg-white p-4 rounded-lg border">
+          {viewCount !== null && (
+            <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600
+                             text-xs font-medium px-3 py-1 rounded-full border border-gray-200 mb-4">
+              <Eye className="w-3.5 h-3.5" />
+              {viewCount.toLocaleString()} {viewCount === 1 ? "view" : "views"}
+            </span>
+          )}
           <h2 className="text-xl font-semibold mb-3">Details</h2>
           <div className="flex justify-between border-b pb-3">
             <span className="text-gray-500">Brand</span>
@@ -369,9 +391,8 @@ export default function ProductDetailsPage() {
                   title={favorited ? "Remove from wishlist" : "Add to wishlist"}
                   className="disabled:opacity-50"
                 >
-                  <Heart className={`w-5 h-5 transition ${
-                    favorited ? "fill-red-500 text-red-500" : "text-gray-500 hover:text-red-500"
-                  }`} />
+                  <Heart className={`w-5 h-5 transition ${favorited ? "fill-red-500 text-red-500" : "text-gray-500 hover:text-red-500"
+                    }`} />
                 </button>
               )}
             </div>
@@ -392,7 +413,7 @@ export default function ProductDetailsPage() {
                     : "bg-gradient-to-r from-black to-yellow-500 text-white hover:opacity-90"}`}>
                 {addedToCart ? <><CheckCircle className="w-5 h-5" /> Added!</>
                   : alreadyInCart ? <><CheckCircle className="w-5 h-5" /> In Cart</>
-                  : <><ShoppingCart className="w-5 h-5" /> Add to Cart</>}
+                    : <><ShoppingCart className="w-5 h-5" /> Add to Cart</>}
               </button>
               {alreadyInCart && (
                 <button onClick={() => navigate("/bandookwale/cart")}
