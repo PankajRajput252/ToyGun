@@ -6,7 +6,7 @@ import UserDropdown from "../components/header/UserDropdown";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { FaStore } from "react-icons/fa";
- import bandookwaleImage from "../components/images/BackgroundImage.png";
+import bandookwaleImage from "../components/images/BackgroundImage.png";
 import { useFilter } from "./Filtercontext";
 // import bandookwaleImage from "../components/images/BandookwaleLogo.jpeg";
 
@@ -16,7 +16,7 @@ const INDIAN_CITIES = [
   "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
   "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Surat",
   "Lucknow", "Kanpur", "Nagpur", "Indore", "Bhopal",
-  "Visakhapatnam", "Patna", "Vadodara", "Coimbatore", "Ludhiana","Peddapuram"
+  "Visakhapatnam", "Patna", "Vadodara", "Coimbatore", "Ludhiana", "Peddapuram"
 ];
 
 export default function Header() {
@@ -59,17 +59,17 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         {/* Logo */}
-       <div
-  className="w-16 h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer bg-black flex items-center justify-center"
-  onClick={() => navigate("/bandookwale/")}
->
-  <img
-    src={bandookwaleImage}
-    alt="Store Logo"
-    className="w-full h-full object-contain"
-  />
-</div>
-        
+        <div
+          className="w-16 h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer flex items-center justify-center bg-black"
+          onClick={() => navigate("/bandookwale/")}
+        >
+          <img
+            src={bandookwaleImage}
+            alt="Store Logo"
+            className="w-full h-full object-contain p-1"
+          />
+        </div>
+
 
         {/* ── Location Dropdown ── */}
         <div ref={dropdownRef} className="relative flex-shrink-0">
@@ -120,10 +120,9 @@ export default function Header() {
                     <button
                       onClick={() => handleCitySelect(city)}
                       className={`w-full flex items-center gap-2 text-left px-4 py-2.5 text-sm transition
-                        ${
-                          (city === "All India" && !selectedCity) || city === selectedCity
-                            ? "bg-blue-50 text-blue-600 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                        ${(city === "All India" && !selectedCity) || city === selectedCity
+                          ? "bg-blue-50 text-blue-600 font-semibold"
+                          : "text-gray-700 hover:bg-gray-50"
                         }`}
                     >
                       <MapPin className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />

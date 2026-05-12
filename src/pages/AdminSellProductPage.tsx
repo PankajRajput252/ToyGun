@@ -422,7 +422,7 @@ export default function AdminSellProductPage() {
                     <div className="space-y-3">
                         <label className="font-medium block">Select Location *</label>
 
-                        <MapPicker
+                        {/* <MapPicker
                             coords={coords}
                             onSelect={(data) => {
                                 setCoords({ lat: data.lat, lng: data.lng });
@@ -435,7 +435,7 @@ export default function AdminSellProductPage() {
                                     country: data.country,
                                 }));
                             }}
-                        />
+                        /> */}
 
                         {/* Address Search */}
                         <div className="flex gap-2">

@@ -75,10 +75,10 @@ export default function SellProductPage() {
                     Array.isArray(data?.data)
                         ? data.data
                         : Array.isArray(data?.content)
-                        ? data.content
-                        : Array.isArray(data)
-                        ? data
-                        : [];
+                            ? data.content
+                            : Array.isArray(data)
+                                ? data
+                                : [];
 
                 setCategories(list);
             } catch (err) {
@@ -439,7 +439,7 @@ export default function SellProductPage() {
                     <div className="space-y-3">
                         <label className="font-medium block">Select Location *</label>
 
-                        <MapPicker
+                        {/* <MapPicker
                             coords={coords}
                             onSelect={(data) => {
                                 setCoords({ lat: data.lat, lng: data.lng });
@@ -452,7 +452,7 @@ export default function SellProductPage() {
                                     country: data.country,
                                 }));
                             }}
-                        />
+                        /> */}
 
                         <div className="flex gap-2">
                             <input

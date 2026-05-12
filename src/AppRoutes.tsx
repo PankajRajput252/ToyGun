@@ -56,6 +56,7 @@ import ChatPage from "./pages/ChatPage";
 import AdminSellerStorePage from "./pages/AdminSellerStorePage";
 import AdminSellProductPage from "./pages/AdminSellProductPage";
 import { WishlistProvider } from "./pages/Wishlistcontext";
+import PremiumPage from "./pages/Premiumpage";
 
 
 export default function AppRoutes() {
@@ -103,6 +104,7 @@ export default function AppRoutes() {
             <Route path="/bandookwale/cart" element={<CartPage />} />
             <Route path="/bandookwale/cart" element={<CartPage />} />
             <Route path="/bandookwale/orders" element={<MyOrdersPage />} />
+             <Route path="/bandookwale/premiumPage" element={<PremiumPage />} />
             <Route path="/bandookwale/orders/:orderId" element={<OrderDetailPage />} />
             <Route path="/bandookwale/chat" element={<ChatPage />} />
             {/* USER FEATURES */}

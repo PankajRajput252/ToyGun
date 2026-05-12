@@ -3,8 +3,17 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext";
+// import crown from "../images/crown.png"
+import {
+  User,
+  Settings,
+  Package,
+  Crown,
+  LogOut
+} from "lucide-react";
 
 export default function UserDropdown() {
+
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -157,30 +166,30 @@ export default function UserDropdown() {
               to="/bandookwale/orders"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
-              <svg
-                className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M6 8H18L17 20H7L6 8Z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M9 8V6A3 3 0 0 1 15 6V8"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-              </svg>
-              My Orders
+
+              <div className="flex items-center gap-3">
+                <Package size={20} />
+                <span>My Orders</span>
+              </div>
+              {/* My Orders */}
             </DropdownItem>
             {/* <button onClick={() => navigate("/bandookwale/orders")}>
               My Orders
             </button> */}
+          </li>
+          <li>
+            <DropdownItem
+              onItemClick={closeDropdown}
+              tag="a"
+              to="/bandookwale/premiumPage"
+              className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+            >
+              <div className="flex items-center gap-3">
+                <Crown size={20} className="text-yellow-400" />
+                <span>Premium Membership</span>
+              </div>
+
+            </DropdownItem>
           </li>
         </ul>
         <button
