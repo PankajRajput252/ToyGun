@@ -331,7 +331,7 @@ export default function UserProfiles() {
       const response = await imageUploadApi.uploadUserImage(currentUser.nodeId, file);
       
       // Extract image URL from response (check multiple possible response formats)
-      const imageUrl = response?.data?.profileImageUrl || response?.data?.imageUrl || response?.profileImageUrl || response?.imageUrl || response?.data?.url;
+      const imageUrl = response?.data?.profileImageUrl || response?.data?.imageUrl || response?.profileImageUrl || response?.imageUrl || response?.data?.message;
       
       if (imageUrl) {
         // Update user context with new image URL (store in both fields for compatibility)

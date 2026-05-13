@@ -4,8 +4,8 @@ import { Store, Plus } from "lucide-react";
 import { sellProductApi } from "../services/api";
 import ProductCard from "./ProductCard";
 import { Product } from "./ProductCard";
- import storeLogo from "../components/images/storeLogo.png"// adjust path
-import bgImage from "../components/images/bg-gun2.jpeg"// adjust path
+import storeLogo from "../components/images/storeLogo.png";
+import bgImage from "../components/images/bg-gun2.jpeg";
 
 export default function AdminSellerStorePage() {
   const navigate = useNavigate();
@@ -14,8 +14,6 @@ export default function AdminSellerStorePage() {
   const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
   const loggedInUserId = user?.nodeId;
 
-  // Use sellerId from URL if visiting someone else's store,
-  // otherwise use logged-in user's ID
   const sellerId = sellerIdFromUrl || loggedInUserId;
   const isOwnStore = sellerId === loggedInUserId;
   const sellerName = isOwnStore
@@ -52,7 +50,17 @@ export default function AdminSellerStorePage() {
         sellerId: item.sellerId,
         sellerName: item.sellerName || item.sellerId || "Seller",
         isNegotiable: item.negotiable,
-        isStoreProduct: true,  // ← ALL products in store page are store products
+        isStoreProduct: true,
+        // raw fields for edit pre-fill
+        categoryId: item.categoryId,
+        subcategoryId: item.subcategoryId,
+        city: item.city,
+        state: item.state,
+        zipCode: item.zipCode,
+        country: item.country,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        productImageList: item.productImageList,
       }));
 
       setProducts(mapped);
@@ -68,37 +76,32 @@ export default function AdminSellerStorePage() {
     fetchStoreProducts();
   }, [sellerId]);
 
+  // ─── Remove deleted product from list instantly ───────────────────────────
+  const handleProductDeleted = (deletedId: number) => {
+    setProducts((prev) => prev.filter((p) => p.id !== deletedId));
+    setTotalCount((prev) => Math.max(0, prev - 1));
+  };
+
   return (
-    <div style={{"marginTop":"100px"}} className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div style={{ marginTop: "100px" }} className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
 
       {/* STORE BANNER */}
-      {/* <div className="bg-gradient-to-r from-black to-yellow-500 px-6 py-8"> */}
       <div
-  className="px-6 py-8 bg-cover bg-center"
-  style={{
-    backgroundImage: `url(${bgImage})`,
-  }}
->
+        className="px-6 py-8 bg-cover bg-center"
+        style={{ backgroundImage: `url(${bgImage})` }}
+      >
         <div className="max-w-7xl mx-auto flex items-center gap-5">
 
           {/* Avatar */}
-          {/* <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center
-                          text-2xl font-bold text-yellow-500 shadow-lg flex-shrink-0">
-            {sellerName.charAt(0).toUpperCase()}
-          </div> */}
-<div className="w-16 h-16 rounded-full overflow-hidden bg-white shadow-lg flex-shrink-0">
-  <img
-    src={storeLogo}
-    alt="Store Logo"
-    className="w-full h-full object-cover"
-  />
-</div>
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-white shadow-lg flex-shrink-0">
+            <img src={storeLogo} alt="Store Logo" className="w-full h-full object-cover" />
+          </div>
+
           {/* Info */}
           <div className="text-white flex-1">
             <div className="flex items-center gap-2">
               <Store className="w-5 h-5 text-yellow-300" />
-              {/* <h1 className="text-2xl font-bold">{sellerName}'s Store</h1> */}
-               <h1 className="text-2xl font-bold">Luthra Gun House Private Limited's Store</h1>
+              <h1 className="text-2xl font-bold">Luthra Gun House Private Limited's Store</h1>
             </div>
             <p className="text-white/70 text-sm mt-1">
               {totalCount} {totalCount === 1 ? "product" : "products"}
@@ -108,7 +111,7 @@ export default function AdminSellerStorePage() {
             </p>
           </div>
 
-          {/* Post new ad — own store only */}
+          {/* Post new — own store only */}
           {isOwnStore && (
             <button
               onClick={() => navigate("/bandookwale/admin/sellProductPage")}
@@ -140,11 +143,9 @@ export default function AdminSellerStorePage() {
             </h2>
             {isOwnStore && (
               <>
-                <p className="text-gray-500 mt-2 mb-6">
-                  Post your first product to start selling.
-                </p>
+                <p className="text-gray-500 mt-2 mb-6">Post your first product to start selling.</p>
                 <button
-                  onClick={() => navigate("//bandookwale/admin/sellProductPage")}
+                  onClick={() => navigate("/bandookwale/admin/sellProductPage")}
                   className="bg-gradient-to-r from-black to-yellow-500 text-white
                              px-6 py-3 rounded-xl font-medium hover:opacity-90 transition
                              flex items-center gap-2"
@@ -163,7 +164,6 @@ export default function AdminSellerStorePage() {
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
                 {isOwnStore ? "Your Products" : `Products by ${sellerName}`}
               </h2>
-              {/* Store badge */}
               <span className="text-xs bg-yellow-100 text-yellow-700 px-3 py-1
                                rounded-full border border-yellow-300 font-medium">
                 🛒 Cart + Razorpay enabled
@@ -172,7 +172,11 @@ export default function AdminSellerStorePage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {products.map((item, index) => (
-                <ProductCard key={index} item={item} />
+                <ProductCard
+                  key={item.id ?? index}
+                  item={item}
+                  onDeleted={handleProductDeleted}
+                />
               ))}
             </div>
           </>

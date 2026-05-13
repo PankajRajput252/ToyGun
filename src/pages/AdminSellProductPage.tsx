@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { imageUploadApi, sellProductApi, ProductReq } from "../services/api";
 
 type ProductForm = {
@@ -32,9 +32,15 @@ const API_URL = "http://bandookwale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com
 export default function AdminSellProductPage() {
     const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
     const userNodeId = user?.nodeId;
-    console.log("USER NODE ID ps", userNodeId);
 
     const navigate = useNavigate();
+    const routerLocation = useLocation();
+
+    // ─── Edit Mode Detection ──────────────────────────────────────────────────────
+    // Pass existing product via router state: navigate('/admin/sell', { state: { product } })
+    const existingProduct = routerLocation.state?.product || null;
+    const isEditMode = !!existingProduct;
+    const editProductId = existingProduct?.productPkId || existingProduct?.id || null;
 
     // ─── State ───────────────────────────────────────────────────────────────────
     const [coords, setCoords] = useState({ lat: 0, lng: 0 });
@@ -43,6 +49,8 @@ export default function AdminSellProductPage() {
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     // ─── Category & Subcategory state ─────────────────────────────────────────────
     const [categories, setCategories] = useState<Category[]>([]);
@@ -56,14 +64,49 @@ export default function AdminSellProductPage() {
         categoryId: "",
         subcategoryId: "",
         price: "",
-        isNegotiable: false,       // not used in admin page
-        isStoreProduct: true,      // ← always true by default for admin
+        isNegotiable: false,
+        isStoreProduct: true,
         location: "",
         city: "",
         state: "",
         zipCode: "",
         country: "India",
     });
+
+    // ─── Pre-fill form in edit mode ───────────────────────────────────────────────
+    useEffect(() => {
+        if (!isEditMode || !existingProduct) return;
+
+        setForm({
+            title: existingProduct.title || "",
+            description: existingProduct.description || "",
+            categoryId: existingProduct.categoryId?.toString() || "",
+            subcategoryId: existingProduct.subcategoryId?.toString() || "",
+            price: existingProduct.price?.toString() || "",
+            isNegotiable: existingProduct.isNegotiable || false,
+            isStoreProduct: true,
+            location: existingProduct.location || "",
+            city: existingProduct.city || "",
+            state: existingProduct.state || "",
+            zipCode: existingProduct.zipCode || "",
+            country: existingProduct.country || "India",
+        });
+
+        setCoords({
+            lat: existingProduct.latitude || 0,
+            lng: existingProduct.longitude || 0,
+        });
+
+        // Pre-fill existing images
+        if (existingProduct.productImageList?.length) {
+            const ids = existingProduct.productImageList.map(
+                (img: any) => img.productImageId
+            );
+            setProductImageIds(ids);
+            productImageIdsRef.current = ids;
+            setImagePreviews(ids.map((id: string) => `uploaded:${id}`));
+        }
+    }, [isEditMode]);
 
     // ─── Fetch Categories on mount ────────────────────────────────────────────────
     useEffect(() => {
@@ -74,11 +117,10 @@ export default function AdminSellProductPage() {
                     `${API_URL}/api/users/getCategory?filterBy=ACTIVE&page=0&size=20&inputPkId=null&inputFkId=null&searchValue=null`
                 );
                 const data = await res.json();
-                console.log("Categories response:", data);
                 const list: Category[] =
                     Array.isArray(data?.data) ? data.data :
-                        Array.isArray(data?.content) ? data.content :
-                            Array.isArray(data) ? data : [];
+                    Array.isArray(data?.content) ? data.content :
+                    Array.isArray(data) ? data : [];
                 setCategories(list);
             } catch (err) {
                 console.error("Failed to fetch categories:", err);
@@ -101,19 +143,15 @@ export default function AdminSellProductPage() {
             try {
                 setIsSubCategoryLoading(true);
                 setSubCategories([]);
-                setForm((prev) => ({ ...prev, subcategoryId: "" }));
-
+                // Don't reset subcategoryId here so edit mode keeps its value
                 const res = await fetch(
                     `${API_URL}/api/users/getSubCategory?categoryFkId=${form.categoryId}&SubCategoryPkId=null`
                 );
                 const data = await res.json();
-                console.log("SubCategories response:", data);
-
                 const list: SubCategory[] =
                     Array.isArray(data?.data) ? data.data :
-                        Array.isArray(data?.content) ? data.content :
-                            Array.isArray(data) ? data : [];
-
+                    Array.isArray(data?.content) ? data.content :
+                    Array.isArray(data) ? data : [];
                 setSubCategories(list);
             } catch (err) {
                 console.error("Failed to fetch subcategories:", err);
@@ -145,38 +183,6 @@ export default function AdminSellProductPage() {
         });
     };
 
-    // ─── Address Search ───────────────────────────────────────────────────────────
-    const handleAddressSearch = async () => {
-        const searchValue = form.zipCode || form.location;
-        if (!searchValue) return;
-
-        const isZip = /^\d{5,6}$/.test(searchValue);
-        const query = isZip ? `${searchValue}, India` : searchValue;
-
-        try {
-            const res = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&addressdetails=1&q=${encodeURIComponent(query)}`
-            );
-            const data = await res.json();
-            if (data.length === 0) {
-                alert("Location not found. Try adding city/state or PIN code.");
-                return;
-            }
-            const place = data[0];
-            setCoords({ lat: parseFloat(place.lat), lng: parseFloat(place.lon) });
-            setForm((prev) => ({
-                ...prev,
-                location: place.display_name,
-                city: place.address?.city || place.address?.town || "",
-                state: place.address?.state || "",
-                zipCode: place.address?.postcode || searchValue,
-                country: place.address?.country || "India",
-            }));
-        } catch (err) {
-            alert("Error fetching location. Try again.");
-        }
-    };
-
     // ─── Image Upload ─────────────────────────────────────────────────────────────
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -190,8 +196,6 @@ export default function AdminSellProductPage() {
             try {
                 setIsUploadingImage(true);
                 const response = await imageUploadApi.uploadUserImage(userNodeId, file);
-                console.log("Full upload response:", JSON.stringify(response));
-
                 const productImageId = response?.message;
 
                 if (productImageId) {
@@ -203,9 +207,7 @@ export default function AdminSellProductPage() {
                     setImagePreviews((prev) =>
                         prev.map((u) => (u === localPreview ? `uploaded:${productImageId}` : u))
                     );
-                    console.log("Stored productImageId:", productImageId);
                 } else {
-                    console.warn("No productImageId in response:", response);
                     setImagePreviews((prev) => prev.filter((u) => u !== localPreview));
                     alert("Image uploaded but ID not received. Try again.");
                 }
@@ -230,7 +232,7 @@ export default function AdminSellProductPage() {
         });
     };
 
-    // ─── Submit ───────────────────────────────────────────────────────────────────
+    // ─── Submit (Add or Update) ───────────────────────────────────────────────────
     const handleSubmit = async () => {
         if (!form.title || !form.price || !form.categoryId) {
             alert("Please fill all required fields: Title, Price, Category");
@@ -240,10 +242,7 @@ export default function AdminSellProductPage() {
         if (imagePreviews.some((url) => url.startsWith("blob:"))) {
             alert("Some images are still uploading. Please wait."); return;
         }
-        const sellerId = userNodeId;
-        if (!sellerId) { alert("You must be logged in to post an ad."); return; }
-
-        console.log("productImageIdsRef at submit:", productImageIdsRef.current);
+        if (!userNodeId) { alert("You must be logged in to post an ad."); return; }
 
         const payload: ProductReq = {
             title: form.title,
@@ -251,9 +250,9 @@ export default function AdminSellProductPage() {
             categoryId: Number(form.categoryId),
             subcategoryId: form.subcategoryId ? Number(form.subcategoryId) : null,
             price: Number(form.price),
-            isNegotiable: false,           // always false for admin store products
-            isStoreProduct: true,          // always true for admin
-            sellerId,
+            isNegotiable: false,
+            isStoreProduct: true,
+            sellerId: userNodeId,
             location: form.location,
             city: form.city,
             state: form.state,
@@ -271,13 +270,15 @@ export default function AdminSellProductPage() {
             })),
         };
 
-        console.log("Submitting payload:", payload);
-
         try {
             setIsSubmitting(true);
-            const response = await sellProductApi.add(payload);
-            console.log("Product posted:", response);
-            alert("Ad posted successfully!");
+            if (isEditMode && editProductId) {
+                await sellProductApi.update(editProductId, payload);
+                alert("Product updated successfully!");
+            } else {
+                await sellProductApi.add(payload);
+                alert("Product posted successfully!");
+            }
             navigate(-1);
         } catch (error: any) {
             console.error("Submit error:", error);
@@ -287,19 +288,93 @@ export default function AdminSellProductPage() {
         }
     };
 
+    // ─── Delete ───────────────────────────────────────────────────────────────────
+    const handleDelete = async () => {
+        if (!editProductId) return;
+        try {
+            setIsDeleting(true);
+            await sellProductApi.delete(editProductId);
+            alert("Product deleted successfully!");
+            navigate(-1);
+        } catch (error: any) {
+            console.error("Delete error:", error);
+            alert(`Failed to delete: ${error.message || "Please try again."}`);
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false);
+        }
+    };
+
     // ─── Render ───────────────────────────────────────────────────────────────────
     return (
         <div className="max-w-4xl mx-auto p-6 mt-10 bg-transparent">
+
+            {/* ── Delete Confirmation Modal ── */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
+                        <div className="flex flex-col items-center text-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-2xl">
+                                🗑️
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-800">Delete Product?</h3>
+                            <p className="text-sm text-gray-500">
+                                This action cannot be undone. The product will be permanently removed.
+                            </p>
+                        </div>
+                        <div className="flex gap-3 mt-6">
+                            <button
+                                onClick={() => setShowDeleteModal(false)}
+                                disabled={isDeleting}
+                                className="flex-1 py-2 rounded-lg border border-gray-300 text-gray-700
+                                           hover:bg-gray-50 transition disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className="flex-1 py-2 rounded-lg bg-red-500 text-white font-medium
+                                           hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isDeleting ? "Deleting..." : "Yes, Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="bg-white rounded-xl shadow overflow-hidden">
 
                 {/* HEADER */}
                 <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-black to-yellow-500">
-                    <h2 className="text-lg font-semibold text-white">Post Store Product</h2>
-                    <button onClick={handleCancel} className="text-white/80 hover:text-white transition">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    <h2 className="text-lg font-semibold text-white">
+                        {isEditMode ? "Edit Store Product" : "Post Store Product"}
+                    </h2>
+                    <div className="flex items-center gap-3">
+                        {/* Delete button — only in edit mode */}
+                        {isEditMode && (
+                            <button
+                                onClick={() => setShowDeleteModal(true)}
+                                disabled={isDeleting}
+                                title="Delete product"
+                                className="flex items-center gap-1.5 bg-red-500 hover:bg-red-600 text-white
+                                           text-sm px-3 py-1.5 rounded-lg transition disabled:opacity-50
+                                           disabled:cursor-not-allowed"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Delete
+                            </button>
+                        )}
+                        <button onClick={handleCancel} className="text-white/80 hover:text-white transition">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Store Product Badge */}
@@ -390,10 +465,10 @@ export default function AdminSellProductPage() {
                                     {!form.categoryId
                                         ? "Select a category first"
                                         : isSubCategoryLoading
-                                            ? "Loading subcategories..."
-                                            : subCategories.length === 0
-                                                ? "No subcategories available"
-                                                : "Select Subcategory"}
+                                        ? "Loading subcategories..."
+                                        : subCategories.length === 0
+                                        ? "No subcategories available"
+                                        : "Select Subcategory"}
                                 </option>
                                 {subCategories.map((sub) => (
                                     <option key={sub.subCategoryPkId} value={sub.subCategoryPkId}>
@@ -485,7 +560,7 @@ export default function AdminSellProductPage() {
                             className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         />
 
-                        {/* ZIP + City */}
+                        {/* PIN + City */}
                         <div className="grid grid-cols-2 gap-4">
                             <input
                                 name="zipCode"
@@ -529,7 +604,9 @@ export default function AdminSellProductPage() {
                         className="w-full py-3 text-white rounded-xl bg-gradient-to-r from-black to-yellow-500
                                    disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition"
                     >
-                        {isSubmitting ? "Posting..." : "Post Store Product"}
+                        {isSubmitting
+                            ? isEditMode ? "Updating..." : "Posting..."
+                            : isEditMode ? "Update Product" : "Post Store Product"}
                     </button>
 
                 </div>

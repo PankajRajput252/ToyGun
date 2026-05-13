@@ -9,11 +9,13 @@ import { useAuth } from "../context/AuthContext";
 import { DropdownItem } from "../components/ui/dropdown/DropdownItem";
 import SupportSidebar from "../components/ui/support/SupportSidebar";
 import Header from "../pages/Header";
+import bandookwaleImage from "../components/images/bandg.png";
+import { useNavigate } from "react-router-dom";
 
 
 const AppHeader: React.FC = () => {
 
-
+  const navigate = useNavigate();
   const usersRef = useRef(null);
   const manageUsersRef = useRef(null);
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -94,17 +96,27 @@ const AppHeader: React.FC = () => {
 
             {/* LEFT: LOGO + NAV */}
             <div className="flex items-center gap-10">
+                  <div
+          className="w-16 h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer flex items-center justify-center bg-black"
+          onClick={() => navigate("/bandookwale/")}
+        >
+          <img
+            src={bandookwaleImage}
+            alt="Store Logo"
+            className="w-full h-full object-contain"
+          />
+        </div>
 
               {/* LOGO */}
               {/* <div className="text-xl font-semibold text-gray-800 cursor-pointer">
                 AdminPanel
               </div> */}
-              <Link
+              {/* <Link
                 to="/bandookwale"
                 className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
               >
                 AdminPanel
-              </Link>
+              </Link> */}
 
               {/* NAV LINKS */}
               <nav className="hidden lg:flex items-center gap-6">
