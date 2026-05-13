@@ -106,6 +106,7 @@ export default function UserProfiles() {
 
           // Load profile image from API response (check both profileImageUrl and imageUrl)
           const fetchedImageUrl = fetchedUser.profileImageUrl || fetchedUser.imageUrl;
+          console.log(fetchedImageUrl,"afdafd")
           const currentImageUrl = currentUserData?.profileImageUrl || currentUserData?.imageUrl;
           
           if (fetchedImageUrl) {

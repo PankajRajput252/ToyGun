@@ -1018,7 +1018,7 @@ export interface ImageUploadResponse {
 export const imageUploadApi = {
   // Upload user image
   uploadUserImage: (userNodeId: string, file: File): Promise<ImageUploadResponse> => {
-    const url = `${API_BASE_URL}/api/image/upload?userNodeId=${userNodeId}`;
+    const url = `${API_BASE_URL}/api/image/uploadUserImage?userNodeId=${userNodeId}`;
     const formData = new FormData();
     formData.append('file', file);
 

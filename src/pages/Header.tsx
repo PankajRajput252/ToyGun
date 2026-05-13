@@ -6,9 +6,10 @@ import UserDropdown from "../components/header/UserDropdown";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { FaStore } from "react-icons/fa";
-import bandookwaleImage from "../components/images/BackgroundImage.png";
+// import bandookwaleImage from "../components/images/BackgroundImage.png";
 import { useFilter } from "./Filtercontext";
 // import bandookwaleImage from "../components/images/BandookwaleLogo.jpeg";
+import bandookwaleImage from "../components/images/bandg.png";
 
 // Popular Indian cities
 const INDIAN_CITIES = [
@@ -66,7 +67,7 @@ export default function Header() {
           <img
             src={bandookwaleImage}
             alt="Store Logo"
-            className="w-full h-full object-contain p-1"
+            className="w-full h-full object-contain"
           />
         </div>
 
