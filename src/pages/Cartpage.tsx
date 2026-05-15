@@ -267,7 +267,7 @@ export default function CartPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
           {/* Cart Items */}
-          <div className="md:col-span-2 space-y-4">
+          <div className="md:col-span-2 space-y-4 mt-10">
             {cartItems.map((item) => (
               <div
                 key={item.id}
@@ -306,7 +306,7 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="md:col-span-1">
+          <div className="md:col-span-1 mt-10">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-5 sticky top-24">
               <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
                 Order Summary

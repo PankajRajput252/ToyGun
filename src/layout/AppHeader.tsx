@@ -91,7 +91,8 @@ const AppHeader: React.FC = () => {
       {!user ? (
         <Header />
       ) : isAdmin ? (
-        <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
+        // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
+        <header className="fixed top-0 left-0 w-full z-50 bg-[#f5b301] border-b border-[#d89c00]">
           <div className="flex items-center justify-between px-6 py-3">
 
             {/* LEFT: LOGO + NAV */}

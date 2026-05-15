@@ -56,7 +56,8 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-[#D4A017] via-[#3B2A00] to-[#071426] border-b">
+    // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-[#D4A017] via-[#3B2A00] to-[#071426] border-b">
+    <header className="fixed top-0 left-0 w-full z-50 bg-[#f5b301] border-b border-[#d89c00]">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         {/* Logo */}
@@ -167,62 +168,77 @@ export default function Header() {
         </div>
 
         {/* ── Actions ── */}
-        <div className="flex items-center gap-6 ml-4">
+       {/* ── Actions ── */}
+<div className="flex items-center gap-7 ml-4">
 
-          {/* Wishlist */}
-          <div
-            className="flex flex-col items-center text-sm cursor-pointer text-white hover:text-yellow-300 transition"
-            onClick={() => navigate("/bandookwale/wishlistPage")}
-          >
-            <Heart className="w-5 h-5" />
-            <span>Wishlist</span>
-          </div>
+  {/* Wishlist */}
+  <div
+    className="flex flex-col items-center text-sm cursor-pointer text-black hover:scale-110 transition duration-200"
+    onClick={() => navigate("/bandookwale/wishlistPage")}
+  >
+    <Heart
+      className="w-7 h-7 drop-shadow-md"
+      strokeWidth={2.5}
+    />
+    <span className="font-semibold mt-1">Wishlist</span>
+  </div>
 
-          {/* Cart */}
-          <button
-            onClick={() => navigate("/bandookwale/cart")}
-            className="relative text-white hover:text-yellow-300 transition"
-          >
-            <ShoppingCart className="w-6 h-6" />
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 bg-yellow-500 text-white
-                               text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {totalItems}
-              </span>
-            )}
-          </button>
+  {/* Cart */}
+  <button
+    onClick={() => navigate("/bandookwale/cart")}
+    className="relative text-black hover:scale-110 transition duration-200"
+  >
+    <ShoppingCart
+      className="w-8 h-8 drop-shadow-md"
+      strokeWidth={2.5}
+    />
 
-          {/* Sell Button */}
-          <button
-            className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold
-                       border-2 border-yellow-400 bg-white shadow-md hover:bg-yellow-50 transition"
-            onClick={() => navigate("/bandookwale/sellProductPage")}
-          >
-            <Plus className="w-5 h-5" />
-            SELL
-          </button>
+    {totalItems > 0 && (
+      <span
+        className="absolute -top-2 -right-2 bg-black text-white
+                   text-xs rounded-full min-w-[20px] h-5 px-1
+                   flex items-center justify-center font-bold shadow"
+      >
+        {totalItems}
+      </span>
+    )}
+  </button>
 
-          {/* Store */}
-          <button
-            onClick={() => navigate("/bandookwale/store")}
-            className="text-white hover:text-yellow-300 transition"
-          >
-            <FaStore className="w-5 h-5" />
-          </button>
+  {/* Sell Button */}
+  <button
+    className="flex items-center gap-2 px-6 py-2.5 rounded-full
+               font-bold text-black bg-white border-2 border-black
+               shadow-lg hover:scale-105 hover:bg-gray-100 transition duration-200"
+    onClick={() => navigate("/bandookwale/sellProductPage")}
+  >
+    <Plus className="w-5 h-5" strokeWidth={3} />
+    SELL
+  </button>
 
-          {/* Login / User */}
-          {isAuthenticated ? (
-            <UserDropdown />
-          ) : (
-            <div
-              onClick={() => navigate("/bandookwale/signin")}
-              className="flex flex-col items-center text-sm cursor-pointer text-white hover:text-yellow-300 transition"
-            >
-              <User className="w-5 h-5" />
-              <span>Login</span>
-            </div>
-          )}
-        </div>
+  {/* Store */}
+  <button
+    onClick={() => navigate("/bandookwale/store")}
+    className="text-black hover:scale-110 transition duration-200"
+  >
+    <FaStore className="w-7 h-7 drop-shadow-md" />
+  </button>
+
+  {/* Login / User */}
+  {isAuthenticated ? (
+    <UserDropdown />
+  ) : (
+    <div
+      onClick={() => navigate("/bandookwale/signin")}
+      className="flex flex-col items-center text-sm cursor-pointer text-black hover:scale-110 transition duration-200"
+    >
+      <User
+        className="w-7 h-7 drop-shadow-md"
+        strokeWidth={2.5}
+      />
+      <span className="font-semibold mt-1">Login</span>
+    </div>
+  )}
+</div>
       </div>
 
       {/* ── Active filter pills (shown below navbar when filters are on) ── */}
