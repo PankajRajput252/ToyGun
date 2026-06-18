@@ -468,7 +468,7 @@ export default function UserProfiles() {
 
   return (
     <>
-      <PageMeta title="StyloCoin Dashboard" description="StyloCoin Dashboard" />
+      <PageMeta title="Bandookwale Dashboard" description="Bandookwale Dashboard" />
       <div className="p-6">
         {/* Breadcrumb */}
         <div className="mb-6">

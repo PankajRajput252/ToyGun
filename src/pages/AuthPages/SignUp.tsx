@@ -6,8 +6,8 @@ export default function SignUp() {
   return (
     <>
       <PageMeta
-        title="StyloCoin Dashboard"
-        description= "StyloCoin Dashboard"
+        title="Bandookwale Dashboard"
+        description= "Bandookwale Dashboard"
   
     />
       <AuthLayout>

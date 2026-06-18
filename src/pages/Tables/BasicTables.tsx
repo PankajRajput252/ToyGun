@@ -7,8 +7,8 @@ export default function BasicTables() {
   return (
     <>
       <PageMeta
-     title="StyloCoin Dashboard"
-        description= "StyloCoin Dashboard"
+     title="Bandookwale Dashboard"
+        description= "Bandookwale Dashboard"
   
     />
       <PageBreadcrumb pageTitle="Basic Tables" />

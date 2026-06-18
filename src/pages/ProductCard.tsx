@@ -1,6 +1,10 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, MessageCircle, Heart, Loader2, Pencil, Trash2 } from "lucide-react";
+import {
+  ShoppingCart, MessageCircle, Heart, Loader2,
+  Pencil, Trash2, Store, ChevronLeft, ChevronRight
+} from "lucide-react";
 import { useWishlist } from "./Wishlistcontext";
 import { sellProductApi } from "../services/api";
 
@@ -17,7 +21,6 @@ export interface Product {
   brand?: string;
   isNegotiable?: boolean;
   isStoreProduct?: boolean;
-  // raw fields needed for edit pre-fill
   categoryId?: number;
   subcategoryId?: number;
   city?: string;
@@ -31,53 +34,42 @@ export interface Product {
 
 type Props = {
   item: Product;
-  onDeleted?: (id: number) => void; // optional callback to remove card from parent list
+  onDeleted?: (id: number) => void;
 };
 
 export default function ProductCard({ item, onDeleted }: Props) {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const { toggleFavorite, isFavorited, isLoading, isInitialized } = useWishlist();
-
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // ─── Ownership check ──────────────────────────────────────────────────────
   const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
   const loggedInUserId = user?.nodeId;
   const isOwner = !!loggedInUserId && loggedInUserId === item.sellerId;
 
-  const images = item.images?.length
-    ? item.images
-    : ["https://via.placeholder.com/300"];
+  const images = item.images?.length ? item.images : ["https://via.placeholder.com/300"];
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIndex((prev) => (prev + 1) % images.length);
   };
-
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
-
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (item.id != null) toggleFavorite(item.id);
   };
-
-  // ─── Edit ─────────────────────────────────────────────────────────────────
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigate("/bandookwale/admin/sellProductPage", { state: { product: item } });
   };
-
-  // ─── Delete ───────────────────────────────────────────────────────────────
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDeleteModal(true);
   };
-
   const handleDeleteConfirm = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (item.id == null) return;
@@ -85,14 +77,13 @@ export default function ProductCard({ item, onDeleted }: Props) {
       setIsDeleting(true);
       await sellProductApi.delete(item.id);
       setShowDeleteModal(false);
-      onDeleted?.(item.id); // tell parent to remove this card
+      onDeleted?.(item.id);
     } catch (error: any) {
       alert(`Failed to delete: ${error.message || "Please try again."}`);
     } finally {
       setIsDeleting(false);
     }
   };
-
   const handleModalBackdropClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isDeleting) setShowDeleteModal(false);
@@ -103,47 +94,46 @@ export default function ProductCard({ item, onDeleted }: Props) {
 
   return (
     <>
-      {/* ── Delete Confirmation Modal ── */}
+      {/* ── Delete Modal ── */}
       {showDeleteModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.7)" }}
           onClick={handleModalBackdropClick}
         >
           <div
-            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4"
+            className="rounded-2xl p-6 w-full max-w-sm mx-4"
+            style={{ background: "#1a1a1a", border: "1px solid #2a2a2a" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-500" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ background: "#2d1515" }}>
+                <Trash2 className="w-5 h-5 text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">Delete Product?</h3>
-              <p className="text-sm text-gray-500">
-                <span className="font-medium text-gray-700">"{item.title}"</span> will be
-                permanently removed and cannot be recovered.
+              <h3 className="text-base font-semibold text-white">Delete product?</h3>
+              <p className="text-sm" style={{ color: "#888" }}>
+                <span className="text-[#ccc] font-medium">"{item.title}"</span> will be permanently removed.
               </p>
             </div>
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-3 mt-5">
               <button
                 onClick={handleModalBackdropClick}
                 disabled={isDeleting}
-                className="flex-1 py-2 rounded-lg border border-gray-300 text-gray-700
-                           hover:bg-gray-50 transition disabled:opacity-50"
+                className="flex-1 py-2 rounded-lg text-sm disabled:opacity-50"
+                style={{ background: "#252525", color: "#aaa", border: "1px solid #333" }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 disabled={isDeleting}
-                className="flex-1 py-2 rounded-lg bg-red-500 text-white font-medium
-                           hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed
-                           flex items-center justify-center gap-2"
+                className="flex-1 py-2 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ background: "#7f1d1d", color: "#fca5a5" }}
               >
                 {isDeleting ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Deleting...</>
-                ) : (
-                  "Yes, Delete"
-                )}
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Deleting…</>
+                ) : "Yes, delete"}
               </button>
             </div>
           </div>
@@ -153,135 +143,185 @@ export default function ProductCard({ item, onDeleted }: Props) {
       {/* ── Card ── */}
       <div
         onClick={() => navigate("/bandookwale/productdetails", { state: item })}
-        className="group cursor-pointer p-[2px] rounded-xl bg-gradient-to-r from-black to-yellow-500"
+        className="group cursor-pointer rounded-xl overflow-hidden flex flex-col"
+        style={{
+          background: "#1a1a1a",
+          border: "0.5px solid #2a2a2a",
+          transition: "border-color 0.15s",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#c9931a")}
+        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#2a2a2a")}
       >
-        <div className="bg-white rounded-xl overflow-hidden relative">
+        {/* IMAGE */}
+        <div className="relative">
+          <img
+            src={images[index]}
+            alt={item.title}
+            className="w-full object-cover"
+            style={{ height: "160px" }}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = "https://via.placeholder.com/300";
+            }}
+          />
 
-          {/* IMAGE SECTION */}
-          <div className="relative">
-            <img
-              src={images[index]}
-              alt={item.title}
-              className="w-full h-48 object-cover"
-              onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/300"; }}
-            />
-
-            {/* ── STORE / MARKETPLACE BADGE ── */}
-            <div className="absolute top-2 left-2">
-              {item.isStoreProduct ? (
-                <span className="flex items-center gap-1 bg-yellow-500 text-white
-                                 text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
-                  <ShoppingCart className="w-2.5 h-2.5" /> Store
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 bg-blue-500 text-white
-                                 text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
-                  <MessageCircle className="w-2.5 h-2.5" /> Listing
-                </span>
-              )}
-            </div>
-
-            {/* ── WISHLIST HEART (non-owner) / EDIT+DELETE (owner) ── */}
-            {isOwner ? (
-              /* Edit & Delete buttons — top-right, only for owner */
-              <div
-                className="absolute top-2 right-2 flex gap-1"
-                onClick={(e) => e.stopPropagation()}
+          {/* Store / Listing badge — prominently styled */}
+          <div className="absolute top-2.5 left-2.5">
+            {item.isStoreProduct ? (
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-lg"
+                style={{ background: "#c9931a", color: "#fff", letterSpacing: "0.01em" }}
               >
+                <Store className="w-3 h-3" />
+                Store
+              </span>
+            ) : (
+              <span
+                className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-lg"
+                style={{ background: "#1d4480", color: "#93c5fd" }}
+              >
+                <MessageCircle className="w-3 h-3" />
+                Listing
+              </span>
+            )}
+          </div>
+
+          {/* Negotiable badge */}
+          {item.isNegotiable && (
+            <div className="absolute top-10 left-2.5">
+              <span
+                className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                style={{ background: "#14532d", color: "#86efac" }}
+              >
+                Negotiable
+              </span>
+            </div>
+          )}
+
+          {/* Owner controls / wishlist */}
+          <div className="absolute top-2.5 right-2.5 flex gap-1.5" onClick={(e) => e.stopPropagation()}>
+            {isOwner ? (
+              <>
                 <button
                   onClick={handleEdit}
-                  title="Edit product"
-                  className="bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-md
-                             hover:scale-110 hover:bg-yellow-50 transition-transform"
+                  title="Edit"
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
+                  style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
                 >
-                  <Pencil className="w-3.5 h-3.5 text-yellow-600" />
+                  <Pencil className="w-3.5 h-3.5" style={{ color: "#fbbf24" }} />
                 </button>
                 <button
                   onClick={handleDeleteClick}
-                  title="Delete product"
-                  className="bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-md
-                             hover:scale-110 hover:bg-red-50 transition-transform"
+                  title="Delete"
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
+                  style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
                 >
-                  <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                  <Trash2 className="w-3.5 h-3.5 text-red-400" />
                 </button>
-              </div>
+              </>
             ) : (
-              /* Wishlist heart — non-owner only */
               item.id != null && (
                 <button
                   onClick={handleWishlistClick}
                   disabled={!isInitialized || loading}
-                  className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5
-                             rounded-full shadow-md hover:scale-110 transition-transform
-                             disabled:opacity-60"
                   title={favorited ? "Remove from wishlist" : "Add to wishlist"}
+                  className="w-7 h-7 rounded-full flex items-center justify-center disabled:opacity-60"
+                  style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
                 >
                   {loading ? (
-                    <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 text-gray-400 animate-spin" />
                   ) : (
                     <Heart
-                      className={`w-4 h-4 transition-colors ${
-                        favorited ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-red-400"
-                      }`}
+                      className="w-3.5 h-3.5 transition-colors"
+                      style={{
+                        fill: favorited ? "#ef4444" : "transparent",
+                        color: favorited ? "#ef4444" : "#aaa",
+                      }}
                     />
                   )}
                 </button>
               )
             )}
+          </div>
 
-            {/* Negotiable badge */}
-            {item.isNegotiable && (
-              <div className="absolute top-10 right-2">
-                <span className="bg-green-500 text-white text-[10px] font-bold
-                                 px-2 py-0.5 rounded-full shadow">
-                  Negotiable
-                </span>
-              </div>
-            )}
-
-            {/* Carousel buttons */}
-            {images.length > 1 && (
+          {/* Carousel */}
+          {images.length > 1 && (
+            <>
               <button
                 onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 rounded"
-              >‹</button>
-            )}
-            {images.length > 1 && (
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(0,0,0,0.5)" }}
+              >
+                <ChevronLeft className="w-4 h-4 text-white" />
+              </button>
               <button
                 onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 rounded"
-              >›</button>
-            )}
-
-            {/* Dots */}
-            {images.length > 1 && (
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(0,0,0,0.5)" }}
+              >
+                <ChevronRight className="w-4 h-4 text-white" />
+              </button>
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                 {images.map((_, i) => (
-                  <div key={i} className={`w-2 h-2 rounded-full ${i === index ? "bg-yellow-400" : "bg-white"}`} />
+                  <div
+                    key={i}
+                    className="rounded-full"
+                    style={{
+                      width: i === index ? "16px" : "6px",
+                      height: "6px",
+                      background: i === index ? "#c9931a" : "rgba(255,255,255,0.4)",
+                      transition: "all 0.2s",
+                    }}
+                  />
                 ))}
               </div>
+            </>
+          )}
+        </div>
+
+        {/* BODY */}
+        <div className="p-3 flex flex-col gap-1 flex-1">
+          <p className="text-lg font-semibold" style={{ color: "#fff", lineHeight: 1.2 }}>
+            ₹ {Number(item.price).toLocaleString()}
+          </p>
+          <p className="text-sm truncate" style={{ color: "#aaa" }}>{item.title}</p>
+
+          <div className="flex justify-between text-[11px] mt-1" style={{ color: "#555" }}>
+            <span className="truncate max-w-[60%]">{item.location}</span>
+            <span>{item.date}</span>
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate("/bandookwale/productdetails", { state: item }); }}
+            className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors"
+            style={
+              item.isStoreProduct
+                ? { background: "transparent", border: "0.5px solid #c9931a", color: "#c9931a" }
+                : { background: "transparent", border: "0.5px solid #3b5898", color: "#93c5fd" }
+            }
+            onMouseEnter={(e) => {
+              if (item.isStoreProduct) {
+                (e.currentTarget as HTMLButtonElement).style.background = "#c9931a";
+                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+              } else {
+                (e.currentTarget as HTMLButtonElement).style.background = "#1d3a6e";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (item.isStoreProduct) {
+                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                (e.currentTarget as HTMLButtonElement).style.color = "#c9931a";
+              } else {
+                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+              }
+            }}
+          >
+            {item.isStoreProduct ? (
+              <><ShoppingCart className="w-3.5 h-3.5" /> Add to cart & buy</>
+            ) : (
+              <><MessageCircle className="w-3.5 h-3.5" /> Chat with seller</>
             )}
-          </div>
-
-          {/* CONTENT */}
-          <div className="p-3">
-            <h3 className="font-bold text-lg">₹ {Number(item.price).toLocaleString()}</h3>
-            <p className="text-gray-700 text-sm truncate">{item.title}</p>
-
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
-              <span>{item.location}</span>
-              <span>{item.date}</span>
-            </div>
-
-            <div className={`mt-2 text-[10px] font-medium flex items-center gap-1
-              ${item.isStoreProduct ? "text-yellow-600" : "text-blue-500"}`}>
-              {item.isStoreProduct ? (
-                <><ShoppingCart className="w-3 h-3" /> Add to cart & buy</>
-              ) : (
-                <><MessageCircle className="w-3 h-3" /> Chat with seller</>
-              )}
-            </div>
-          </div>
+          </button>
         </div>
       </div>
     </>

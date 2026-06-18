@@ -587,3 +587,22 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
 }
+
+
+
+@keyframes attention {
+  0%, 100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.25);
+    box-shadow: 0 0 20px gold;
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+.store-attention {
+  animation: attention 1s infinite;
+}

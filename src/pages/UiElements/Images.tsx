@@ -9,8 +9,8 @@ export default function Images() {
   return (
     <>
       <PageMeta
-      title="StyloCoin Dashboard"
-        description= "StyloCoin Dashboard"
+      title="Bandookwale Dashboard"
+        description= "Bandookwale Dashboard"
       />
       <PageBreadcrumb pageTitle="Images" />
       <div className="space-y-5 sm:space-y-6">

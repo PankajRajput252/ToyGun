@@ -7,8 +7,8 @@ export default function LineChart() {
   return (
     <>
       <PageMeta
-     title="StyloCoin Dashboard"
-        description= "StyloCoin Dashboard"
+     title="Bandookwale Dashboard"
+        description= "Bandookwale Dashboard"
 
      />
       <PageBreadcrumb pageTitle="Line Chart" />

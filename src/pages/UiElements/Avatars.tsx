@@ -7,8 +7,8 @@ export default function Avatars() {
   return (
     <>
       <PageMeta
-    title="StyloCoin Dashboard"
-        description= "StyloCoin Dashboard"
+    title="Bandookwale Dashboard"
+        description= "Bandookwale Dashboard"
      />
       <PageBreadcrumb pageTitle="Avatars" />
       <div className="space-y-5 sm:space-y-6">

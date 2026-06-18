@@ -7,8 +7,8 @@ export default function Alerts() {
   return (
     <>
       <PageMeta
-    title="StyloCoin Dashboard"
-        description= "StyloCoin Dashboard"
+    title="Bandookwale Dashboard"
+        description= "Bandookwale Dashboard"
    />
       <PageBreadcrumb pageTitle="Alerts" />
       <div className="space-y-5 sm:space-y-6">
