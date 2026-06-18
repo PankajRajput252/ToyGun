@@ -65,10 +65,10 @@ export default function Footer() {
             </div>
 
             {/* App Buttons */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <img src="/playstore.png" alt="Google Play" className="h-10" />
               <img src="/appstore.png" alt="App Store" className="h-10" />
-            </div>
+            </div> */}
           </div>
 
         </div>
