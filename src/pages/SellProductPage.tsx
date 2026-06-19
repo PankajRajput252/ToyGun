@@ -46,6 +46,7 @@ export default function SellProductPage() {
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     // ─── Category & Subcategory state ─────────────────────────────────────────────
     const [categories, setCategories] = useState<Category[]>([]);
     const [isCategoryLoading, setIsCategoryLoading] = useState(false);
@@ -136,12 +137,12 @@ export default function SellProductPage() {
 
     // ─── Cancel ──────────────────────────────────────────────────────────────────
     const handleCancel = () => {
-        const confirmLeave = window.confirm(
-            "Are you sure you want to cancel? Your changes will be lost."
-        );
-        if (confirmLeave) navigate(-1);
+        setShowCancelModal(true);
     };
-
+    const confirmCancel = () => {
+        setShowCancelModal(false);
+        navigate(-1);
+    };
     // ─── Form Change ─────────────────────────────────────────────────────────────
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -321,6 +322,45 @@ export default function SellProductPage() {
     // ─── Render ───────────────────────────────────────────────────────────────────
     return (
         <>
+            {showCancelModal && (
+                <div
+                    className="fixed inset-0 z-[9998] flex items-center justify-center"
+                    style={{ background: "rgba(0,0,0,0.7)" }}
+                >
+                    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 w-full max-w-sm mx-4">
+                        <div className="flex justify-center mb-4">
+                            <AlertTriangle
+                                className="w-10 h-10 text-yellow-400"
+                                strokeWidth={3}
+                            />
+                        </div>
+
+                        <h3 className="text-white text-lg font-semibold text-center">
+                            Cancel Changes?
+                        </h3>
+
+                        <p className="text-gray-400 mt-2 text-center">
+                            Are you sure you want to leave? All unsaved changes will be lost.
+                        </p>
+
+                        <div className="flex gap-3 mt-5">
+                            <button
+                                onClick={() => setShowCancelModal(false)}
+                                className="flex-1 py-2 rounded-lg bg-gray-700 text-white"
+                            >
+                                Stay
+                            </button>
+
+                            <button
+                                onClick={confirmCancel}
+                                className="flex-1 py-2 rounded-lg bg-red-500 text-white"
+                            >
+                                Leave
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {popup.open && (
                 <div
                     className="fixed inset-0 z-[9999] flex items-center justify-center"
