@@ -1051,6 +1051,41 @@ export const imageUploadApi = {
       return response.json();
     });
   },
+
+  uploadImage: (userNodeId: string, file: File): Promise<ImageUploadResponse> => {
+    const url = `${API_BASE_URL}/api/image/upload?userNodeId=${userNodeId}`;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return fetch(url, {
+      method: 'POST',
+      headers: createFileUploadHeaders(),
+      body: formData
+    }).then(async (response) => {
+      if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
+
+        // Handle specific status codes
+        if (response.status === 413) {
+          errorMessage = '413 Request Entity Too Large - Image file is too large. Please compress the image before uploading.';
+        } else if (response.status === 400) {
+          errorMessage = '400 Bad Request - Invalid image file format.';
+        }
+
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Image Upload Error:', {
+          endpoint: '/api/image/upload',
+          method: 'POST',
+          status: response.status,
+          errorData,
+          fileSize: file.size,
+        });
+
+        throw new Error(errorData.message || errorMessage);
+      }
+      return response.json();
+    });
+  },
 };
 
 // Support Ticket interfaces

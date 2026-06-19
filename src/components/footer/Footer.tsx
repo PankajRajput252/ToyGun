@@ -59,9 +59,9 @@ export default function Footer() {
               <span>📘</span>
               <span>📸</span>
               <span>▶️</span>
-              <span>❌</span>
+              {/* <span>❌</span>
               <span>💬</span>
-              <span>🔗</span>
+              <span>🔗</span> */}
             </div>
 
             {/* App Buttons */}
@@ -82,11 +82,11 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-between gap-6 border-b border-white/30 pb-6">
             <h2 className="text-lg font-semibold">Luthra Gun House Private limited</h2>
             <div className="flex gap-8 flex-wrap text-sm opacity-90">
-              <span>BandookWale</span>
-              <span>CarWale</span>
+              {/* <span>BandookWale</span> */}
+              {/* <span>CarWale</span>
               <span>BikeWale</span>
               <span>CarTrade</span>
-              <span>Mobility Outlook</span>
+              <span>Mobility Outlook</span> */}
             </div>
           </div>
 

@@ -196,7 +196,7 @@ export default function SellProductPage() {
             setImagePreviews((prev) => [...prev, localPreview]);
             try {
                 setIsUploadingImage(true);
-                const response = await imageUploadApi.uploadUserImage(userNodeId, file);
+                const response = await imageUploadApi.uploadImage(userNodeId, file);
                 const productImageId = response?.message;
                 if (productImageId) {
                     setProductImageIds((prev) => {
