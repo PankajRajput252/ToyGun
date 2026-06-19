@@ -1,27 +1,17 @@
 import { useState, useEffect, useRef } from "react";
+import { subscriptionIncomeTypeApi } from "../services/api"; // ← adjust path to your actual api.ts
 
-// ─── CONFIG — replace with your real values ───────────────────────
-const API_BASE = "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com/api/v1";
-const PREMIUM_PRODUCT_ID = 1;
-// ─────────────────────────────────────────────────────────────────
+// ─── CONFIG ─────────────────────────────────────────────────────────────────────
+const SUBSCRIPTION_CODE = "PREMIUM_MEMBERSHIP_CHARGE";
+const RAZORPAY_KEY = "rzp_test_Sk36cjHZNLcY5o"; // ← your key
+// ─────────────────────────────────────────────────────────────────────────────────
 
-const PLANS = {
-  monthly: {
-    id: "monthly",
-    label: "Monthly",
-    price: 499,
-    billingNote: "Billed every month",
-    badge: null,
-  },
-  yearly: {
-    id: "yearly",
-    label: "Yearly",
-    price: 3588,
-    perMonth: 299,
-    billingNote: "Billed ₹3,588 / year",
-    badge: "Save 40%",
-  },
-};
+interface SubscriptionType {
+  subscriptionDefinitionPkId: number;
+  subscriptionName: string;
+  subscriptionCode: string;
+  subscriptionAmount: number;
+}
 
 const FEATURES = [
   { icon: "⚡", title: "Unlimited access", desc: "No caps, no throttling, ever" },
@@ -38,10 +28,15 @@ const TESTIMONIALS = [
   { name: "Rahul Dev", role: "CTO, Buildspace", text: "Switching to yearly was the best decision we made.", avatar: "RD" },
 ];
 
-function loadRazorpay() {
+declare global {
+  interface Window { Razorpay: any; }
+}
+
+function loadRazorpay(): Promise<boolean> {
   return new Promise((resolve) => {
-    if (window.Razorpay) return resolve(true);
+    if ((window as any).Razorpay) return resolve(true);
     const script = document.createElement("script");
+    script.id = "razorpay-script";
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
@@ -50,16 +45,48 @@ function loadRazorpay() {
 }
 
 export default function PremiumPage() {
-  const [selectedPlan, setSelectedPlan] = useState("yearly");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(null);
+  const [success, setSuccess] = useState<any>(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  // ─── Subscription / pricing state ────────────────────────────────────────────
+  const [subscriptionDef, setSubscriptionDef] = useState<SubscriptionType | null>(null);
+  const [isFetchingPrice, setIsFetchingPrice] = useState(false);
+  const [fetchError, setFetchError] = useState("");
+
   const heroRef = useRef(null);
 
-  const plan = PLANS[selectedPlan];
-  const gst = +(plan.price * 0.18).toFixed(2);
-  const total = +(plan.price + gst).toFixed(2);
+  // ─── Fetch PREMIUM_AMOUNT subscription on mount ──────────────────────────────
+  useEffect(() => {
+    const fetchPremiumPrice = async () => {
+      try {
+        setIsFetchingPrice(true);
+        setFetchError("");
+
+        const response = await subscriptionIncomeTypeApi.getAll(0, 25, "ACTIVE");
+        console.log("Subscription definitions:", response);
+
+        // Find the one matching PREMIUM_AMOUNT code
+        const premiumSub = response.content.find(
+          (item: any) => item.subscriptionName === SUBSCRIPTION_CODE
+        );
+
+        if (premiumSub) {
+          setSubscriptionDef(premiumSub);
+        } else {
+          setFetchError(`No subscription found with code "${SUBSCRIPTION_CODE}"`);
+        }
+      } catch (err) {
+        console.error("Failed to fetch premium subscription price:", err);
+        setFetchError("Failed to load pricing. Please refresh the page.");
+      } finally {
+        setIsFetchingPrice(false);
+      }
+    };
+
+    fetchPremiumPrice();
+  }, []);
 
   // auto-rotate testimonials
   useEffect(() => {
@@ -67,71 +94,121 @@ export default function PremiumPage() {
     return () => clearInterval(t);
   }, []);
 
-  const getToken = () => localStorage.getItem("token") || "";
+  // ─── Derived pricing ──────────────────────────────────────────────────────────
+  const basePrice = subscriptionDef?.subscriptionAmount || 0;
+  const gst = +(basePrice * 0.18).toFixed(2);
+  const total = +(basePrice + gst).toFixed(2);
 
+  const getUser = () => JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+
+  // ─── Purchase flow — same pattern as CartPage ────────────────────────────────
   const handlePurchase = async () => {
     setError("");
+
+    if (!subscriptionDef || basePrice <= 0) {
+      setError("Premium pricing not available right now. Please try again later.");
+      return;
+    }
+
     setLoading(true);
     try {
       const sdkLoaded = await loadRazorpay();
       if (!sdkLoaded) throw new Error("Could not load Razorpay. Check your connection.");
 
-      // 1. Create order on backend
-      const orderRes = await fetch(`${API_BASE}/payments/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify({
-          productId: PREMIUM_PRODUCT_ID,
-          currency: "INR",
-          notes: `Premium ${plan.label} membership`,
-        }),
-      });
-      if (!orderRes.ok) throw new Error("Failed to create payment order. Please try again.");
-      const order = await orderRes.json();
+      const user = getUser();
+      const buyerName  = user?.name || user?.fullName || "";
+      const buyerEmail = user?.email || "";
+      const buyerPhone = user?.phone || user?.mobile || "";
 
-      // 2. Open Razorpay checkout
+      // ── STEP 1: Create order on backend ────────────────────────────────────
+      // ── When your backend order-create API is ready, replace this block ───
+      // const orderRes = await fetch(`${API_URL}/api/payments/orders`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   },
+      //   body: JSON.stringify({
+      //     subscriptionId: subscriptionDef.subscriptionDefinitionPkId,
+      //     amount: total,
+      //     currency: "INR",
+      //     notes: `Premium membership - ${subscriptionDef.subscriptionName}`,
+      //   }),
+      // });
+      // const order = await orderRes.json();
+      // const razorpayOrderId = order.razorpayOrderId;
+      // ────────────────────────────────────────────────────────────────────────
+
+      // TEMPORARY: until backend order-create API is ready
+      const razorpayOrderId: string | null = null;
+      const localOrderId = `PREM-${Date.now()}`;
+
+      // ── STEP 2: Open Razorpay checkout ──────────────────────────────────────
       const options = {
-        key: order.razorpayKeyId,
-        amount: order.amount * 100,
-        currency: order.currency || "INR",
-        name: "Premium Membership",
-        description: `${plan.label} Plan`,
-        order_id: order.razorpayOrderId,
-        prefill: { name: "", email: "", contact: "" },
+        key: RAZORPAY_KEY,
+        amount: Math.round(total * 100), // paise
+        currency: "INR",
+        name: "Bandookwale Premium",
+        description: subscriptionDef.subscriptionName || "Premium Membership",
+        order_id: razorpayOrderId, // null until backend ready
+        prefill: { name: buyerName, email: buyerEmail, contact: buyerPhone },
+        notes: {
+          subscriptionCode: subscriptionDef.subscriptionCode,
+          subscriptionId:   subscriptionDef.subscriptionDefinitionPkId,
+        },
         theme: { color: "#B45309" },
-        modal: { ondismiss: () => setLoading(false) },
-        handler: async (response) => {
-          // 3. Verify payment on backend
-          const verifyRes = await fetch(`${API_BASE}/payments/verify`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getToken()}`,
-            },
-            body: JSON.stringify({
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            }),
+
+        // ── PAYMENT SUCCESS ────────────────────────────────────────────────────
+        handler: async (razorpayResponse: any) => {
+          console.log("Premium payment success:", razorpayResponse);
+
+          // ── STEP 3: Verify payment on backend ──────────────────────────────
+          // ── When your backend verify API is ready, replace this block ─────
+          // const verifyRes = await fetch(`${API_URL}/api/payments/verify`, {
+          //   method: "POST",
+          //   headers: {
+          //     "Content-Type": "application/json",
+          //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+          //   },
+          //   body: JSON.stringify({
+          //     razorpayOrderId: razorpayResponse.razorpay_order_id,
+          //     razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+          //     razorpaySignature: razorpayResponse.razorpay_signature,
+          //     subscriptionId: subscriptionDef.subscriptionDefinitionPkId,
+          //   }),
+          // });
+          // const result = await verifyRes.json();
+          // ────────────────────────────────────────────────────────────────────
+
+          setSuccess({
+            paymentId: razorpayResponse.razorpay_payment_id,
+            plan: subscriptionDef.subscriptionName,
+            amount: total,
           });
-          const result = await verifyRes.json();
-          if (result.success) {
-            setSuccess({
-              paymentId: response.razorpay_payment_id,
-              plan: plan.label,
-              amount: total,
-            });
-          } else {
-            setError("Payment verification failed. Contact support with your payment ID.");
-          }
           setLoading(false);
         },
+
+        // ── MODAL DISMISSED ─────────────────────────────────────────────────────
+        modal: {
+          ondismiss: () => {
+            console.log("Premium payment modal dismissed by user");
+            setLoading(false);
+          },
+        },
       };
-      new window.Razorpay(options).open();
-    } catch (e) {
+
+      const razorpay = new window.Razorpay(options);
+
+      // ── PAYMENT FAILED ───────────────────────────────────────────────────────
+      razorpay.on("payment.failed", (response: any) => {
+        console.error("Premium payment failed:", response.error);
+        setError(`Payment failed: ${response.error.description}`);
+        setLoading(false);
+      });
+
+      razorpay.open();
+
+    } catch (e: any) {
       setError(e.message || "Something went wrong. Please try again.");
       setLoading(false);
     }
@@ -141,7 +218,6 @@ export default function PremiumPage() {
 
   return (
     <div style={styles.page}>
-      {/* ── Background decorations ── */}
       <div style={styles.bgOrb1} />
       <div style={styles.bgOrb2} />
 
@@ -151,7 +227,7 @@ export default function PremiumPage() {
         <header style={styles.header}>
           <div style={styles.logo}>
             <span style={styles.logoIcon}>◆</span>
-            <span style={styles.logoText}>YourApp</span>
+            <span style={styles.logoText}>Bandookwale</span>
           </div>
           <div style={styles.headerBadge}>
             <span style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "#92400E" }}>
@@ -191,7 +267,6 @@ export default function PremiumPage() {
               ))}
             </div>
 
-            {/* Testimonials */}
             <div style={styles.testimonialBox}>
               <div style={styles.stars}>{"★".repeat(5)}</div>
               <p style={styles.testimonialText}>"{TESTIMONIALS[activeTestimonial].text}"</p>
@@ -219,52 +294,53 @@ export default function PremiumPage() {
           <div style={styles.rightCol}>
             <div style={styles.pricingCard}>
 
-              {/* Plan toggle */}
-              <p style={styles.sectionLabel}>Choose your plan</p>
-              <div style={styles.planToggle}>
-                {Object.values(PLANS).map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setSelectedPlan(p.id)}
-                    style={{
-                      ...styles.planBtn,
-                      ...(selectedPlan === p.id ? styles.planBtnActive : {}),
-                    }}
-                  >
-                    <div style={styles.planBtnTop}>
-                      <span style={styles.planBtnName}>{p.label}</span>
-                      {p.badge && (
-                        <span style={styles.planBtnBadge}>{p.badge}</span>
-                      )}
-                    </div>
-                    <div style={styles.planBtnPrice}>
-                      {p.perMonth ? (
-                        <>₹{p.perMonth}<span style={styles.planBtnPer}>/mo</span></>
-                      ) : (
-                        <>₹{p.price}<span style={styles.planBtnPer}>/mo</span></>
-                      )}
-                    </div>
-                    <div style={styles.planBtnNote}>{p.billingNote}</div>
-                  </button>
-                ))}
-              </div>
+              <p style={styles.sectionLabel}>Premium Membership</p>
+
+              {/* Loading skeleton for price */}
+              {isFetchingPrice && (
+                <div style={styles.priceSkeleton} />
+              )}
+
+              {/* Fetch error */}
+              {!isFetchingPrice && fetchError && (
+                <div style={styles.errorBox}>
+                  <span>⚠️</span> {fetchError}
+                </div>
+              )}
+
+              {/* Single plan card — driven by API */}
+              {!isFetchingPrice && subscriptionDef && (
+                <div style={styles.singlePlanCard}>
+                  <div style={styles.planBtnTop}>
+                    <span style={styles.planBtnName}>{subscriptionDef.subscriptionName}</span>
+                  </div>
+                  <div style={styles.planBtnPrice}>
+                    ₹{basePrice.toLocaleString()}
+                  </div>
+                  <div style={styles.planBtnNote}>
+                    One-time payment via Razorpay
+                  </div>
+                </div>
+              )}
 
               {/* Order summary */}
-              <div style={styles.summaryBox}>
-                <div style={styles.summaryRow}>
-                  <span style={styles.summaryLabel}>Plan</span>
-                  <span style={styles.summaryVal}>{plan.label} · ₹{plan.price}</span>
+              {!isFetchingPrice && subscriptionDef && (
+                <div style={styles.summaryBox}>
+                  <div style={styles.summaryRow}>
+                    <span style={styles.summaryLabel}>Plan</span>
+                    <span style={styles.summaryVal}>{subscriptionDef.subscriptionName} · ₹{basePrice.toLocaleString()}</span>
+                  </div>
+                  <div style={styles.summaryRow}>
+                    <span style={styles.summaryLabel}>GST (18%)</span>
+                    <span style={styles.summaryVal}>₹{gst.toFixed(2)}</span>
+                  </div>
+                  <div style={styles.summaryDivider} />
+                  <div style={{ ...styles.summaryRow, ...styles.summaryTotal }}>
+                    <span>Total today</span>
+                    <span>₹{total.toFixed(2)}</span>
+                  </div>
                 </div>
-                <div style={styles.summaryRow}>
-                  <span style={styles.summaryLabel}>GST (18%)</span>
-                  <span style={styles.summaryVal}>₹{gst.toFixed(2)}</span>
-                </div>
-                <div style={styles.summaryDivider} />
-                <div style={{ ...styles.summaryRow, ...styles.summaryTotal }}>
-                  <span>Total today</span>
-                  <span>₹{total.toFixed(2)}</span>
-                </div>
-              </div>
+              )}
 
               {/* Error */}
               {error && (
@@ -276,11 +352,18 @@ export default function PremiumPage() {
               {/* CTA */}
               <button
                 onClick={handlePurchase}
-                disabled={loading}
-                style={{ ...styles.payBtn, ...(loading ? styles.payBtnDisabled : {}) }}
+                disabled={loading || isFetchingPrice || !subscriptionDef}
+                style={{
+                  ...styles.payBtn,
+                  ...(loading || isFetchingPrice || !subscriptionDef ? styles.payBtnDisabled : {}),
+                }}
               >
                 {loading ? (
                   <span style={styles.spinner} />
+                ) : isFetchingPrice ? (
+                  <span>Loading price...</span>
+                ) : !subscriptionDef ? (
+                  <span>Pricing unavailable</span>
                 ) : (
                   <>
                     <span>🔒</span>
@@ -309,7 +392,6 @@ export default function PremiumPage() {
               </p>
             </div>
 
-            {/* Money-back guarantee */}
             <div style={styles.guaranteeBox}>
               <span style={{ fontSize: 24 }}>💯</span>
               <div>
@@ -338,20 +420,20 @@ export default function PremiumPage() {
         </div>
 
         <footer style={styles.footer}>
-          <span>© 2026 YourApp</span>
+          <span>© 2026 Bandookwale</span>
           <span>·</span>
           <a href="#" style={styles.footerLink}>Privacy</a>
           <span>·</span>
           <a href="#" style={styles.footerLink}>Terms</a>
           <span>·</span>
-          <a href="mailto:support@yourapp.com" style={styles.footerLink}>Support</a>
+          <a href="mailto:support@bandookwale.com" style={styles.footerLink}>Support</a>
         </footer>
       </div>
     </div>
   );
 }
 
-function SuccessScreen({ success }) {
+function SuccessScreen({ success }: { success: any }) {
   return (
     <div style={styles.page}>
       <div style={styles.bgOrb1} />
@@ -369,11 +451,11 @@ function SuccessScreen({ success }) {
           <div style={{ fontFamily: "monospace", fontSize: 13, marginTop: 4, wordBreak: "break-all" }}>{success.paymentId}</div>
         </div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          <button style={styles.payBtn} onClick={() => window.location.href = "/dashboard"}>
+          <button style={styles.payBtn} onClick={() => window.location.href = "/bandookwale"}>
             Go to Dashboard →
           </button>
           <button style={{ ...styles.payBtn, background: "transparent", border: "1.5px solid #B45309", color: "#B45309" }}
-            onClick={() => window.location.href = "/profile"}>
+            onClick={() => window.location.href = "/bandookwale/profile"}>
             View Membership
           </button>
         </div>
@@ -382,8 +464,8 @@ function SuccessScreen({ success }) {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────
-const styles = {
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
     background: "#FFFBF5",
@@ -526,33 +608,26 @@ const styles = {
     padding: "28px 24px",
     boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
   },
-  planToggle: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 },
-  planBtn: {
-    background: "#FAFAF9",
-    border: "1.5px solid #E7E5E4",
+  priceSkeleton: {
+    height: 96,
     borderRadius: 12,
-    padding: "14px 12px",
-    cursor: "pointer",
-    textAlign: "left",
-    transition: "all 0.15s",
-    fontFamily: "serif",
+    background: "linear-gradient(90deg, #FAFAF9 25%, #F0EFEE 37%, #FAFAF9 63%)",
+    backgroundSize: "400% 100%",
+    animation: "shimmer 1.4s ease infinite",
+    marginBottom: 20,
   },
-  planBtnActive: {
+  singlePlanCard: {
     background: "#FFFBF5",
     border: "1.5px solid #B45309",
     boxShadow: "0 0 0 3px rgba(180,83,9,0.08)",
+    borderRadius: 12,
+    padding: "16px 16px",
+    marginBottom: 16,
   },
   planBtnTop: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 },
-  planBtnName: { fontSize: 13, fontWeight: 600, color: "#1C1917", fontFamily: "sans-serif" },
-  planBtnBadge: {
-    fontSize: 10, fontWeight: 700, color: "#92400E",
-    background: "#FEF3C7", padding: "2px 8px", borderRadius: 10,
-    letterSpacing: "0.05em", textTransform: "uppercase",
-    fontFamily: "sans-serif",
-  },
-  planBtnPrice: { fontSize: 22, fontWeight: 700, color: "#1C1917", lineHeight: 1.2 },
-  planBtnPer: { fontSize: 13, fontWeight: 400, color: "#78716C" },
-  planBtnNote: { fontSize: 11, color: "#A8A29E", marginTop: 2, fontFamily: "sans-serif" },
+  planBtnName: { fontSize: 14, fontWeight: 600, color: "#1C1917", fontFamily: "sans-serif" },
+  planBtnPrice: { fontSize: 28, fontWeight: 700, color: "#1C1917", lineHeight: 1.2 },
+  planBtnNote: { fontSize: 12, color: "#A8A29E", marginTop: 4, fontFamily: "sans-serif" },
   summaryBox: {
     background: "#FAFAF9",
     border: "1px solid #E7E5E4",
@@ -699,8 +774,14 @@ const styles = {
   },
 };
 
-// Inject keyframes for spinner
-const styleTag = document.createElement("style");
-styleTag.textContent = `@keyframes spin { to { transform: rotate(360deg); } }
-  button:hover:not(:disabled) { opacity: 0.92; }`;
-document.head.appendChild(styleTag);
+// Inject keyframes for spinner + shimmer
+if (typeof document !== "undefined" && !document.getElementById("premium-page-keyframes")) {
+  const styleTag = document.createElement("style");
+  styleTag.id = "premium-page-keyframes";
+  styleTag.textContent = `
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+    button:hover:not(:disabled) { opacity: 0.92; }
+  `;
+  document.head.appendChild(styleTag);
+}
