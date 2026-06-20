@@ -52,6 +52,7 @@ export default function AdminSellProductPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     const [popup, setPopup] = useState({
         open: false,
         title: "",
@@ -177,13 +178,14 @@ export default function AdminSellProductPage() {
 
         fetchSubCategories();
     }, [form.categoryId]);
+    const confirmCancel = () => {
+        setShowCancelModal(false);
+        navigate(-1);
+    };
 
     // ─── Cancel ──────────────────────────────────────────────────────────────────
     const handleCancel = () => {
-        const confirmLeave = window.confirm(
-            "Are you sure you want to cancel? Your changes will be lost."
-        );
-        if (confirmLeave) navigate(-1);
+        setShowCancelModal(true);
     };
 
     // ─── Form Change ─────────────────────────────────────────────────────────────
@@ -358,6 +360,45 @@ export default function AdminSellProductPage() {
     // ─── Render ───────────────────────────────────────────────────────────────────
     return (
         <>
+            {showCancelModal && (
+                <div
+                    className="fixed inset-0 z-[9998] flex items-center justify-center"
+                    style={{ background: "rgba(0,0,0,0.7)" }}
+                >
+                    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 w-full max-w-sm mx-4">
+                        <div className="flex justify-center mb-4">
+                            <AlertTriangle
+                                className="w-10 h-10 text-yellow-400"
+                                strokeWidth={3}
+                            />
+                        </div>
+
+                        <h3 className="text-white text-lg font-semibold text-center">
+                            Cancel Changes?
+                        </h3>
+
+                        <p className="text-gray-400 mt-2 text-center">
+                            Are you sure you want to leave? All unsaved changes will be lost.
+                        </p>
+
+                        <div className="flex gap-3 mt-5">
+                            <button
+                                onClick={() => setShowCancelModal(false)}
+                                className="flex-1 py-2 rounded-lg bg-gray-700 text-white"
+                            >
+                                Stay
+                            </button>
+
+                            <button
+                                onClick={confirmCancel}
+                                className="flex-1 py-2 rounded-lg bg-red-500 text-white"
+                            >
+                                Leave
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {popup.open && (
                 <div
                     className="fixed inset-0 z-[9999] flex items-center justify-center"
@@ -498,7 +539,7 @@ export default function AdminSellProductPage() {
                 <div className="bg-white rounded-xl shadow overflow-hidden">
 
                     {/* HEADER */}
-                    <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-black to-yellow-500">
+                    <div className="flex items-center justify-between px-6 py-4 mt-8 bg-gradient-to-r from-black to-yellow-500">
                         <h2 className="text-lg font-semibold text-white">
                             {isEditMode ? "Edit Store Product" : "Post Store Product"}
                         </h2>

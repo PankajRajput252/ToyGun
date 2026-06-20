@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PageMeta from '../../components/common/PageMeta';
 import AdminModal, { FormField } from '../../components/admin/AdminModal';
-import { PopupModal } from '../Dashboard/PopupModal'; 
+import { PopupModal } from '../Dashboard/PopupModal';
 import { subscriptionIncomeTypeApi, SubscriptionType, AddSubscriptionTypeRequest } from '../../services/api';
 
 export default function ManageSubscription() {
@@ -14,7 +14,8 @@ export default function ManageSubscription() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  const [showSavePopup, setShowSavePopup] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<any>(null);
   // Popup Modal States for Delete Confirmation
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [subscriptionToDelete, setSubscriptionToDelete] = useState<SubscriptionType | null>(null);
@@ -42,9 +43,18 @@ export default function ManageSubscription() {
     {
       name: 'subscriptionName',
       label: 'Subscription Name',
-      type: 'text',
-      placeholder: 'Enter subscription type name',
-      required: true
+      type: 'select',
+      required: true,
+      options: [
+        {
+          label: 'PREMIUM_MEMBERSHIP_CHARGE',
+          value: 'PREMIUM_MEMBERSHIP_CHARGE'
+        },
+        {
+          label: 'REGISTRATION_CHARGE',
+          value: 'REGISTRATION_CHARGE'
+        }
+      ]
     },
     {
       name: 'amount',
@@ -55,6 +65,10 @@ export default function ManageSubscription() {
     },
   ];
 
+  const handleModalSubmit = async (formData: any) => {
+    setPendingFormData(formData);
+    setShowSavePopup(true);
+  };
   const handleAddIncomeType = () => {
     setEditingIncomeType(null);
     setModalError('');
@@ -62,7 +76,11 @@ export default function ManageSubscription() {
   };
 
   const handleEditIncomeType = (subscriptionType: SubscriptionType) => {
-    setEditingIncomeType(subscriptionType);
+    setEditingIncomeType({
+      ...subscriptionType,
+      amount: subscriptionType.subscriptionAmount,
+    } as any);
+
     setModalError('');
     setIsModalOpen(true);
   };
@@ -79,7 +97,7 @@ export default function ManageSubscription() {
       setDeleteLoading(true);
       await subscriptionIncomeTypeApi.delete(subscriptionToDelete.subscriptionDefinitionPkId!);
       await fetchIncomeTypes(); // Refresh the list
-      
+
       // Close the popup after successful deletion
       setShowDeletePopup(false);
       setSubscriptionToDelete(null);
@@ -98,37 +116,37 @@ export default function ManageSubscription() {
     setSubscriptionToDelete(null);
   };
 
-  const handleModalSubmit = async (formData: any) => {
-    try {
-      setIsSubmitting(true);
-      setModalError('');
+  // const handleModalSubmit = async (formData: any) => {
+  //   try {
+  //     setIsSubmitting(true);
+  //     setModalError('');
 
-      if (editingIncomeType) {
-        // Update existing income type
-        await subscriptionIncomeTypeApi.update(editingIncomeType.subscriptionDefinitionPkId!, {
-          subscriptionName: formData.subscriptionName,
-          subscriptionAmount: Number(formData.amount),
-        });
-      } else {
-        // Add new income type
-        const addData: AddSubscriptionTypeRequest = {
-          subscriptionDefinitionPkId: null,
-          subscriptionName: formData.subscriptionName,
-          subscriptionAmount: Number(formData.amount),
-        };
-        console.log(addData);
-        await subscriptionIncomeTypeApi.add(addData);
-      }
+  //     if (editingIncomeType) {
+  //       // Update existing income type
+  //       await subscriptionIncomeTypeApi.update(editingIncomeType.subscriptionDefinitionPkId!, {
+  //         subscriptionName: formData.subscriptionName,
+  //         subscriptionAmount: Number(formData.amount),
+  //       });
+  //     } else {
+  //       // Add new income type
+  //       const addData: AddSubscriptionTypeRequest = {
+  //         subscriptionDefinitionPkId: null,
+  //         subscriptionName: formData.subscriptionName,
+  //         subscriptionAmount: Number(formData.amount),
+  //       };
+  //       console.log(addData);
+  //       await subscriptionIncomeTypeApi.add(addData);
+  //     }
 
-      await fetchIncomeTypes(); // Refresh the list
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error('Error saving income type:', error);
-      setModalError(error instanceof Error ? error.message : 'Failed to save income type');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  //     await fetchIncomeTypes(); // Refresh the list
+  //     setIsModalOpen(false);
+  //   } catch (error) {
+  //     console.error('Error saving income type:', error);
+  //     setModalError(error instanceof Error ? error.message : 'Failed to save income type');
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   // Filter and paginate income types
   const filteredIncomeTypes = (incomeTypes || []).filter(subscriptionTypes =>
@@ -143,6 +161,8 @@ export default function ManageSubscription() {
 
   const getIncomeTypeIcon = (incomeName: string) => {
     const name = incomeName.toLowerCase();
+    if (incomeName === 'PREMIUM_MEMBERSHIP_CHARGE') return '💎';
+    if (incomeName === 'REGISTRATION_CHARGE') return '📝';
     if (name.includes('service')) return '⚙️';
     if (name.includes('matching')) return '🔗';
     if (name.includes('club')) return '👥';
@@ -154,33 +174,78 @@ export default function ManageSubscription() {
   };
 
   const formatDate = (dateValue: string | number | null | undefined) => {
-  if (!dateValue) return '—';
-  
-  try {
-    const date = new Date(dateValue);
-    
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
+    if (!dateValue) return '—';
+
+    try {
+      const date = new Date(dateValue);
+
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid Date';
+      }
+
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
       return 'Invalid Date';
     }
-    
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  } catch {
-    return 'Invalid Date';
-  }
-};
+  };
+  const handleSaveConfirm = async () => {
+    if (!pendingFormData) return;
 
+    try {
+      setIsSubmitting(true);
+      setModalError('');
+
+      if (editingIncomeType) {
+        await subscriptionIncomeTypeApi.update(
+          editingIncomeType.subscriptionDefinitionPkId!,
+          {
+            subscriptionName: pendingFormData.subscriptionName,
+            subscriptionAmount: Number(pendingFormData.amount),
+          }
+        );
+      } else {
+        const addData: AddSubscriptionTypeRequest = {
+          subscriptionDefinitionPkId: null,
+          subscriptionName: pendingFormData.subscriptionName,
+          subscriptionAmount: Number(pendingFormData.amount),
+        };
+
+        await subscriptionIncomeTypeApi.add(addData);
+      }
+
+      await fetchIncomeTypes();
+
+      setShowSavePopup(false);
+      setPendingFormData(null);
+      setIsModalOpen(false);
+
+    } catch (error) {
+      console.error('Error saving income type:', error);
+      setModalError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to save income type'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const handleSaveCancel = () => {
+    setShowSavePopup(false);
+    setPendingFormData(null);
+  };
   return (
     <>
       <PageMeta
         title="Manage Subscription - Admin"
         description="Admin panel for managing income types and percentages"
       />
-      
+
       <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen">
         {/* Breadcrumb */}
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -338,21 +403,20 @@ export default function ManageSubscription() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                        page === currentPage
-                          ? "bg-orange-500 text-white"
-                          : "text-gray-400 bg-gray-700 border border-gray-600 hover:text-white hover:bg-gray-600"
-                      }`}
+                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${page === currentPage
+                        ? "bg-orange-500 text-white"
+                        : "text-gray-400 bg-gray-700 border border-gray-600 hover:text-white hover:bg-gray-600"
+                        }`}
                     >
                       {page}
                     </button>
                   ))}
-                  
+
                   <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
@@ -379,7 +443,31 @@ export default function ManageSubscription() {
           isLoading={isSubmitting}
           error={modalError}
         />
-
+        {/* Save Confirmation Popup Modal */}
+        <PopupModal
+          isOpen={showSavePopup}
+          onClose={handleSaveCancel}
+          onConfirm={handleSaveConfirm}
+          title={
+            editingIncomeType
+              ? "Update Subscription Type"
+              : "Add Subscription Type"
+          }
+          message={
+            editingIncomeType
+              ? "Are you sure you want to update this subscription type?"
+              : "Are you sure you want to add this subscription type?"
+          }
+          type="success"
+          confirmText={
+            isSubmitting
+              ? (editingIncomeType ? "Updating..." : "Saving...")
+              : (editingIncomeType ? "Update" : "Save")
+          }
+          cancelText="Cancel"
+          showCheckmark={false}
+          position="center"
+        />
         {/* Delete Confirmation Popup Modal */}
         <PopupModal
           isOpen={showDeletePopup}
@@ -387,7 +475,7 @@ export default function ManageSubscription() {
           onConfirm={handleDeleteConfirm}
           title="Delete Subscription Type"
           message={
-            subscriptionToDelete 
+            subscriptionToDelete
               ? `Are you sure you want to delete the subscription type ${subscriptionToDelete.subscriptionName}`
               : "Are you sure you want to delete this subscription type?"
           }

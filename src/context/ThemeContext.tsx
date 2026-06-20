@@ -15,36 +15,37 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    const initialTheme = savedTheme || "light";
+  document.documentElement.classList.add("dark");
+  document.documentElement.style.setProperty(
+    "--custom-dark-bg",
+    "rgb(20 20 20 / var(--tw-bg-opacity,1))"
+  );
+  setIsInitialized(true);
+}, []);
 
-    setTheme(initialTheme);
-    setIsInitialized(true);
-  }, []);
+  // useEffect(() => {
+  //   if (isInitialized) {
+  //     localStorage.setItem("theme", theme);
 
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem("theme", theme);
-
-      if (theme === "dark") {
-        document.documentElement.classList.add("dark");
-        document.documentElement.style.setProperty(
-          "--custom-dark-bg",
-          "rgb(20 20 20 / var(--tw-bg-opacity,1))"
-        );
-      } else {
-        document.documentElement.classList.remove("dark");
-        document.documentElement.style.removeProperty("--custom-dark-bg");
-      }
-    }
-  }, [theme, isInitialized]);
+  //     if (theme === "dark") {
+  //       document.documentElement.classList.add("dark");
+  //       document.documentElement.style.setProperty(
+  //         "--custom-dark-bg",
+  //         "rgb(20 20 20 / var(--tw-bg-opacity,1))"
+  //       );
+  //     } else {
+  //       document.documentElement.classList.remove("dark");
+  //       document.documentElement.style.removeProperty("--custom-dark-bg");
+  //     }
+  //   }
+  // }, [theme, isInitialized]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    // setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
   return (

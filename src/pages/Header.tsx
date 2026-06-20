@@ -59,9 +59,9 @@ export default function Header() {
   return (
     // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-[#D4A017] via-[#3B2A00] to-[#071426] border-b">
     // <header className="fixed top-0 left-0 w-full z-50 bg-[#f5b301] border-b border-[#d89c00]">
-      // <header className="fixed top-0 left-0 w-full z-50 bg-slate-900 border-b border-slate-700 shadow-lg">
-      // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-amber-500/20 shadow-lg">
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
+    // <header className="fixed top-0 left-0 w-full z-50 bg-slate-900 border-b border-slate-700 shadow-lg">
+    // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-amber-500/20 shadow-lg">
+    <header className="fixed top-0 left-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
 
         {/* Logo */}
@@ -109,7 +109,7 @@ export default function Header() {
               {/* Search inside dropdown */}
               <div className="p-2 border-b border-gray-100">
                 <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-1.5">
-                  <Search className="bg-slate-800 text-white border border-slate-600"/>
+                  <Search className="bg-slate-800 text-white border border-slate-600" />
                   <input
                     autoFocus
                     value={citySearch}
@@ -177,36 +177,36 @@ export default function Header() {
 
           {/* Wishlist */}
           <div
-  className="flex flex-col items-center text-sm cursor-pointer text-white hover:text-amber-400 hover:scale-110 transition duration-200"
-  onClick={() => navigate("/bandookwale/wishlistPage")}
->
-  <Heart
-    className="w-7 h-7 drop-shadow-md"
-    strokeWidth={2.5}
-  />
-  <span className="font-semibold mt-1">Wishlist</span>
-</div>
+            className="flex flex-col items-center text-sm cursor-pointer text-white hover:text-amber-400 hover:scale-110 transition duration-200"
+            onClick={() => navigate("/bandookwale/wishlistPage")}
+          >
+            <Heart
+              className="w-7 h-7 drop-shadow-md"
+              strokeWidth={2.5}
+            />
+            <span className="font-semibold mt-1">Wishlist</span>
+          </div>
 
           {/* Cart */}
-         <button
-  onClick={() => navigate("/bandookwale/cart")}
-  className="relative text-white hover:text-amber-400 hover:scale-110 transition duration-200"
->
-  <ShoppingCart
-    className="w-8 h-8 drop-shadow-md"
-    strokeWidth={2.5}
-  />
+          <button
+            onClick={() => navigate("/bandookwale/cart")}
+            className="relative text-white hover:text-amber-400 hover:scale-110 transition duration-200"
+          >
+            <ShoppingCart
+              className="w-8 h-8 drop-shadow-md"
+              strokeWidth={2.5}
+            />
 
-  {totalItems > 0 && (
-    <span
-      className="absolute -top-2 -right-2 bg-amber-500 text-black
+            {totalItems > 0 && (
+              <span
+                className="absolute -top-2 -right-2 bg-amber-500 text-black
                  text-xs rounded-full min-w-[20px] h-5 px-1
                  flex items-center justify-center font-bold shadow"
-    >
-      {totalItems}
-    </span>
-  )}
-</button>
+              >
+                {totalItems}
+              </span>
+            )}
+          </button>
 
           {/* Sell Button */}
           <button
@@ -222,16 +222,16 @@ export default function Header() {
           {/* Store */}
           <button
             onClick={() => navigate("/bandookwale/store")}
-            // className="text-black hover:scale-110 transition duration-200"
-              // className="hover:scale-110 transition duration-200"
+          // className="text-black hover:scale-110 transition duration-200"
+          // className="hover:scale-110 transition duration-200"
           >
             <img
               src={storeImg}
               alt="Store"
               // className="w-15 h-15 rounded-full object-cover"
-                  // className="w-15 h-15 rounded-full object-cover animate-pulse"
-                  // className="w-16 h-16 rounded-full object-cover animate-bounce"
-                  className="store-attention w-15 h-15 rounded-full object-cover"
+              // className="w-15 h-15 rounded-full object-cover animate-pulse"
+              // className="w-16 h-16 rounded-full object-cover animate-bounce"
+              className="store-attention w-15 h-15 rounded-full object-cover"
             />
           </button>
 

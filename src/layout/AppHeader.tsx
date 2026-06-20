@@ -92,7 +92,7 @@ const AppHeader: React.FC = () => {
         <Header />
       ) : isAdmin ? (
         // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
-        <header className="fixed top-0 left-0 w-full z-50 bg-[#f5b301] border-b border-[#d89c00]">
+        <header className="fixed top-0 left-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
           <div className="flex items-center justify-between px-6 py-3">
 
             {/* LEFT: LOGO + NAV */}
@@ -125,7 +125,7 @@ const AppHeader: React.FC = () => {
                 {isUserAdmin(user) && (
                   <Link
                     to="/bandookwale/admin"
-                    className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                    className="text-white hover:text-blue-600 text-sm font-medium transition"
                   >
                     Dashboard
                   </Link>
@@ -136,7 +136,7 @@ const AppHeader: React.FC = () => {
                   <div className="relative" ref={usersRef}>
                     <button
                       onClick={() => setIsUsersOpen(!isUsersOpen)}
-                      className="flex items-center gap-1 text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                      className="flex items-center gap-1 text-white hover:text-blue-600 text-sm font-medium transition"
                     >
                       Users
                       <span className={`transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
@@ -190,7 +190,7 @@ const AppHeader: React.FC = () => {
                         setIsManageUserOpen(!isManageUserOpen);
                         setIsUsersOpen(false);
                       }}
-                      className="flex items-center gap-1 text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                      className="flex items-center gap-1 text-white hover:text-blue-600 text-sm font-medium transition"
                     >
                       Manage Users
                       <span className={`transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
@@ -247,7 +247,7 @@ const AppHeader: React.FC = () => {
               <SupportSidebar />
 
               {/* THEME */}
-              <ThemeToggleButton />
+              {/* <ThemeToggleButton /> */}
 
               {/* USER */}
               <UserDropdown />

@@ -207,7 +207,7 @@ export default function AdminUsers() {
         </div>
 
         {/* Filter Info */}
-        <div className="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
+        <div className="mb-6 p-4 bg-gray-800 mt-15 rounded-lg border border-gray-700">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-white font-semibold mb-1">{getPageTitle()}</h3>
