@@ -385,9 +385,6 @@ export default function UserProfiles() {
         email: formData.email.trim() || currentUser.email || null,
         country: formData.country.trim() || currentUser.country || null,
         mobile: formData.mobile.trim() || currentUser.mobile || null,
-        transactionPassword: formData.transactionPassword !== "******" && formData.transactionPassword.trim() !== ""
-          ? formData.transactionPassword.trim()
-          : null,
         userNodeId: currentUser.nodeId || null,
       };
 
@@ -570,6 +567,31 @@ export default function UserProfiles() {
                   </div>
 
                   {/* Mobile */}
+                  
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-6">
+                  {/* Country */}
+                  <div>
+                    <Label htmlFor="country">Country</Label>
+                    <Input
+                      id="country"
+                      // type={showPassword ? "text" : "password"}
+                      value={selectedCountry}
+                      onChange={(e) => handleCountryChange(e.target.value)}
+                      className="pr-12"
+                      placeholder="Select a country"
+                    />
+                    {/* <Select
+                      options={countryOptions}
+                      placeholder="Select a country"
+                      onChange={handleCountryChange}
+                      value={selectedCountry}
+                      defaultValue={selectedCountry}
+                    /> */}
+                  </div>
+
                   <div>
                     <Label htmlFor="mobile">Mobile</Label>
                     <div className="relative">
@@ -598,55 +620,7 @@ export default function UserProfiles() {
                       />
                     </div>
                   </div>
-                </div>
 
-                {/* Right Column */}
-                <div className="space-y-6">
-                  {/* Country */}
-                  <div>
-                    <Label htmlFor="country">Country</Label>
-                    <Input
-                      id="country"
-                      // type={showPassword ? "text" : "password"}
-                      value={selectedCountry}
-                      onChange={(e) => handleCountryChange(e.target.value)}
-                      className="pr-12"
-                      placeholder="Select a country"
-                    />
-                    {/* <Select
-                      options={countryOptions}
-                      placeholder="Select a country"
-                      onChange={handleCountryChange}
-                      value={selectedCountry}
-                      defaultValue={selectedCountry}
-                    /> */}
-                  </div>
-
-                  {/* Transaction Password */}
-                  <div>
-                    <Label htmlFor="transactionPassword">Transaction Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="transactionPassword"
-                        type={showPassword ? "text" : "password"}
-                        value={formData.transactionPassword}
-                        onChange={handleInputChange("transactionPassword")}
-                        className="pr-12"
-                        placeholder="Enter transaction password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                      >
-                        {showPassword ? (
-                          <EyeIcon className="w-5 h-5" />
-                        ) : (
-                          <EyeCloseIcon className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
 

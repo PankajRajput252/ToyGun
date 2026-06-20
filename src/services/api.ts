@@ -971,7 +971,6 @@ export interface UpdateProfileRequest {
   email: string | null;
   country: string | null;
   mobile: string | null;
-  transactionPassword: string | null;
   userNodeId: string | null;
 }
 
@@ -992,7 +991,7 @@ export interface UpdateProfileResponse {
 export const individualProfileApi = {
   // Update user profile
   updateProfile: (data: UpdateProfileRequest): Promise<UpdateProfileResponse> =>
-    apiCall<any>('/api/individual/updateProfile', 'PUT', data).then(
+    apiCall<any>('/api/users/updateProfile', 'PUT', data).then(
       (response) => response
     ),
 };
