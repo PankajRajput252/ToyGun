@@ -32,7 +32,7 @@ export default function Home() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
   const [showGrid, setShowGrid] = useState(true);
-  const [activeTab, setActiveTab] = useState<Tab>("all");
+  const [activeTab, setActiveTab] = useState<Tab>("listing");
 
   // ── Pull search & city from shared context (set by Navbar) ──────────────────
   const { searchQuery, selectedCity } = useFilter();
@@ -151,8 +151,8 @@ export default function Home() {
   // ─── Tab config ─────────────────────────────────────────────────────────────
   const tabs: { key: Tab; label: string; icon: React.ReactNode; count: number }[] = [
     { key: "all",     label: "All",      icon: <LayoutGrid className="w-3.5 h-3.5" />,     count: allProducts.length },
-    { key: "store",   label: "Store",    icon: <ShoppingCart className="w-3.5 h-3.5" />,   count: storeCount },
     { key: "listing", label: "Listings", icon: <MessageCircle className="w-3.5 h-3.5" />,  count: listingCount },
+    { key: "store",   label: "Store",    icon: <ShoppingCart className="w-3.5 h-3.5" />,   count: storeCount },
   ];
 
   // ─── Active filter summary label ────────────────────────────────────────────
