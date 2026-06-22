@@ -11,6 +11,7 @@ import { useFilter } from "./Filtercontext";
 // import bandookwaleImage from "../components/images/BandookwaleLogo.jpeg";
 import bandookwaleImage from "../components/images/bandg.png";
 import storeImg from "../components/images/storeImg1.jpg"
+import storeNewImg from "../components/images/StoreNewLogo.jpeg"
 
 // Popular Indian cities
 const INDIAN_CITIES = [
@@ -219,21 +220,7 @@ export default function Header() {
             SELL
           </button>
 
-          {/* Store */}
-          <button
-            onClick={() => navigate("/bandookwale/store")}
-          // className="text-black hover:scale-110 transition duration-200"
-          // className="hover:scale-110 transition duration-200"
-          >
-            <img
-              src={storeImg}
-              alt="Store"
-              // className="w-15 h-15 rounded-full object-cover"
-              // className="w-15 h-15 rounded-full object-cover animate-pulse"
-              // className="w-16 h-16 rounded-full object-cover animate-bounce"
-              className="store-attention w-15 h-15 rounded-full object-cover"
-            />
-          </button>
+         
 
           {/* Login / User */}
           {isAuthenticated ? (
@@ -250,6 +237,22 @@ export default function Header() {
               <span className="font-semibold mt-1">Login</span>
             </div>
           )}
+
+           {/* Store */}
+          <button
+            onClick={() => navigate("/bandookwale/store")}
+          // className="text-black hover:scale-110 transition duration-200"
+          // className="hover:scale-110 transition duration-200"
+          >
+            <img
+              src={storeNewImg}
+              alt="Store"
+               className="w-15 h-15 rounded-full object-cover"
+              // className="w-15 h-15 rounded-full object-cover animate-pulse"
+              // className="w-16 h-16 rounded-full object-cover animate-bounce"
+              // className="store-attention w-15 h-15 rounded-full object-cover"
+            />
+          </button>
         </div>
       </div>
 
