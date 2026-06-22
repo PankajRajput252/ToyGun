@@ -991,7 +991,7 @@ export interface UpdateProfileResponse {
 export const individualProfileApi = {
   // Update user profile
   updateProfile: (data: UpdateProfileRequest): Promise<UpdateProfileResponse> =>
-    apiCall<any>('/api/users/updateProfile', 'PUT', data).then(
+    apiCall<any>('/api/users/updateUserProfile', 'PUT', data).then(
       (response) => response
     ),
 };
@@ -1643,7 +1643,7 @@ export const favoriteApi = {
     userFkId: string,
     productFkId: number
   ): Promise<Favorite> =>
-    apiCall<any>(`/api/users/postFavorites`, "POST", {
+    apiCall<any>(`/api/users/addFavorite`, "POST", {
       userFkId,
       productFkId,
       createdAt: "",

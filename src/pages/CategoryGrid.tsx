@@ -73,7 +73,7 @@ export default function CategoryGrid({ selectedCategoryId, onSelectCategory }: P
   const selectedCat = categories.find((c) => c.categoryPkId === selectedCategoryId);
 
   return (
-    <section className="w-full bg-[#f4f4f2] py-8 mt-16">
+    <section className="w-full bg-[#101828 ] py-8 mt-16">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Grid */}

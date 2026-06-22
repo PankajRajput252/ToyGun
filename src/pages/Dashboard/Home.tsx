@@ -183,10 +183,15 @@ export default function Home() {
               onSelectCategory={handleSelectCategory}
             />
           )}
-
+<hr
+  style={{
+    border: "none",
+    height: "1px",
+    backgroundColor: "#F5B301",
+  }}
+/>
           {/* Products Section */}
-          <div className="mx-8 my-8">
-
+          <div className="mx-8 my-8 ">
             {/* ── TABS + HEADING ROW ── */}
             <div style={{ marginTop: "100px" }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
 

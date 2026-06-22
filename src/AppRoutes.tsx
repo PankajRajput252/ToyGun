@@ -57,6 +57,7 @@ import AdminSellerStorePage from "./pages/AdminSellerStorePage";
 import AdminSellProductPage from "./pages/AdminSellProductPage";
 import { WishlistProvider } from "./pages/Wishlistcontext";
 import PremiumPage from "./pages/Premiumpage";
+import TrackOrderPage from "./pages/Trackorderpage";
 
 
 export default function AppRoutes() {
@@ -86,10 +87,10 @@ export default function AppRoutes() {
         <Route path="/bandookwale/signin" element={<SignIn />} />
         <Route path="/bandookwale/signup" element={<SignUp />} />
         <Route path="wishlistPage" element={
-  <WishlistProvider>
-    <WishlistPage />
-  </WishlistProvider>
-} />
+          <WishlistProvider>
+            <WishlistPage />
+          </WishlistProvider>
+        } />
 
         {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
@@ -98,13 +99,14 @@ export default function AppRoutes() {
             <Route path="/bandookwale/store" element={<SellerStorePage />} />
             // Any seller's store (from ProductDetailsPage "View Store" button)
             <Route path="/bandookwale/store/:sellerId" element={<SellerStorePage />} />
+            <Route path="/bandookwale/track" element={<TrackOrderPage />} />
             <Route index element={<ConditionalHome />} />
             <Route path="dashboard" element={<Home />} />
             <Route path="/bandookwale/store" element={<SellerStorePage />} />
             <Route path="/bandookwale/cart" element={<CartPage />} />
             <Route path="/bandookwale/cart" element={<CartPage />} />
             <Route path="/bandookwale/orders" element={<MyOrdersPage />} />
-             <Route path="/bandookwale/premiumPage" element={<PremiumPage />} />
+            <Route path="/bandookwale/premiumPage" element={<PremiumPage />} />
             <Route path="/bandookwale/orders/:orderId" element={<OrderDetailPage />} />
             <Route path="/bandookwale/chat" element={<ChatPage />} />
             {/* USER FEATURES */}
@@ -149,7 +151,7 @@ export default function AppRoutes() {
         {/* ADMIN ROUTES (STRICT ADMIN ONLY) */}
         <Route element={<AdminRoute />}>
           <Route path="/bandookwale/admin" element={<AppLayout />}>
-          <Route path="store" element={<AdminSellerStorePage />} />
+            <Route path="store" element={<AdminSellerStorePage />} />
             <Route path="sellProductPage" element={<AdminSellProductPage />} />
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />

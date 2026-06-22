@@ -39,7 +39,7 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
   }, []);
 
   return (
-    <div className="w-full bg-white border-b sticky top-[70px] z-40">
+    <div className="w-full bg-black border-b sticky top-[70px] z-40 pt-2">
       <div className="max-w-7xl mx-auto px-3 py-3 flex items-center gap-2 overflow-x-auto scrollbar-hide">
 
         {/* All Categories */}

@@ -39,6 +39,22 @@ export default function CartPage() {
   const buyerEmail = user?.email || "";
   const buyerPhone = user?.phone || user?.mobile || "";
 
+//   handler: async (razorpayResponse) => {
+//   await fetch(`${API_URL}/api/orders/verify`, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       razorpay_order_id: razorpayResponse.razorpay_order_id,
+//       razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+//       razorpay_signature: razorpayResponse.razorpay_signature,
+//       customerName: user?.name, email: user?.email, phone: user?.mobile,
+//       address: "...", city: "...", state: "...", pincode: "...",
+//       subTotal: totalPrice,
+//       items: cartItems.map(i => ({ name: i.title, sku: i.id, units: i.quantity, selling_price: i.price }))
+//     })
+//   });
+// }
+
   // ─── Razorpay Payment Flow ───────────────────────────────────────────────────
   const handlePlaceOrder = async () => {
     if (cartItems.length === 0) return;
