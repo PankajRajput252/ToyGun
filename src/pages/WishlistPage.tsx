@@ -14,7 +14,7 @@ export default function WishlistPage() {
     Promise.all([
       refreshFavorites(),
       sellProductApi
-        .getAll(0, 50, "ACTIVE", null)
+        .getAll(0, 50, "ACTIVE", null,false)
         .then((res) => setProducts(res.content.map(mapApiToProduct)))
         .catch(console.error),
     ]).finally(() => setProductsLoading(false));

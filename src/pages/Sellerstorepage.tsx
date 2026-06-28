@@ -112,7 +112,7 @@ export default function AdminSellerStorePage() {
           </div>
 
           {/* Post new — own store only */}
-          {isOwnStore && (
+          {/* {isOwnStore && (
             <button
               onClick={() => navigate("/bandookwale/admin/sellProductPage")}
               className="ml-auto bg-white text-black font-semibold px-4 py-2 rounded-lg
@@ -120,7 +120,7 @@ export default function AdminSellerStorePage() {
             >
               <Plus className="w-4 h-4" /> Post New Item
             </button>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -139,19 +139,19 @@ export default function AdminSellerStorePage() {
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Store className="w-16 h-16 text-gray-300 mb-4" />
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
-              {isOwnStore ? "No products in your store yet" : "This store has no products"}
+              {isOwnStore ? "No products in  store yet" : "This store has no products"}
             </h2>
             {isOwnStore && (
               <>
-                <p className="text-gray-500 mt-2 mb-6">Post your first product to start selling.</p>
-                <button
+                {/* <p className="text-gray-500 mt-2 mb-6">Post your first product to start selling.</p> */}
+                {/* <button
                   onClick={() => navigate("/bandookwale/admin/sellProductPage")}
                   className="bg-gradient-to-r from-black to-yellow-500 text-white
                              px-6 py-3 rounded-xl font-medium hover:opacity-90 transition
                              flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" /> Post Your First Product
-                </button>
+                </button> */}
               </>
             )}
           </div>

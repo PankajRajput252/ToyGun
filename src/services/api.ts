@@ -1602,7 +1602,7 @@ export const sellProductApi = {
     size: number = 25,
     filterBy: string = 'ACTIVE',
     userNodeId?: string | null,
-    isStoreProduct:boolean | false
+    isStoreProduct?:boolean ,
   ): Promise<{ content: ProductResponse[]; totalElements: number; count?: number }> =>
     apiCall<any>(
       `/api/users/getProduct?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}&isStoreProduct=${isStoreProduct}`
