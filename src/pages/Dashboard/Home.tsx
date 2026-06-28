@@ -66,7 +66,7 @@ export default function Home() {
   const fetchAllProducts = async () => {
     try {
       setIsLoading(true);
-      const response = await sellProductApi.getAll(0, 25, "ACTIVE", null);
+      const response = await sellProductApi.getAll(0, 25, "ACTIVE", null,false);
       setAllProducts(response.content.map(mapProduct));
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -80,7 +80,7 @@ export default function Home() {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=200&inputPkId=null&inputFkId=null&searchValue=null&categoryId=${categoryId}`
+        `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=200&inputPkId=null&inputFkId=null&searchValue=null&categoryId=${categoryId}&isStoreProduct=false`
       );
       const data = await res.json();
       const list = Array.isArray(data?.data)

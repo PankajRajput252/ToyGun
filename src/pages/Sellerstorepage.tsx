@@ -29,7 +29,7 @@ export default function AdminSellerStorePage() {
     if (!sellerId) return;
     try {
       setIsLoading(true);
-      const response = await sellProductApi.getAll(0, 50, "ACTIVE", sellerId);
+      const response = await sellProductApi.getAll(0, 50, "ACTIVE", sellerId,true);
 
       const mapped: Product[] = response.content.map((item: any) => ({
         id: item.productPkId,

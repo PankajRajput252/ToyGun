@@ -1601,10 +1601,11 @@ export const sellProductApi = {
     page: number = 0,
     size: number = 25,
     filterBy: string = 'ACTIVE',
-    userNodeId?: string | null
+    userNodeId?: string | null,
+    isStoreProduct:boolean | false
   ): Promise<{ content: ProductResponse[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/users/getProduct?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}`
+      `/api/users/getProduct?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId}&isStoreProduct=${isStoreProduct}`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,

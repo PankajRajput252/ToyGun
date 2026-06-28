@@ -21,10 +21,14 @@ type ProductForm = {
     country: string;
 };
 
-type WeaponCategory = { weapon_category_id: number; name: string };
-type WeaponType      = { weapon_type_id: number;     name: string };
-type WeaponSubType   = { weapon_sub_type_id: number; name: string };
-type Caliber         = { caliber_id: number;         caliber_name: string };
+// NOTE: WeaponCategory field names confirmed from actual API response.
+// WeaponType / WeaponSubType / Caliber are ASSUMED to follow the same
+// "*PkId" / "*Name" pattern — please verify against real responses from
+// getWeaponType / getWeaponSubType / getCaliber and adjust if different.
+type WeaponCategory = { weaponCategoryPkId: number; weaponCategoryName: string };
+type WeaponType      = { weaponTypePkId: number;     weaponTypeName: string };
+type WeaponSubType   = { weaponSubTypePkId: number;  weaponSubTypeName: string };
+type Caliber         = { caliberPkId: number;        caliberName: string };
 
 const API_URL = "http://bandookwale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com";
 
@@ -126,7 +130,7 @@ export default function SellProductPage() {
 
                 const [subRes, calRes] = await Promise.all([
                     fetch(`${API_URL}/api/users/getWeaponSubType?weaponTypeId=${form.weaponTypeFkId}`),
-                    fetch(`${API_URL}/api/users/getCaliber?weaponTypeId=${form.weaponTypeFkId}`),
+                    fetch(`${API_URL}/api/users/getCaliberMaster?weaponTypeId=${form.weaponTypeFkId}`),
                 ]);
 
                 const [subData, calData] = await Promise.all([subRes.json(), calRes.json()]);
@@ -258,8 +262,11 @@ export default function SellProductPage() {
             updatedAt:          "",
             latitude:           coords.lat,
             longitude:          coords.lng,
+            // FIX: previously referenced an undefined `productImageId` variable
+            // instead of the `id` from the map callback — this would throw at
+            // submit time. Now correctly maps each id.
             productImageList:   productImageIdsRef.current.map(id => ({
-                productImageId, productFkId: null, profileImageUrl: null,
+                productImageId: id, productFkId: null, profileImageUrl: null,
             })),
         };
 
@@ -397,8 +404,8 @@ export default function SellProductPage() {
                                         onChange={handleChange} disabled={loadingCat}
                                         placeholder={loadingCat ? "Loading..." : "Select Category *"}>
                                     {weaponCategories.map(c => (
-                                        <option key={c.weapon_category_id} value={c.weapon_category_id}>
-                                            {c.name}
+                                        <option key={c.weaponCategoryPkId} value={c.weaponCategoryPkId}>
+                                            {c.weaponCategoryName}
                                         </option>
                                     ))}
                                 </Select>
@@ -423,8 +430,8 @@ export default function SellProductPage() {
                                                                        "Select Weapon Type"
                                         }>
                                     {weaponTypes.map(t => (
-                                        <option key={t.weapon_type_id} value={t.weapon_type_id}>
-                                            {t.name}
+                                        <option key={t.weaponTypePkId} value={t.weaponTypePkId}>
+                                            {t.weaponTypeName}
                                         </option>
                                     ))}
                                 </Select>
@@ -446,8 +453,8 @@ export default function SellProductPage() {
                                                                           "Select Sub Type"
                                         }>
                                     {weaponSubTypes.map(s => (
-                                        <option key={s.weapon_sub_type_id} value={s.weapon_sub_type_id}>
-                                            {s.name}
+                                        <option key={s.weaponSubTypePkId} value={s.weaponSubTypePkId}>
+                                            {s.weaponSubTypeName}
                                         </option>
                                     ))}
                                 </Select>
@@ -469,8 +476,8 @@ export default function SellProductPage() {
                                                                       "Select Caliber"
                                         }>
                                     {calibers.map(c => (
-                                        <option key={c.caliber_id} value={c.caliber_id}>
-                                            {c.caliber_name}
+                                        <option key={c.caliberPkId} value={c.caliberPkId}>
+                                            {c.caliberName}
                                         </option>
                                     ))}
                                 </Select>

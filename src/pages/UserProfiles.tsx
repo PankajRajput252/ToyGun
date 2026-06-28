@@ -583,13 +583,7 @@ export default function UserProfiles() {
                       className="pr-12"
                       placeholder="Select a country"
                     />
-                    {/* <Select
-                      options={countryOptions}
-                      placeholder="Select a country"
-                      onChange={handleCountryChange}
-                      value={selectedCountry}
-                      defaultValue={selectedCountry}
-                    /> */}
+                  
                   </div>
 
                   <div>
