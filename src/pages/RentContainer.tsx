@@ -74,7 +74,7 @@ export default function RentContainer() {
   ============================ */
   useEffect(() => {
     fetch(
-      "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com/api/container/getInvestment?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=CONT66855610",
+      "https://api.bandookwale.in/api/container/getInvestment?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=CONT66855610",
       {
         headers: {
           Authorization: `Bearer YOUR_TOKEN_HERE`,

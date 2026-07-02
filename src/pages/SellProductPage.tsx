@@ -30,7 +30,7 @@ type WeaponType      = { weaponTypePkId: number;     weaponTypeName: string };
 type WeaponSubType   = { weaponSubTypePkId: number;  weaponSubTypeName: string };
 type Caliber         = { caliberPkId: number;        caliberName: string };
 
-const API_URL = "http://bandookwale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com";
+const API_URL = "https://api.bandookwale.in";
 
 const EMPTY_FORM: ProductForm = {
     title: "", description: "",

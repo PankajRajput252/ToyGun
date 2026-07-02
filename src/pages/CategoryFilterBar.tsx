@@ -11,7 +11,7 @@ interface Props {
   onSelectCategory: (categoryId: number | null, categoryName?: string) => void;
 }
 
-const API_URL = "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com";
+const API_URL = "https://api.bandookwale.in";
 
 export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);

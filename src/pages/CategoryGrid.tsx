@@ -20,7 +20,7 @@ interface Props {
   onSelectCategory: (categoryId: number | null, categoryName?: string) => void;
 }
 
-const API_URL = "http://bandookwale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com";
+const API_URL = "https://api.bandookwale.in";
 
 const getImageForCategory = (name: string): string => {
   const n = name.toLowerCase();

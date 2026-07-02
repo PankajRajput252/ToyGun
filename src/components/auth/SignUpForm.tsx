@@ -26,7 +26,7 @@ interface SubscriptionDefinition {
   subscriptionAmount: number;
 }
 
-const API_URL = "http://bandookWale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com";
+const API_URL = "https://api.bandookwale.in";
 const RAZORPAY_KEY = "rzp_test_Sk36cjHZNLcY5o"; // ← your key
 
 export default function SignUpForm() {

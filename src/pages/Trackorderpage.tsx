@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Package, Search, Truck, CheckCircle, ArrowLeft } from "lucide-react";
 
-const API_URL = "http://bandookwale.eba-55irbrg4.ap-south-1.elasticbeanstalk.com";
+const API_URL = "https://api.bandookwale.in";
 
 interface TrackingResult {
   status?: string;
