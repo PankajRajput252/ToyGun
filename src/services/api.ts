@@ -10,7 +10,7 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.trim() ||
   // "https://Minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com";
-  "https://api.bandookwale.in";
+  "http://Bandookwala-env.eba-rrwxiwsw.ap-south-1.elasticbeanstalk.com";
 
 
 // Get auth token from localStorage
@@ -1628,8 +1628,8 @@ export const sellProductApi = {
 };
 
 
-export const WS_URL = "https://api.bandookwale.in/ws"; // ← update to your backend URL
-export const API_URL = "https://api.bandookwale.in";
+export const WS_URL = "http://Bandookwala-env.eba-rrwxiwsw.ap-south-1.elasticbeanstalk.com/ws"; // ← update to your backend URL
+export const API_URL = "http://Bandookwala-env.eba-rrwxiwsw.ap-south-1.elasticbeanstalk.com";
 
 export type Favorite = {
   favoritesPkId: number;

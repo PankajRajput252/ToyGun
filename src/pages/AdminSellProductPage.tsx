@@ -28,7 +28,7 @@ type SubCategory = {
     subCategoryName: string;
 };
 
-const API_URL = "https://api.bandookwale.in";
+const API_URL = "http://Bandookwala-env.eba-rrwxiwsw.ap-south-1.elasticbeanstalk.com";
 
 export default function AdminSellProductPage() {
     const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");

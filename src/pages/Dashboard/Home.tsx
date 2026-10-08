@@ -24,7 +24,7 @@ export interface Product {
 
 type Tab = "all" | "store" | "listing";
 
-const API_URL = "https://api.bandookwale.in";
+const API_URL = "http://Bandookwala-env.eba-rrwxiwsw.ap-south-1.elasticbeanstalk.com";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);

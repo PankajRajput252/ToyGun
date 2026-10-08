@@ -31,8 +31,8 @@ type Props = {
   sellerName?: string;
 };
 
-// const WS_URL = "https://api.bandookwale.in/ws"; // ← update to your backend URL
-// const API_URL = "https://api.bandookwale.in";
+// const WS_URL = "http://Bandookwala-env.eba-rrwxiwsw.ap-south-1.elasticbeanstalk.com/ws"; // ← update to your backend URL
+// const API_URL = "http://Bandookwala-env.eba-rrwxiwsw.ap-south-1.elasticbeanstalk.com";
 
 export default function ChatUI({
   conversationId,
