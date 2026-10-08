@@ -170,8 +170,8 @@ export default function DepositConfirmation() {
   return (
     <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen">
       {/* Important Reminder */}
-      <div className="mb-6 rounded-lg border border-blue-600/30 bg-gradient-to-r from-blue-900/40 to-blue-800/30 p-6 shadow-lg">
-        <div className="flex items-start gap-4">
+      <div className="mb-6 rounded-lg border border-blue-600/30 bg-gradient-to-r from-blue-900/40 to-blue-800/30 p-4 sm:p-6 shadow-lg">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 ring-2 ring-blue-400/30 flex-shrink-0">
             <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -189,16 +189,17 @@ export default function DepositConfirmation() {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Scan QR Code Panel */}
-        <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm p-8">
+        <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm p-4 sm:p-6 md:p-8">
           <h3 className="font-bold text-white text-xl mb-6">Scan QR Code</h3>
           <div className="flex flex-col items-center">
-            <div className="bg-white p-4 rounded-lg mb-4">
+            <div className="bg-white p-4 rounded-lg mb-4 max-w-full">
               <QRCodeSVG
                 // value={confirmationData.walletAddress}
                 value={getQRValue()}
                 size={256}
                 level="H"
                 includeMargin={true}
+                className="max-w-full h-auto"
               />
             </div>
             <div className="w-full bg-gray-700 rounded-lg p-4 text-center">
@@ -216,12 +217,12 @@ export default function DepositConfirmation() {
         </div>
 
         {/* Payment Details Panel */}
-        <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm p-8">
+        <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm p-4 sm:p-6 md:p-8">
           <h3 className="font-bold text-white text-xl mb-6">Payment Details</h3>
           <div className="space-y-4">
             <div>
               <p className="text-gray-400 text-sm mb-1">Amount To Send</p>
-              <p className="text-orange-500 font-bold text-lg">
+              <p className="text-orange-500 font-bold text-lg break-all">
                 {confirmationData.amount.toFixed(8)} {confirmationData.currency}
               </p>
               <p className="text-gray-500 text-xs mt-1">(Total confirms needed: 10)</p>

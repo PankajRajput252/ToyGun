@@ -524,7 +524,7 @@ export default function Buy() {
 
       {/* Reminder */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex gap-3">
-        <InfoIcon className="w-5 h-5 text-blue-600" />
+        <InfoIcon className="w-5 h-5 shrink-0 text-blue-600" />
         <p className="text-sm text-blue-700">
           Minimum contract period: <b>36 months</b>. ROI credited monthly until container is sold.
         </p>
@@ -625,7 +625,8 @@ export default function Buy() {
       )}
       {!isAddMode && (
         <ComponentCard title="Available Containers">
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="whitespace-nowrap">
             <TableHeader>
               <TableRow className="text-gray-800 dark:text-white">
                 <TableCell>#</TableCell>
@@ -724,14 +725,15 @@ export default function Buy() {
               )}
             </TableBody>
           </Table>
+          </div>
         </ComponentCard>
       )}
 
       {/* bank detail */}
       {openBankModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
 
-          <div className="bg-white rounded-2xl shadow-xl w-[500px] p-6 relative animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 relative animate-fadeIn">
 
             {/* CLOSE BUTTON */}
             <button
@@ -757,10 +759,10 @@ export default function Buy() {
                 >
                   <p><b>Account Holder:</b> {bank.accountHolderName}</p>
                   <p><b>Bank Name:</b> {bank.bankName}</p>
-                  <p><b>Account No:</b> {bank.accountNumber}</p>
+                  <p className="break-all"><b>Account No:</b> {bank.accountNumber}</p>
                   <p><b>IFSC Code:</b> {bank.ifscCode}</p>
                   {bank.upiId && (
-                    <p><b>UPI ID:</b> {bank.upiId}</p>
+                    <p className="break-all"><b>UPI ID:</b> {bank.upiId}</p>
                   )}
                 </div>
               ))

@@ -19,7 +19,7 @@ export default function SignIn() {
       />
 
       {/* MAIN AUTH AREA */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-y-auto lg:overflow-hidden">
         <AuthLayout>
           <SignInForm />
         </AuthLayout>

@@ -39,7 +39,7 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 sm:py-8 px-3 sm:px-4">
       <div className="max-w-2xl mx-auto">
 
         {/* Header */}
@@ -50,7 +50,7 @@ export default function OrderDetailPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
             Order Details
           </h1>
         </div>
@@ -71,29 +71,29 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Order Info */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-5 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 sm:p-5 mb-4">
           <h2 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">
             Order Info
           </h2>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Order ID</span>
-              <span className="font-mono text-gray-800 dark:text-white">
+            <div className="flex justify-between gap-3">
+              <span className="text-gray-500 shrink-0">Order ID</span>
+              <span className="text-right break-all font-mono text-gray-800 dark:text-white">
                 {order.orderId}
               </span>
             </div>
             {order.razorpayOrderId && (
-              <div className="flex justify-between">
-                <span className="text-gray-500">Razorpay Order ID</span>
-                <span className="font-mono text-gray-800 dark:text-white text-xs">
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500 shrink-0">Razorpay Order ID</span>
+                <span className="text-right break-all font-mono text-gray-800 dark:text-white text-xs">
                   {order.razorpayOrderId}
                 </span>
               </div>
             )}
             {order.razorpayPaymentId && (
-              <div className="flex justify-between">
-                <span className="text-gray-500">Payment ID</span>
-                <span className="font-mono text-gray-800 dark:text-white text-xs">
+              <div className="flex justify-between gap-3">
+                <span className="text-gray-500 shrink-0">Payment ID</span>
+                <span className="text-right break-all font-mono text-gray-800 dark:text-white text-xs">
                   {order.razorpayPaymentId}
                 </span>
               </div>
@@ -102,17 +102,17 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Items */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-5 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 sm:p-5 mb-4">
           <h2 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">
             Items ({order.items.length})
           </h2>
           <div className="space-y-4">
             {order.items.map((item, i) => (
-              <div key={i} className="flex gap-4 items-center">
+              <div key={i} className="flex gap-3 sm:gap-4 items-center">
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-16 h-16 rounded-lg object-cover border flex-shrink-0"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover border flex-shrink-0"
                   onError={(e) => {
                     e.currentTarget.src = "https://via.placeholder.com/64";
                   }}
@@ -121,7 +121,7 @@ export default function OrderDetailPage() {
                   <p className="font-medium text-gray-800 dark:text-white truncate">
                     {item.title}
                   </p>
-                  <p className="text-xs text-gray-500">{item.location}</p>
+                  <p className="text-xs text-gray-500 truncate">{item.location}</p>
                   {item.quantity > 1 && (
                     <p className="text-xs text-gray-400 mt-0.5">
                       Qty: {item.quantity}
@@ -137,7 +137,7 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Price Summary */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-5 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 sm:p-5 mb-6">
           <h2 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">
             Price Summary
           </h2>

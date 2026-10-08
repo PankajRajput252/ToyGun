@@ -499,7 +499,7 @@ export default function AdminSellProductPage() {
                     </div>
                 </div>
             )}
-            <div className="max-w-4xl mx-auto p-6 mt-10 bg-transparent">
+            <div className="max-w-4xl mx-auto p-3 sm:p-6 mt-10 bg-transparent">
 
                 {/* ── Delete Confirmation Modal ── */}
                 {showDeleteModal && (
@@ -539,8 +539,8 @@ export default function AdminSellProductPage() {
                 <div className="bg-white rounded-xl shadow overflow-hidden">
 
                     {/* HEADER */}
-                    <div className="flex items-center justify-between px-6 py-4 mt-8 bg-gradient-to-r from-black to-yellow-500">
-                        <h2 className="text-lg font-semibold text-white">
+                    <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-4 mt-8 bg-gradient-to-r from-black to-yellow-500">
+                        <h2 className="text-base sm:text-lg font-semibold text-white">
                             {isEditMode ? "Edit Store Product" : "Post Store Product"}
                         </h2>
                         <div className="flex items-center gap-3">
@@ -570,15 +570,15 @@ export default function AdminSellProductPage() {
                     </div>
 
                     {/* Store Product Badge */}
-                    <div className="px-6 pt-4">
+                    <div className="px-4 sm:px-6 pt-4">
                         <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200
-                                    rounded-lg px-4 py-2 text-sm text-yellow-700 font-medium">
+                                    rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm text-yellow-700 font-medium">
                             🛒 This product will be listed as a <strong>Store Product</strong> — buyers can add to cart and pay via Razorpay.
                         </div>
                     </div>
 
                     {/* FORM BODY */}
-                    <div className="p-6 space-y-6">
+                    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
 
                         {/* Title */}
                         <input
@@ -700,7 +700,7 @@ export default function AdminSellProductPage() {
                                 multiple
                                 onChange={handleImageChange}
                                 disabled={isUploadingImage}
-                                className="w-full border p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full min-w-0 text-sm border p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                             {isUploadingImage && (
                                 <p className="text-sm text-yellow-600 flex items-center gap-2">
@@ -710,7 +710,7 @@ export default function AdminSellProductPage() {
                             {imagePreviews.length > 0 && (
                                 <div className="flex flex-wrap gap-3 mt-2">
                                     {imagePreviews.map((preview, i) => (
-                                        <div key={i} className="relative w-24 h-24">
+                                        <div key={i} className="relative w-20 h-20 sm:w-24 sm:h-24">
                                             {preview.startsWith("blob:") ? (
                                                 <div className="w-full h-full rounded-lg border bg-gray-100
                                                             flex items-center justify-center text-xs text-gray-400 animate-pulse">
@@ -753,38 +753,38 @@ export default function AdminSellProductPage() {
                             />
 
                             {/* PIN + City */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <input
                                     name="zipCode"
                                     value={form.zipCode}
                                     onChange={handleChange}
                                     placeholder="PIN Code"
-                                    className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                    className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                 />
                                 <input
                                     name="city"
                                     value={form.city}
                                     onChange={handleChange}
                                     placeholder="City"
-                                    className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                    className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                 />
                             </div>
 
                             {/* State + Country */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <input
                                     name="state"
                                     value={form.state}
                                     onChange={handleChange}
                                     placeholder="State"
-                                    className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                    className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                 />
                                 <input
                                     name="country"
                                     value={form.country}
                                     onChange={handleChange}
                                     placeholder="Country"
-                                    className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                    className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                 />
                             </div>
                         </div>

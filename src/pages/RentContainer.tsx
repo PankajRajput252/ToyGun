@@ -185,8 +185,8 @@ export default function RentContainer() {
         </Button>
       </div>
       {isAddMode && (
-        <section className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
-          <h2 className="text-2xl font-semibold mb-6">Rent Container</h2>
+        <section className="max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg">
+          <h2 className="text-xl md:text-2xl font-semibold mb-6">Rent Container</h2>
 
           {/* Select Container */}
           <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -275,7 +275,7 @@ export default function RentContainer() {
           </div>
 
           {/* Summary */}
-          <div className="bg-gray-50 rounded-xl p-6 mb-6">
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-6 mb-6">
             <p>
               <strong>Monthly ROI:</strong> {rentData.monthlyROI}%
             </p>
@@ -300,7 +300,8 @@ export default function RentContainer() {
       )}
       {!isAddMode && (
         <ComponentCard title="Rent Containers">
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="whitespace-nowrap">
             <TableHeader>
               <TableRow className="text-gray-800 dark:text-white">
                 <TableCell>User Id </TableCell>
@@ -333,6 +334,7 @@ export default function RentContainer() {
               )}
             </TableBody>
           </Table>
+          </div>
         </ComponentCard>
       )}
     </>

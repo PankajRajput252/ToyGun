@@ -55,13 +55,13 @@ export default function SignInForm() {
     }
   };
  return (
-  <div className="flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+  <div className="flex items-center justify-center min-h-screen px-4 py-6 sm:px-6 lg:px-8 lg:py-0">
     
     {/* Gradient Border Wrapper */}
     <div className="w-full max-w-lg p-[2px] rounded-2xl bg-gradient-to-r from-white to-yellow-500">
       
       {/* Inner Card */}
-      <div className="w-full p-6 rounded-2xl bg-white dark:bg-gray-900">
+      <div className="w-full p-5 sm:p-6 rounded-2xl bg-white dark:bg-gray-900">
         
         <div className="mb-5 sm:mb-8 text-center sm:text-left">
           <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
@@ -116,7 +116,7 @@ export default function SignInForm() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <Checkbox checked={isChecked} onChange={setIsChecked} />
                 <span className="text-gray-700 text-theme-sm dark:text-gray-400">

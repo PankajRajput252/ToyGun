@@ -39,13 +39,13 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
   }, []);
 
   return (
-    <div className="w-full bg-black border-b sticky top-[70px] z-40 pt-2">
+    <div className="w-full bg-black border-b sticky top-0 z-40 pt-2">
       <div className="max-w-7xl mx-auto px-3 py-3 flex items-center gap-2 overflow-x-auto scrollbar-hide">
 
         {/* All Categories */}
         <button
           onClick={() => onSelectCategory(null)}
-          className={`flex items-center gap-2 px-5 py-2 rounded-full whitespace-nowrap
+          className={`flex items-center gap-2 px-4 lg:px-5 py-2 rounded-full whitespace-nowrap
                       transition font-medium text-sm flex-shrink-0
                       ${selectedCategoryId === null
                         ? "bg-blue-600 text-white"

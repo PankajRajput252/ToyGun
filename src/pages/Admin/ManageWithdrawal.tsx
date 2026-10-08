@@ -203,7 +203,7 @@ export default function SellRequests() {
                         Sell Request
                     </h2>
                     <nav>
-                        <ol className="flex items-center gap-2">
+                        <ol className="flex flex-wrap items-center gap-2">
                             {/* <li><a className="font-medium text-gray-300 hover:text-white" href="/">Home /</a></li>
                             <li><a className="font-medium text-gray-300 hover:text-white" href="/admin">Admin /</a></li> */}
                             <li className="font-medium text-orange-500">Sell Request</li>
@@ -220,11 +220,11 @@ export default function SellRequests() {
 
                 {/* Admin Panel */}
                 <div className="bg-[rgb(16_16_16_/1)] rounded-xl border border-[rgb(35_35_35_/1)] shadow-2xl overflow-hidden">
-                    <div className="p-6 border-b border-gray-700">
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="p-4 sm:p-6 border-b border-gray-700">
+                        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
                             <h3 className="text-white font-bold text-xl">Sell Requests</h3>
-                            <div className="flex items-center gap-4">
-                                <div className="relative">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                                <div className="relative w-full sm:w-auto">
                                     <input
                                         type="text"
                                         placeholder="Search Sell Req..."
@@ -260,13 +260,13 @@ export default function SellRequests() {
                                 <table className="w-full">
                                     <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
                                         <tr>
-                                            <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
-                                            <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">User NodeId</th>
-                                            <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">CONTAINER TYPE</th>
-                                            <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">CURRENCY CODE</th>
-                                            <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Requested Amount</th>
-                                            <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Requested Date/Time</th>
-                                            <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Actions</th>
+                                            <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">#</th>
+                                            <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">User NodeId</th>
+                                            <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">CONTAINER TYPE</th>
+                                            <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">CURRENCY CODE</th>
+                                            <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">Requested Amount</th>
+                                            <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">Requested Date/Time</th>
+                                            <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-700">
@@ -274,8 +274,8 @@ export default function SellRequests() {
                                             withdrawals?.map((withdrawal, index) => (
                                                 console.log("withdrawalwithdrawal", withdrawal),
                                                 <tr key={withdrawal.investmentPkId} className="hover:bg-gray-700/50 transition-colors">
-                                                    <td className="py-4 px-6 text-white font-medium">{startIndex + index + 1}</td>
-                                                    <td className="py-4 px-6">
+                                                    <td className="py-4 px-6 whitespace-nowrap text-white font-medium">{startIndex + index + 1}</td>
+                                                    <td className="py-4 px-6 whitespace-nowrap">
                                                         <div className="flex items-center gap-3">
                                                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-bold">
                                                                 {withdrawal?.user?.name?.toString().charAt(0) || 'U'}
@@ -283,19 +283,19 @@ export default function SellRequests() {
                                                             <span className="text-white font-semibold">{withdrawal.investment?.userFkId || '—'}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="py-4 px-6 text-gray-300 font-semibold">
+                                                    <td className="py-4 px-6 whitespace-nowrap text-gray-300 font-semibold">
                                                         {withdrawal?.investment?.containerType || '—'}
                                                     </td>
-                                                    <td className="py-4 px-6 text-green-400 font-mono font-bold">
+                                                    <td className="py-4 px-6 whitespace-nowrap text-green-400 font-mono font-bold">
                                                         {formatAmount(withdrawal?.investment?.currency)}
                                                     </td>
-                                                    <td className="py-4 px-6 text-orange-400 font-mono font-bold">
+                                                    <td className="py-4 px-6 whitespace-nowrap text-orange-400 font-mono font-bold">
                                                         {formatAmount(withdrawal.final_amount)}
                                                     </td>
-                                                    <td className="py-4 px-6 text-gray-300">
+                                                    <td className="py-4 px-6 whitespace-nowrap text-gray-300">
                                                         {formatDate(withdrawal.requestedAt)}
                                                     </td>
-                                                    <td className="py-4 px-6">
+                                                    <td className="py-4 px-6 whitespace-nowrap">
                                                         <div className="flex items-center gap-2">
                                                             {withdrawal?.status==="REQUESTED" &&<button
                                                                 onClick={() => handlePaymentAction(withdrawal?.sellRequestPkId, 'APPROVED')}
@@ -340,12 +340,12 @@ export default function SellRequests() {
 
                             {/* Pagination */}
                             {filteredWithdrawals.length > 0 && (
-                                <div className="px-6 py-4 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-                                    <div className="flex items-center gap-2 text-gray-400">
+                                <div className="px-4 sm:px-6 py-4 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <div className="flex items-center gap-2 text-gray-400 text-center">
                                         <span>Showing {startIndex + 1} to {Math.min(endIndex, filteredWithdrawals.length)} of {filteredWithdrawals.length} entries</span>
                                     </div>
 
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex flex-wrap items-center justify-center gap-2">
                                         <button
                                             onClick={() => setCurrentPage(currentPage - 1)}
                                             disabled={currentPage === 1}

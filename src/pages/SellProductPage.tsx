@@ -365,11 +365,11 @@ export default function SellProductPage() {
             )}
 
             {/* ── Main Page ── */}
-            <div className="max-w-4xl mx-auto p-6 mt-20 bg-transparent">
+            <div className="max-w-4xl mx-auto p-3 sm:p-6 bg-transparent">
                 <div className="bg-white rounded-xl shadow overflow-hidden">
 
                     {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-black to-yellow-500">
+                    <div className="flex items-center justify-between px-4 sm:px-6 py-4 bg-gradient-to-r from-black to-yellow-500">
                         <h2 className="text-lg font-semibold text-white">Post Your Ad</h2>
                         <button onClick={handleCancel} className="text-white/80 hover:text-white transition">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,7 +380,7 @@ export default function SellProductPage() {
                     </div>
 
                     {/* Form */}
-                    <div className="p-6 space-y-6">
+                    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
 
                         {/* Title */}
                         <input name="title" placeholder="Title *" value={form.title}
@@ -510,7 +510,7 @@ export default function SellProductPage() {
                             <label className="font-medium block">Product Images</label>
                             <input type="file" accept="image/*" multiple
                                    onChange={handleImageChange} disabled={isUploadingImage}
-                                   className="w-full border p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" />
+                                   className="w-full min-w-0 text-sm border p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" />
                             {isUploadingImage && (
                                 <p className="text-sm text-yellow-600 flex items-center gap-2">
                                     <span className="animate-spin inline-block">⏳</span> Uploading image...
@@ -519,7 +519,7 @@ export default function SellProductPage() {
                             {imagePreviews.length > 0 && (
                                 <div className="flex flex-wrap gap-3 mt-2">
                                     {imagePreviews.map((preview, i) => (
-                                        <div key={i} className="relative w-24 h-24">
+                                        <div key={i} className="relative w-20 h-20 sm:w-24 sm:h-24">
                                             {preview.startsWith("blob:") ? (
                                                 <div className="w-full h-full rounded-lg border bg-gray-100
                                                                 flex items-center justify-center text-xs text-gray-400 animate-pulse">
@@ -552,21 +552,21 @@ export default function SellProductPage() {
                             <input name="location" value={form.location} onChange={handleChange}
                                    placeholder="Address"
                                    className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <input name="zipCode" value={form.zipCode} onChange={handleChange}
                                        placeholder="PIN Code"
-                                       className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                                       className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
                                 <input name="city" value={form.city} onChange={handleChange}
                                        placeholder="City"
-                                       className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                                       className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <input name="state" value={form.state} onChange={handleChange}
                                        placeholder="State"
-                                       className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                                       className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
                                 <input name="country" value={form.country} onChange={handleChange}
                                        placeholder="Country"
-                                       className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                                       className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
                             </div>
                             <button type="button" onClick={handleAddressSearch}
                                     className="text-sm text-yellow-600 underline hover:text-yellow-700">

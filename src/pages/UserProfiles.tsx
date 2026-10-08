@@ -466,7 +466,7 @@ export default function UserProfiles() {
   return (
     <>
       <PageMeta title="Bandookwale Dashboard" description="Bandookwale Dashboard" />
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {/* Breadcrumb */}
         <div className="mb-6">
           <nav className="text-sm text-gray-500 dark:text-gray-400 mb-2">
@@ -478,11 +478,11 @@ export default function UserProfiles() {
 
         {/* Main Content */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-6">
+          <div className="p-4 md:p-6">
             {/* Profile Image Upload Section */}
             <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
               <Label>Profile Image</Label>
-              <div className="flex items-center gap-6 mt-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mt-4">
                 <div className="relative">
                   <div className="overflow-hidden rounded-full h-24 w-24 border-2 border-gray-200 dark:border-gray-700">
                     {previewImage ? (
@@ -498,7 +498,7 @@ export default function UserProfiles() {
                     )}
                   </div>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 flex flex-wrap items-center gap-3 sm:block">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -517,7 +517,7 @@ export default function UserProfiles() {
                     type="button"
                     onClick={handleImageUpload}
                     disabled={isUploadingImage || (!compressedFile && !fileInputRef.current?.files?.[0])}
-                    className="ml-3 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="sm:ml-3 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isUploadingImage ? "Uploading..." : "Upload"}
                   </Button>

@@ -7,7 +7,7 @@ export default function ChatPage() {
 
   if (!state) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen px-4">
         <div className="text-center">
           <p className="text-gray-500">No chat data found.</p>
           <button

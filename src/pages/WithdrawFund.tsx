@@ -346,7 +346,7 @@ export default function WithdrawFund() {
           Withdraw Fund
         </h2>
         <nav>
-          <ol className="flex items-center gap-2">
+          <ol className="flex flex-wrap items-center gap-2">
             <li><a className="font-medium text-gray-300 hover:text-white" href="/">Home /</a></li>
             <li><a className="font-medium text-gray-300 hover:text-white" href="/">Financial /</a></li>
             <li className="font-medium text-orange-500">Withdraw Fund</li>
@@ -363,7 +363,7 @@ export default function WithdrawFund() {
         <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm">
 
           <form onSubmit={handleSubmit}>
-            <div className="p-8">
+            <div className="p-4 sm:p-6 md:p-8">
               {/* Error Message */}
               {error && (
                 <div className="mb-6 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-900/40 to-red-800/30 p-4 shadow-lg">
@@ -524,7 +524,7 @@ export default function WithdrawFund() {
                 <label className="mb-3 block text-white font-medium text-lg">
                   One Time Password
                 </label>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <div className="relative flex-1">
                     <input
                       type="text"
@@ -634,9 +634,9 @@ export default function WithdrawFund() {
         
         <div className="rounded-xl border border-gray-700 bg-gray-800 shadow-2xl backdrop-blur-sm">
 
-          <div className="p-8">
+          <div className="p-4 sm:p-6 md:p-8">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full whitespace-nowrap">
                 <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
                   <tr>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
@@ -742,9 +742,9 @@ export default function WithdrawFund() {
       </div>
 
       {/* Edit Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={closeEditModal} className="max-w-2xl">
-        <div className="p-8 bg-gray-800">
-          <h2 className="text-2xl font-bold text-white mb-6">Edit Withdrawal Request</h2>
+      <Modal isOpen={isEditModalOpen} onClose={closeEditModal} className="max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 md:p-8 bg-gray-800">
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Edit Withdrawal Request</h2>
           
           {error && (
             <div className="mb-6 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-900/40 to-red-800/30 p-4 shadow-lg">

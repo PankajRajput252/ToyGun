@@ -191,9 +191,9 @@ export default function Home() {
   }}
 />
           {/* Products Section */}
-          <div className="mx-8 my-8 ">
+          <div className="mx-4 md:mx-8 my-8 ">
             {/* ── TABS + HEADING ROW ── */}
-            <div style={{ marginTop: "100px" }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div className="mt-16 md:mt-[100px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
 
               {/* Section heading */}
               <h2 className="text-base font-semibold text-gray-700 dark:text-gray-200">
@@ -204,13 +204,13 @@ export default function Home() {
               </h2>
 
               {/* Tabs */}
-              <div className="flex items-center bg-white dark:bg-gray-800 border
+              <div className="flex items-center self-start sm:self-auto max-w-full overflow-x-auto bg-white dark:bg-gray-800 border
                               border-gray-200 dark:border-gray-700 rounded-xl p-1 gap-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm
+                    className={`flex items-center flex-shrink-0 whitespace-nowrap gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-sm
                                 font-medium transition-all duration-200
                                 ${activeTab === tab.key
                                   ? tab.key === "store"
@@ -249,7 +249,7 @@ export default function Home() {
             {activeTab === "store" && (
               <div className="mb-4 flex items-center gap-2 text-xs text-yellow-700
                               bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200
-                              dark:border-yellow-800 px-3 py-2 rounded-lg w-fit">
+                              dark:border-yellow-800 px-3 py-2 rounded-lg w-fit max-w-full">
                 <ShoppingCart className="w-3.5 h-3.5" />
                 Store products — Add to cart and pay via Razorpay
               </div>
@@ -257,7 +257,7 @@ export default function Home() {
             {activeTab === "listing" && (
               <div className="mb-4 flex items-center gap-2 text-xs text-blue-700
                               bg-blue-50 dark:bg-blue-900/20 border border-blue-200
-                              dark:border-blue-800 px-3 py-2 rounded-lg w-fit">
+                              dark:border-blue-800 px-3 py-2 rounded-lg w-fit max-w-full">
                 <MessageCircle className="w-3.5 h-3.5" />
                 Marketplace listings — Chat with seller to negotiate
               </div>
@@ -321,7 +321,7 @@ export default function Home() {
 
             {/* Products Grid */}
             {!isLoading && filteredProducts.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4">
                 {filteredProducts.map((item, index) => (
                   <ProductCard key={index} item={item} />
                 ))}

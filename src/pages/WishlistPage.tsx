@@ -24,8 +24,8 @@ export default function WishlistPage() {
   const wishlistedProducts = products.filter((p) => favoritesMap.has(p.id!));
 
   return (
-    <div className="p-12">
-      <h1 className="text-2xl font-semibold mb-6">
+    <div className="px-4 py-6 sm:p-8 md:p-12">
+      <h1 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">
         Wishlist ({isLoading ? "..." : wishlistedProducts.length})
       </h1>
       {isLoading ? (
@@ -35,7 +35,7 @@ export default function WishlistPage() {
           Your wishlist is empty
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {wishlistedProducts.map((item) => (
             <ProductCard key={item.id} item={item} />
           ))}

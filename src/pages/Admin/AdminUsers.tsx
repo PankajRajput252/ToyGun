@@ -199,7 +199,7 @@ export default function AdminUsers() {
             {getPageTitle()}
           </h2>
           <nav>
-            <ol className="flex items-center gap-2">
+            <ol className="flex flex-wrap items-center gap-2">
               <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/admin">Admin Dashboard /</a></li>
               <li className="font-medium text-orange-500">{getPageTitle()}</li>
             </ol>
@@ -208,12 +208,12 @@ export default function AdminUsers() {
 
         {/* Filter Info */}
         <div className="mb-6 p-4 bg-gray-800 mt-15 rounded-lg border border-gray-700">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
               <h3 className="text-white font-semibold mb-1">{getPageTitle()}</h3>
               <p className="text-gray-400 text-sm">{getFilterDescription()}</p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex-shrink-0">
               <p className="text-gray-400 text-sm">Total Users</p>
               <p className="text-2xl font-bold text-white">{users.length}</p>
             </div>

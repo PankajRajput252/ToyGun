@@ -83,25 +83,25 @@ export default function AdminSellerStorePage() {
   };
 
   return (
-    <div style={{ marginTop: "100px" }} className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div style={{ marginTop: "10px" }} className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
 
       {/* STORE BANNER */}
       <div
-        className="px-6 py-8 bg-cover bg-center"
+        className="px-4 py-6 sm:px-6 sm:py-8 bg-cover bg-center"
         style={{ backgroundImage: `url(${bgImage})` }}
       >
-        <div className="max-w-7xl mx-auto flex items-center gap-5">
+        <div className="max-w-7xl mx-auto flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-5">
 
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full overflow-hidden bg-white shadow-lg flex-shrink-0">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-white shadow-lg flex-shrink-0">
             <img src={storeLogo} alt="Store Logo" className="w-full h-full object-cover" />
           </div>
 
           {/* Info */}
-          <div className="text-white flex-1">
+          <div className="text-white flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <Store className="w-5 h-5 text-yellow-300" />
-              <h1 className="text-2xl font-bold">Luthra Gun House Private Limited's Store</h1>
+              <Store className="w-5 h-5 text-yellow-300 flex-shrink-0" />
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold break-words">Luthra Gun House Private Limited's Store</h1>
             </div>
             <p className="text-white/70 text-sm mt-1">
               {totalCount} {totalCount === 1 ? "product" : "products"}
@@ -115,7 +115,7 @@ export default function AdminSellerStorePage() {
           {isOwnStore && (
             <button
               onClick={() => navigate("/bandookwale/admin/sellProductPage")}
-              className="ml-auto bg-white text-black font-semibold px-4 py-2 rounded-lg
+              className="w-full sm:w-auto justify-center sm:ml-auto bg-white text-black font-semibold px-4 py-2 rounded-lg
                          hover:bg-yellow-100 transition text-sm flex items-center gap-2 flex-shrink-0"
             >
               <Plus className="w-4 h-4" /> Post New Item
@@ -125,7 +125,7 @@ export default function AdminSellerStorePage() {
       </div>
 
       {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
 
         {/* Loading */}
         {isLoading && (
@@ -160,7 +160,7 @@ export default function AdminSellerStorePage() {
         {/* Products Grid */}
         {!isLoading && products.length > 0 && (
           <>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
                 {isOwnStore ? "Your Products" : `Products by ${sellerName}`}
               </h2>
@@ -170,7 +170,7 @@ export default function AdminSellerStorePage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
               {products.map((item, index) => (
                 <ProductCard
                   key={item.id ?? index}

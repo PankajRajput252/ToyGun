@@ -157,8 +157,7 @@ export default function ProductCard({ item, onDeleted }: Props) {
           <img
             src={images[index]}
             alt={item.title}
-            className="w-full object-cover"
-            style={{ height: "160px" }}
+            className="w-full object-cover h-[130px] sm:h-[160px]"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "https://via.placeholder.com/300";
             }}
@@ -280,20 +279,20 @@ export default function ProductCard({ item, onDeleted }: Props) {
 
         {/* BODY */}
         <div className="p-3 flex flex-col gap-1 flex-1">
-          <p className="text-lg font-semibold" style={{ color: "#fff", lineHeight: 1.2 }}>
+          <p className="text-base sm:text-lg font-semibold break-words" style={{ color: "#fff", lineHeight: 1.2 }}>
             ₹ {Number(item.price).toLocaleString()}
           </p>
           <p className="text-sm truncate" style={{ color: "#aaa" }}>{item.title}</p>
 
-          <div className="flex justify-between text-[11px] mt-1" style={{ color: "#555" }}>
+          <div className="flex justify-between gap-1 text-[11px] mt-1" style={{ color: "#555" }}>
             <span className="truncate max-w-[60%]">{item.location}</span>
-            <span>{item.date}</span>
+            <span className="whitespace-nowrap">{item.date}</span>
           </div>
 
           {/* CTA */}
           <button
             onClick={(e) => { e.stopPropagation(); navigate("/bandookwale/productdetails", { state: item }); }}
-            className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors"
+            className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold transition-colors whitespace-nowrap"
             style={
               item.isStoreProduct
                 ? { background: "transparent", border: "0.5px solid #c9931a", color: "#c9931a" }

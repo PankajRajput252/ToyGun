@@ -64,7 +64,7 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
 
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
+        <span className="mr-1 lg:mr-3 overflow-hidden rounded-full h-11 w-11 flex-shrink-0">
           {user?.profileImageUrl || user?.imageUrl ? (
             <img src={(user.profileImageUrl || user.imageUrl) || ''} alt="User" className="w-full h-full object-cover" />
           ) : (
@@ -74,7 +74,7 @@ export default function UserDropdown() {
           )}
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">
+        <span className="hidden lg:block mr-1 font-medium text-theme-sm">
           {user?.name ? user.name : user?.username || "User"}
         </span>
         <svg
@@ -99,7 +99,7 @@ export default function UserDropdown() {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
-        className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+        className="absolute right-0 mt-[17px] flex w-[260px] max-w-[calc(100vw-1.5rem)] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">

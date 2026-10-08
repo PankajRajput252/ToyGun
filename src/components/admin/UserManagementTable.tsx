@@ -49,7 +49,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="w-full">
       {/* Search Bar */}
       <div className="mb-4">
         <input
@@ -62,16 +62,17 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
       </div>
 
       {/* Table */}
+      <div className="overflow-x-auto">
       <table className="min-w-full bg-gray-800 text-white rounded-lg border border-gray-700">
         <thead>
           <tr className="bg-gray-700 text-left">
-            <th className="p-3">User ID</th>
-            <th className="p-3">Name</th>
-            <th className="p-3">Email</th>
-            <th className="p-3">Node ID</th>
-            <th className="p-3">Status</th>
-            <th className="p-3">Wallet</th>
-            <th className="p-3">Actions</th>
+            <th className="p-3 whitespace-nowrap">User ID</th>
+            <th className="p-3 whitespace-nowrap">Name</th>
+            <th className="p-3 whitespace-nowrap">Email</th>
+            <th className="p-3 whitespace-nowrap">Node ID</th>
+            <th className="p-3 whitespace-nowrap">Status</th>
+            <th className="p-3 whitespace-nowrap">Wallet</th>
+            <th className="p-3 whitespace-nowrap">Actions</th>
           </tr>
         </thead>
 
@@ -92,12 +93,12 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                   key={user.userPkId}
                   className="border-b border-gray-700 hover:bg-gray-750"
                 >
-                  <td className="p-3">{user.userPkId}</td>
-                  <td className="p-3">{user.name}</td>
-                  <td className="p-3">{user.email}</td>
-                  <td className="p-3">{user.nodeId}</td>
+                  <td className="p-3 whitespace-nowrap">{user.userPkId}</td>
+                  <td className="p-3 whitespace-nowrap">{user.name}</td>
+                  <td className="p-3 whitespace-nowrap">{user.email}</td>
+                  <td className="p-3 whitespace-nowrap">{user.nodeId}</td>
 
-                  <td className="p-3">
+                  <td className="p-3 whitespace-nowrap">
                     {user.enabled ? (
                       <span className="text-green-400">Active</span>
                     ) : (
@@ -105,7 +106,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                     )}
                   </td>
 
-                  <td className="p-3">
+                  <td className="p-3 whitespace-nowrap">
                     {wallet ? (
                       <>
                         <p>Mine: {wallet.mineWallet}</p>
@@ -117,7 +118,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                     )}
                   </td>
 
-                  <td className="p-3">
+                  <td className="p-3 whitespace-nowrap">
                     <button
                       // onClick={() => onTransactionApproval?.(user.userPkId)}
                       onClick={() => handleConfirmUser(user.nodeId)}
@@ -133,6 +134,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

@@ -113,7 +113,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 
   return (
     <div 
-      className={`relative p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer ${colorClasses.bg} hover:scale-105`}
+      className={`relative p-4 sm:p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer ${colorClasses.bg} hover:scale-105`}
       //    onClick={onClick}
     >
       {/* Icon */}
@@ -122,7 +122,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       </div>
       
       {/* Value */}
-      <div className={`text-3xl font-bold ${colorClasses.text} mb-2`}>
+      <div className={`text-2xl sm:text-3xl font-bold ${colorClasses.text} mb-2 pr-8`}>
         ${formatValue(value)}
       </div>
       

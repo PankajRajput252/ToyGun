@@ -90,7 +90,7 @@ function StatCard({
   return (
     <div
       onClick={onClick}
-      className="group relative bg-[#1a1a2e] border border-gray-800 rounded-2xl p-5
+      className="group relative bg-[#1a1a2e] border border-gray-800 rounded-2xl p-4 sm:p-5
                  cursor-pointer hover:border-yellow-500/40 hover:bg-[#1e1e35]
                  transition-all duration-300 overflow-hidden"
     >
@@ -110,7 +110,7 @@ function StatCard({
         <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-1">
           {label}
         </p>
-        <p className="text-3xl font-bold text-white leading-none mb-2">{value}</p>
+        <p className="text-2xl sm:text-3xl font-bold text-white leading-none mb-2">{value}</p>
 
         {sub !== undefined && subLabel && (
           <p className="text-xs text-gray-500">
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
         description="Admin dashboard for managing users and products"
       />
 
-      <div className="min-h-screen bg-[#0f0f1a] text-white p-6 md:p-8">
+      <div className="min-h-screen bg-[#0f0f1a] text-white p-4 sm:p-6 md:p-8">
 
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
@@ -194,7 +194,7 @@ export default function AdminDashboard() {
               Welcome back, {user?.name || "Admin"} 👋
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="flex items-center gap-1.5 text-xs bg-green-500/10 text-green-400
                              border border-green-500/20 px-3 py-1.5 rounded-full font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -278,8 +278,8 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* User Distribution */}
-          <div className="bg-[#1a1a2e] border border-gray-800 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-5">
+          <div className="bg-[#1a1a2e] border border-gray-800 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="font-semibold text-white flex items-center gap-2">
                 <PieChart className="w-4 h-4 text-yellow-400" />
                 User Distribution
@@ -289,10 +289,10 @@ export default function AdminDashboard() {
               </span>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
               <DonutChart active={activeUsers} inactive={inactiveUsers} />
 
-              <div className="flex-1 space-y-4">
+              <div className="w-full sm:w-auto flex-1 space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="w-3 h-3 rounded-full bg-yellow-400 flex-shrink-0" />
                   <div>
@@ -316,8 +316,8 @@ export default function AdminDashboard() {
           </div>
 
           {/* User Breakdown */}
-          <div className="bg-[#1a1a2e] border border-gray-800 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-5">
+          <div className="bg-[#1a1a2e] border border-gray-800 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between gap-2 mb-5">
               <h3 className="font-semibold text-white flex items-center gap-2">
                 <BarChart2 className="w-4 h-4 text-yellow-400" />
                 User Breakdown

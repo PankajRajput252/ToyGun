@@ -176,7 +176,7 @@ export default function AdminModal({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-black to-yellow-500 rounded-t-lg">
+      <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-gradient-to-r from-black to-yellow-500 rounded-t-lg">
         <h2 className="text-lg font-semibold text-white">
           {title}
         </h2>
@@ -193,7 +193,7 @@ export default function AdminModal({
       </div>
 
       {/* BODY */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
 
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -220,7 +220,7 @@ export default function AdminModal({
           ))}
 
           {/* ACTION BUTTONS */}
-          <div className="flex justify-end space-x-3 pt-4 border-t dark:border-gray-700">
+          <div className="flex flex-wrap justify-end gap-3 pt-4 border-t dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}

@@ -50,7 +50,7 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-gray-900 via-gray-900 to-yellow-600
                     border-b border-yellow-500/20 shadow-xl">
-      <div className="flex items-center gap-3 px-4 py-2.5 max-w-screen-2xl mx-auto">
+      <div className="flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 max-w-screen-2xl mx-auto">
 
         {/* ── LOGO ── */}
         <button
@@ -62,7 +62,7 @@ export default function Navbar() {
         </button>
 
         {/* ── CITY DROPDOWN ── */}
-        <div ref={dropdownRef} className="relative flex-shrink-0">
+        <div ref={dropdownRef} className="relative flex-shrink-0 order-3 md:order-none">
           <button
             onClick={() => setCityDropdownOpen((v) => !v)}
             className="flex items-center gap-2 bg-white/10 border border-white/20 text-white
@@ -117,7 +117,7 @@ export default function Navbar() {
         </div>
 
         {/* ── SEARCH BAR ── */}
-        <div className="flex-1 flex items-center bg-white rounded-full overflow-hidden
+        <div className="order-4 md:order-none grow basis-full md:flex-1 min-w-0 flex items-center bg-white rounded-full overflow-hidden
                         border-2 border-transparent focus-within:border-yellow-400 transition shadow-sm">
           <input
             type="text"
@@ -125,7 +125,7 @@ export default function Navbar() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleSearchKeyDown}
             placeholder="Search here"
-            className="flex-1 px-4 py-2 text-sm text-gray-800 outline-none bg-transparent"
+            className="flex-1 min-w-0 px-4 py-2 text-sm text-gray-800 outline-none bg-transparent"
           />
           {/* Clear button */}
           {searchQuery && (
@@ -142,7 +142,7 @@ export default function Navbar() {
         </div>
 
         {/* ── RIGHT ACTIONS ── */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="order-2 md:order-none ml-auto md:ml-0 flex items-center gap-3 flex-shrink-0">
 
           {/* Wishlist */}
           <button
@@ -172,7 +172,7 @@ export default function Navbar() {
 
       {/* ── Active filter pills ── */}
       {(searchQuery || selectedCity) && (
-        <div className="flex items-center gap-2 px-4 pb-2">
+        <div className="flex flex-wrap items-center gap-2 px-4 pb-2">
           {searchQuery && (
             <span className="flex items-center gap-1.5 bg-blue-600/20 border border-blue-500/30
                              text-blue-300 text-xs px-3 py-1 rounded-full">

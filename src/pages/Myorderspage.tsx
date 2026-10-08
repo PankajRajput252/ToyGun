@@ -22,7 +22,7 @@ export default function MyOrdersPage() {
   const { orders } = useCart();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 sm:py-8 px-3 sm:px-4">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
@@ -33,7 +33,7 @@ export default function MyOrdersPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
             <Package className="w-6 h-6 text-yellow-500" />
             My Orders
           </h1>
@@ -73,9 +73,9 @@ export default function MyOrdersPage() {
                            shadow-sm p-4 cursor-pointer hover:shadow-md transition"
               >
                 {/* Order header row */}
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-xs text-gray-400 font-mono">
+                <div className="flex items-start sm:items-center justify-between gap-2 mb-3">
+                  <div className="min-w-0">
+                    <p className="text-xs text-gray-400 font-mono break-all">
                       {order.orderId}
                     </p>
                     <p className="text-xs text-gray-400 mt-0.5">
@@ -89,7 +89,7 @@ export default function MyOrdersPage() {
                     </p>
                   </div>
                   <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full ${STATUS_STYLES[order.status]}`}
+                    className={`shrink-0 whitespace-nowrap text-xs font-semibold px-3 py-1 rounded-full ${STATUS_STYLES[order.status]}`}
                   >
                     {STATUS_LABEL[order.status]}
                   </span>
@@ -112,7 +112,7 @@ export default function MyOrdersPage() {
 
                 {/* Items summary + total */}
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate flex-1">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate flex-1 min-w-0">
                     {order.items.map((i) => i.title).join(", ")}
                   </p>
                   <p className="text-sm font-bold text-gray-800 dark:text-white ml-4 flex-shrink-0">

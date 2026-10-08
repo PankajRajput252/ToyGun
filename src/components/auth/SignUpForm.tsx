@@ -176,9 +176,9 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-6 sm:px-10 lg:px-16">
+    <div className="flex items-center justify-center min-h-screen px-4 py-6 sm:px-10 lg:px-16 lg:py-0">
       <div className="w-full max-w-2xl p-[2px] rounded-2xl bg-gradient-to-r from-white to-yellow-500">
-        <div className="w-full px-8 py-8 rounded-2xl bg-white dark:bg-gray-900">
+        <div className="w-full px-5 py-6 sm:px-8 sm:py-8 rounded-2xl bg-white dark:bg-gray-900">
 
           {/* Skeleton while fetching charge */}
           {isFetchingCharge && (
@@ -203,7 +203,7 @@ export default function SignUpForm() {
                 </p>
               </div>
               <div className="text-right ml-4 flex-shrink-0">
-                <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                <p className="text-xl sm:text-2xl font-bold text-yellow-700 dark:text-yellow-300">
                   ₹{subscriptionDef.subscriptionAmount.toLocaleString()}
                 </p>
               </div>
@@ -234,7 +234,7 @@ export default function SignUpForm() {
               <div className="space-y-1">
                 <div>
                   <strong>Username:</strong>{" "}
-                  <span className="font-mono bg-white/50 px-2 py-1 rounded">{generatedUsername}</span>
+                  <span className="font-mono bg-white/50 px-2 py-1 rounded break-all">{generatedUsername}</span>
                 </div>
                 <div>
                   <strong>Password:</strong>{" "}
@@ -347,9 +347,9 @@ export default function SignUpForm() {
               </div>
 
               {/* Terms */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-start sm:items-center gap-3">
                 <Checkbox className="w-5 h-5" checked={isChecked} onChange={setIsChecked} />
-                <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
+                <p className="inline-block text-sm sm:text-base font-normal text-gray-500 dark:text-gray-400">
                   By creating an account means you agree to the{" "}
                   <span className="text-gray-800 dark:text-white/90">Terms and Conditions,</span>{" "}
                   and our <span className="text-gray-800 dark:text-white">Privacy Policy</span>

@@ -162,7 +162,7 @@ export default function UserMetaCard() {
             </p>
           </div>
           <form className="flex flex-col">
-            <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
+            <div className="custom-scrollbar max-h-[60vh] lg:max-h-none lg:h-[450px] overflow-y-auto px-2 pb-3">
 
               <div className="mt-7">
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">

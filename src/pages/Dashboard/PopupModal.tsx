@@ -69,7 +69,7 @@ export const PopupModal: React.FC<PopupModalProps> = ({
 
   return (
     <div className={`fixed inset-0 bg-black bg-opacity-50 flex ${getPositionClass()} z-50`}>
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl ${getModalSizeClass()} w-full mx-4 my-2 transform transition-all`}>
+      <div className={`relative bg-white dark:bg-gray-800 rounded-lg shadow-xl ${getModalSizeClass()} w-full mx-4 my-2 transform transition-all`}>
         <div className="p-6">
           {/* Close button - positioned based on location */}
           <button

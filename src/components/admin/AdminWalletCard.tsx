@@ -82,15 +82,15 @@ const AdminWalletCard: React.FC<AdminWalletCardProps> = ({
 
   return (
     <div 
-      className={`flex flex-col p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer ${config.colorClass}`}
+      className={`flex flex-col p-4 sm:p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer ${config.colorClass}`}
       onClick={onClick}
     >
       {/* Top line with amount and icon */}
-      <div className="flex justify-between items-center h-12">
-        <div className="text-3xl font-bold text-white">
+      <div className="flex justify-between items-center gap-2 h-12">
+        <div className="text-2xl sm:text-3xl font-bold text-white truncate">
           ${formatAmount(totalAmount)}
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center flex-shrink-0">
           {config.icon}
         </div>
       </div>

@@ -191,7 +191,7 @@ export default function CartPage() {
   if (orderPlaced) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col items-center max-w-md w-full text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-10 flex flex-col items-center max-w-md w-full text-center">
           <CheckCircle className="text-green-500 w-20 h-20 mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
             Payment Successful!
@@ -223,7 +223,7 @@ export default function CartPage() {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col items-center max-w-md w-full text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-10 flex flex-col items-center max-w-md w-full text-center">
           <ShoppingCart className="text-gray-300 w-20 h-20 mb-4" />
           <h2 className="text-2xl font-bold text-gray-700 dark:text-white mb-2">
             Your cart is empty
@@ -253,18 +253,18 @@ export default function CartPage() {
 
   // ─── Cart Page ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 sm:py-8 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto">
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
           <button
             onClick={() => navigate(-1)}
             className="text-gray-500 hover:text-black dark:hover:text-white transition"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
             My Cart
             <span className="ml-2 text-base font-normal text-gray-500">
               ({totalItems} {totalItems === 1 ? "item" : "items"})
@@ -283,16 +283,16 @@ export default function CartPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
           {/* Cart Items */}
-          <div className="md:col-span-2 space-y-4 mt-10">
+          <div className="md:col-span-2 space-y-4 mt-4 md:mt-10">
             {cartItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-4 flex gap-4"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-3 sm:p-4 flex gap-3 sm:gap-4"
               >
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                  className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg flex-shrink-0"
                   onError={(e) => {
                     e.currentTarget.src = "https://via.placeholder.com/100";
                   }}
@@ -301,7 +301,7 @@ export default function CartPage() {
                   <h3 className="font-semibold text-gray-800 dark:text-white truncate">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">{item.location}</p>
+                  <p className="text-sm text-gray-500 mt-1 truncate">{item.location}</p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-2">
                     ₹ {(item.price * item.quantity).toLocaleString()}
                   </p>
@@ -322,8 +322,8 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="md:col-span-1 mt-10">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-5 sticky top-24">
+          <div className="md:col-span-1 md:mt-10">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-4 sm:p-5 md:sticky md:top-24">
               <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
                 Order Summary
               </h2>

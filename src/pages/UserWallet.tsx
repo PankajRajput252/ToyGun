@@ -295,15 +295,15 @@ const UserWallet = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6 flex justify-between items-center">
+    <div className="p-4 md:p-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">My Wallet</h1>
           <p className="text-gray-600 dark:text-gray-400">Manage your wallet balances and transactions</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors flex items-center space-x-2"
+          className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors flex items-center justify-center space-x-2 self-start sm:self-auto"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -329,8 +329,8 @@ const UserWallet = () => {
                                 wallet.totalDebit === 0;
             
             return (
-              <div key={`wallet-${wallet.walletPkId}`} className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 ${isZeroWallet ? 'border-2 border-red-300 dark:border-red-600' : ''}`}>
-                <div className="flex items-center justify-between mb-4">
+              <div key={`wallet-${wallet.walletPkId}`} className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 ${isZeroWallet ? 'border-2 border-red-300 dark:border-red-600' : ''}`}>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Wallet #{wallet.walletPkId}
                     {isZeroWallet && <span className="ml-2 text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">Zero Values</span>}
@@ -409,7 +409,7 @@ const UserWallet = () => {
 
               {/* Wallet Actions */}
               <div className="mt-6 pt-4 border-t">
-                <div className="flex space-x-2 mb-3">
+                <div className="flex flex-wrap gap-2 mb-3">
                   <button className="flex-1 px-3 py-2 bg-brand-500 text-white text-sm rounded-lg hover:bg-brand-600 transition-colors">
                     Deposit
                   </button>
@@ -420,7 +420,7 @@ const UserWallet = () => {
                     Transfer
                   </button>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   <button 
                     onClick={() => handleEditWallet(wallet)}
                     className="flex-1 px-3 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-1"
@@ -482,7 +482,7 @@ const UserWallet = () => {
       {/* Add Wallet Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Add New Wallet</h3>
               <button
@@ -603,7 +603,7 @@ const UserWallet = () => {
       {/* Edit Wallet Modal */}
       {showEditModal && editingWallet && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Edit Wallet #{editingWallet.walletPkId}</h3>
               <button

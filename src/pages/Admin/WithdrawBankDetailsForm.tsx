@@ -71,8 +71,8 @@ const WithdrawBankDetailsForm = () => {
   };
 
   return (
-    <div style={{
-      padding: 30, backgroundColor: bgColor, minHeight: "100vh", position: "relative"
+    <div className="p-4 sm:p-[30px]" style={{
+      backgroundColor: bgColor, minHeight: "100vh", position: "relative"
 
     }}>
 
@@ -157,6 +157,7 @@ const WithdrawBankDetailsForm = () => {
         Bank Details List
       </h3>
 
+      <div className="w-full overflow-x-auto">
       <table style={styles.table}>
         <thead>
           <tr>
@@ -185,6 +186,7 @@ const WithdrawBankDetailsForm = () => {
           ))}
         </tbody>
       </table>
+      </div>
 
     </div>
   );
@@ -223,7 +225,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
-    zIndex: 10
+    zIndex: 10,
+    padding: 16,
+    boxSizing: "border-box"
   },
   container: {
     marginTop: 20,
@@ -233,7 +237,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: "flex",
     flexDirection: "column",
     gap: 15,
-    width: 380,
+    width: "100%",
+    maxWidth: 380,
+    maxHeight: "90vh",
+    overflowY: "auto",
+    boxSizing: "border-box",
     boxShadow: "0px 4px 10px rgba(0,0,0,0.1)"
   },
 
@@ -268,7 +276,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: "#2c2c2c",
     color: "white",
     fontWeight: 600,
-    fontSize: 15
+    fontSize: 15,
+    whiteSpace: "nowrap"
   },
 
   td: {

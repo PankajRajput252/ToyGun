@@ -53,7 +53,7 @@ export default function TrackOrderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-10 px-3 sm:px-4">
       <div className="max-w-2xl mx-auto">
 
         {/* Header */}
@@ -64,31 +64,31 @@ export default function TrackOrderPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
             <Truck className="w-6 h-6 text-yellow-500" />
             Track Your Order
           </h1>
         </div>
 
         {/* Search box */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6 mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Shipment ID
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={shipmentId}
               onChange={(e) => setShipmentId(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Enter your shipment ID"
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5
+              className="flex-1 min-w-0 border border-gray-300 rounded-lg px-4 py-2.5
                          focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
             />
             <button
               onClick={handleTrack}
               disabled={isLoading}
-              className="px-5 bg-gradient-to-r from-black to-yellow-500 text-white
+              className="px-5 py-2.5 sm:py-0 justify-center bg-gradient-to-r from-black to-yellow-500 text-white
                          rounded-lg font-medium hover:opacity-90 transition
                          disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
@@ -110,7 +110,7 @@ export default function TrackOrderPage() {
 
         {/* Result */}
         {result && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6">
 
             <div className="flex items-center gap-3 mb-5">
               <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
@@ -127,9 +127,9 @@ export default function TrackOrderPage() {
             </div>
 
             {result.awbCode && (
-              <div className="bg-gray-50 rounded-lg px-4 py-3 mb-5 flex justify-between items-center">
+              <div className="bg-gray-50 rounded-lg px-4 py-3 mb-5 flex justify-between items-center gap-3">
                 <span className="text-sm text-gray-500">AWB Number</span>
-                <span className="font-mono text-sm font-semibold text-gray-800">
+                <span className="font-mono text-sm font-semibold text-gray-800 break-all text-right">
                   {result.awbCode}
                 </span>
               </div>
@@ -147,7 +147,7 @@ export default function TrackOrderPage() {
                         <div className="w-px h-8 bg-gray-200 mt-1" />
                       )}
                     </div>
-                    <div className="flex-1 pb-2">
+                    <div className="flex-1 min-w-0 pb-2 break-words">
                       <p className="text-sm font-medium text-gray-800">{event.status}</p>
                       {event.location && (
                         <p className="text-xs text-gray-400">{event.location}</p>

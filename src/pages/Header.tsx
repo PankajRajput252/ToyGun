@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Heart, User, Search, MapPin, ChevronDown, Plus, X } from "lucide-react";
+import { Heart, User, Search, MapPin, ChevronDown, Plus, X, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import UserDropdown from "../components/header/UserDropdown";
@@ -34,6 +34,7 @@ export default function Header() {
   // ── City dropdown state ─────────────────────────────────────────────────────
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [citySearch, setCitySearch] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -58,17 +59,22 @@ export default function Header() {
     setCitySearch("");
   };
 
+  const handleMobileNav = (path: string) => {
+    setMobileMenuOpen(false);
+    navigate(path);
+  };
+
   return (
     // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-[#D4A017] via-[#3B2A00] to-[#071426] border-b">
     // <header className="fixed top-0 left-0 w-full z-50 bg-[#f5b301] border-b border-[#d89c00]">
     // <header className="fixed top-0 left-0 w-full z-50 bg-slate-900 border-b border-slate-700 shadow-lg">
     // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-amber-500/20 shadow-lg">
-    <header className="fixed top-0 left-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
+    <header className="sticky top-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
+      <div className="max-w-7xl mx-auto px-3 py-2 lg:px-6 lg:py-3 flex flex-wrap lg:flex-nowrap items-center gap-x-2 gap-y-1 lg:gap-4">
 
         {/* Logo */}
         <div
-          className="w-16 h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer flex items-center justify-center bg-black"
+          className="order-1 w-12 h-12 lg:w-16 lg:h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer flex items-center justify-center bg-black"
           onClick={() => navigate("/bandookwale/")}
         >
           <img
@@ -80,10 +86,13 @@ export default function Header() {
 
 
         {/* ── Location Dropdown ── */}
-        <div ref={dropdownRef} className="relative flex-shrink-0">
+        {/* Forces location + search onto a second row below lg */}
+        <div className="order-3 basis-full h-0 lg:hidden" />
+
+        <div ref={dropdownRef} className="relative flex-shrink-0 order-4 lg:order-2">
           <button
             onClick={() => setDropdownOpen((v) => !v)}
-            className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border w-[180px] hover:border-blue-400 transition"
+            className="flex items-center gap-2 bg-white px-3 lg:px-4 py-2 rounded-full border w-[120px] sm:w-[180px] hover:border-blue-400 transition"
           >
             <MapPin className="w-5 h-5 text-blue-500 flex-shrink-0" />
             <span className="flex-1 text-sm font-medium truncate text-left">
@@ -149,7 +158,7 @@ export default function Header() {
         </div>
 
         {/* ── Search Bar ── */}
-        <div className="flex flex-1 items-center bg-white rounded-full border overflow-hidden
+        <div className="order-5 lg:order-3 flex flex-1 min-w-0 items-center bg-white rounded-full border overflow-hidden
                         focus-within:ring-2 focus-within:ring-blue-400 transition">
           <input
             type="text"
@@ -157,7 +166,7 @@ export default function Header() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Escape" && setSearchQuery("")}
             placeholder="Search here"
-            className="flex-1 px-4 py-2 outline-none text-sm"
+            className="flex-1 min-w-0 px-3 lg:px-4 py-2 outline-none text-sm"
           />
           {/* Clear button */}
           {searchQuery && (
@@ -168,18 +177,18 @@ export default function Header() {
               <X className="w-4 h-4" />
             </button>
           )}
-          <button className="bg-blue-600 px-4 py-2 hover:bg-blue-700 transition">
+          <button className="bg-blue-600 px-3 lg:px-4 py-2 hover:bg-blue-700 transition">
             <Search className="text-white w-5 h-5" />
           </button>
         </div>
 
         {/* ── Actions ── */}
         {/* ── Actions ── */}
-        <div className="flex items-center gap-7 ml-4">
+        <div className="order-2 lg:order-4 flex items-center gap-3 sm:gap-4 lg:gap-7 ml-auto lg:ml-4">
 
           {/* Wishlist */}
           <div
-            className="flex flex-col items-center text-sm cursor-pointer text-white hover:text-amber-400 hover:scale-110 transition duration-200"
+            className="hidden lg:flex flex-col items-center text-sm cursor-pointer text-white hover:text-amber-400 hover:scale-110 transition duration-200"
             onClick={() => navigate("/bandookwale/wishlistPage")}
           >
             <Heart
@@ -195,7 +204,7 @@ export default function Header() {
             className="relative text-white hover:text-amber-400 hover:scale-110 transition duration-200"
           >
             <ShoppingCart
-              className="w-8 h-8 drop-shadow-md"
+              className="w-7 h-7 lg:w-8 lg:h-8 drop-shadow-md"
               strokeWidth={2.5}
             />
 
@@ -212,7 +221,7 @@ export default function Header() {
 
           {/* Sell Button */}
           <button
-            className="flex items-center gap-2 px-6 py-2.5 rounded-full
+            className="hidden sm:flex items-center gap-2 px-4 lg:px-6 py-2 lg:py-2.5 rounded-full
                font-bold text-black bg-white border-2 border-black
                shadow-lg hover:scale-105 hover:bg-gray-100 transition duration-200"
             onClick={() => navigate("/bandookwale/sellProductPage")}
@@ -241,6 +250,7 @@ export default function Header() {
 
            {/* Store */}
           <button
+            className="hidden lg:block"
             onClick={() => navigate("/bandookwale/store")}
           // className="text-black hover:scale-110 transition duration-200"
           // className="hover:scale-110 transition duration-200"
@@ -254,8 +264,47 @@ export default function Header() {
               // className="store-attention w-15 h-15 rounded-full object-cover"
             />
           </button>
+
+          {/* Mobile / tablet menu toggle */}
+          <button
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-white hover:text-amber-400 hover:bg-white/10 transition"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
+
+      {/* ── Mobile / tablet menu (items hidden from the bar below lg) ── */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-white/10 px-3 pb-3 pt-2">
+          <div className="flex flex-col gap-1">
+            <button
+              onClick={() => handleMobileNav("/bandookwale/wishlistPage")}
+              className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-white font-semibold text-sm hover:bg-white/10 hover:text-amber-400 transition"
+            >
+              <Heart className="w-5 h-5" strokeWidth={2.5} />
+              Wishlist
+            </button>
+            <button
+              onClick={() => handleMobileNav("/bandookwale/sellProductPage")}
+              className="sm:hidden flex items-center gap-3 w-full px-3 py-3 rounded-lg text-white font-semibold text-sm hover:bg-white/10 hover:text-amber-400 transition"
+            >
+              <Plus className="w-5 h-5" strokeWidth={3} />
+              SELL
+            </button>
+            <button
+              onClick={() => handleMobileNav("/bandookwale/store")}
+              className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-white font-semibold text-sm hover:bg-white/10 hover:text-amber-400 transition"
+            >
+              <img src={Finallogo} alt="Store" className="w-7 h-7 rounded-full object-cover" />
+              Store
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Active filter pills (shown below navbar when filters are on) ── */}
       {/* {(searchQuery || selectedCity) && (

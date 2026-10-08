@@ -24,6 +24,7 @@ const AppHeader: React.FC = () => {
   const [withdrawl, setWithdrawl] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { user } = useAuth();
 
@@ -92,11 +93,11 @@ const AppHeader: React.FC = () => {
         <Header />
       ) : isAdmin ? (
         // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-black to-yellow-500 border-b">
-        <header className="fixed top-0 left-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
-          <div className="flex items-center justify-between px-6 py-3">
+        <header className="sticky top-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
+          <div className="flex items-center justify-between px-3 sm:px-4 lg:px-6 py-3">
 
             {/* LEFT: LOGO + NAV */}
-            <div className="flex items-center gap-10">
+            <div className="flex items-center gap-4 lg:gap-10">
                   <div
           className="w-16 h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer flex items-center justify-center bg-black"
           onClick={() => navigate("/bandookwale/")}
@@ -234,7 +235,7 @@ const AppHeader: React.FC = () => {
             </div>
 
             {/* RIGHT: ACTIONS */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
 
               {/* SEARCH (Optional) */}
               <input
@@ -251,8 +252,61 @@ const AppHeader: React.FC = () => {
 
               {/* USER */}
               <UserDropdown />
+
+              {/* MOBILE / TABLET MENU TOGGLE */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMobileMenuOpen}
+                className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-white hover:bg-white/10 transition"
+              >
+                {isMobileMenuOpen ? (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                  </svg>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
+
+          {/* MOBILE / TABLET NAV (same links as the desktop nav) */}
+          {isMobileMenuOpen && isUserAdmin(user) && (
+            <nav className="lg:hidden border-t border-white/10 px-3 sm:px-4 pb-3 pt-2 max-h-[calc(100vh-6rem)] overflow-y-auto">
+              <Link
+                to="/bandookwale/admin"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-3 rounded-lg text-white text-sm font-medium hover:bg-white/10"
+              >
+                Dashboard
+              </Link>
+
+              <p className="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Users</p>
+              <Link to="/bandookwale/all-user" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                All Users
+              </Link>
+              <Link to="/bandookwale/active-user" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                Active Users
+              </Link>
+              <Link to="/bandookwale/inactive-user" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                Inactive Users
+              </Link>
+              <Link to="/bandookwale/admin-user" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                Admin Users
+              </Link>
+
+              <p className="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Manage Users</p>
+              <Link to="/bandookwale/admin/subscription" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                Subscription
+              </Link>
+              <Link to="/bandookwale/admin/store" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                Add Store Items
+              </Link>
+            </nav>
+          )}
         </header>) : (
         <Header />
       )}

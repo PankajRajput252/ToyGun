@@ -1,6 +1,5 @@
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import { Outlet } from "react-router";
-import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";
 import AppSidebar from "./AppSidebar";
 
@@ -20,7 +19,7 @@ const LayoutContent: React.FC = () => {
          ""
         }`}
       >
-        <AppHeader />
+        {/* AppHeader is rendered globally in AppRoutes.tsx — rendering it here too caused a duplicate header */}
         <div className="mx-auto max-w-screen-2xl">
           <Outlet />
         </div>

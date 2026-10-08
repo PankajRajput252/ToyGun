@@ -253,7 +253,7 @@ export default function ManageSubscription() {
             Manage Subscription
           </h2>
           <nav>
-            <ol className="flex items-center gap-2">
+            <ol className="flex flex-wrap items-center gap-2">
               <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/">Home /</a></li>
               <li><a className="font-medium text-gray-300 hover:text-white" href="/StyloCoin/admin">Admin /</a></li>
               <li className="font-medium text-orange-500">Manage Subscription</li>
@@ -263,11 +263,11 @@ export default function ManageSubscription() {
 
         {/* Admin Panel */}
         <div className="bg-[rgb(16_16_16_/1)] rounded-xl border border-[rgb(35_35_35_/1)] shadow-2xl overflow-hidden">
-          <div className="p-6 border-b border-gray-700">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="p-4 sm:p-6 border-b border-gray-700">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
               <h3 className="text-white font-bold text-xl">Subscription Management</h3>
-              <div className="flex items-center gap-4">
-                <div className="relative">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                <div className="relative w-full sm:w-auto">
                   <input
                     type="text"
                     placeholder="Search Subscription types..."
@@ -281,7 +281,7 @@ export default function ManageSubscription() {
                 </div>
                 <button
                   onClick={handleAddIncomeType}
-                  className="px-4 py-2 bg-gradient-to-r from-black to-yellow-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 flex items-center gap-2"
+                  className="px-4 py-2 bg-gradient-to-r from-black to-yellow-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -303,20 +303,20 @@ export default function ManageSubscription() {
                 <table className="w-full">
                   <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
                     <tr>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Subscription Type</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Amount</th>
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Created Date</th>
-                      {/* <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">End Date</th> */}
-                      <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Actions</th>
+                      <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">#</th>
+                      <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">Subscription Type</th>
+                      <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">Amount</th>
+                      <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">Created Date</th>
+                      {/* <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">End Date</th> */}
+                      <th className="text-left py-4 px-6 whitespace-nowrap font-bold text-white text-sm uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
                     {currentIncomeTypes.length > 0 ? (
                       currentIncomeTypes.map((subscriptionTypes, index) => (
                         <tr key={subscriptionTypes.subscriptionDefinitionPkId} className="hover:bg-gray-700/50 transition-colors">
-                          <td className="py-4 px-6 text-white font-medium">{startIndex + index + 1}</td>
-                          <td className="py-4 px-6">
+                          <td className="py-4 px-6 whitespace-nowrap text-white font-medium">{startIndex + index + 1}</td>
+                          <td className="py-4 px-6 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white text-lg">
                                 {getIncomeTypeIcon(subscriptionTypes.subscriptionName)}
@@ -324,16 +324,16 @@ export default function ManageSubscription() {
                               <span className="text-white font-semibold">{subscriptionTypes.subscriptionName}</span>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-gray-300 font-semibold">
+                          <td className="py-4 px-6 whitespace-nowrap text-gray-300 font-semibold">
                             ${subscriptionTypes.subscriptionAmount?.toLocaleString() ?? '—'}
                           </td>
-                          <td className="py-4 px-6 text-gray-300 font-mono">
+                          <td className="py-4 px-6 whitespace-nowrap text-gray-300 font-mono">
                             {formatDate(subscriptionTypes.createdDatetime)}
                           </td>
-                          {/* <td className="py-4 px-6 text-gray-300 font-mono">
+                          {/* <td className="py-4 px-6 whitespace-nowrap text-gray-300 font-mono">
                             {formatDate(subscriptionTypes.subscriptionEndDateTime)}
                           </td> */}
-                          <td className="py-4 px-6">
+                          <td className="py-4 px-6 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleEditIncomeType(subscriptionTypes)}
@@ -374,8 +374,8 @@ export default function ManageSubscription() {
               </div>
 
               {/* Pagination */}
-              <div className="px-6 py-4 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-2 text-gray-400">
+              <div className="px-4 sm:px-6 py-4 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="flex flex-wrap items-center justify-center gap-2 text-gray-400">
                   <span>Row Per Page</span>
                   <select
                     value={rowsPerPage}
@@ -393,7 +393,7 @@ export default function ManageSubscription() {
                   <span>Entries</span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-center gap-2">
                   <button
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}

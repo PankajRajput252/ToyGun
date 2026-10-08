@@ -4,7 +4,7 @@ export default function Footer() {
 
       {/* Top Section */}
       <div className="border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10 text-sm">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-8 md:gap-10 text-sm">
 
           {/* Brand / About column (wider feel via heading) */}
           <div className="col-span-2 lg:col-span-1 lg:pr-4">
@@ -100,7 +100,7 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="bg-black/40">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 flex flex-col md:flex-row text-center md:text-left
                         justify-between items-center gap-3 text-xs text-gray-500">
           <p>
             <span className="text-gray-300 font-medium">

@@ -74,7 +74,7 @@ export default function CategoryGrid({ selectedCategoryId, onSelectCategory }: P
 
   return (
     <section className="w-full bg-[#101828 ] py-8 mt-16">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -105,7 +105,7 @@ export default function CategoryGrid({ selectedCategoryId, onSelectCategory }: P
                 )}
 
                 {/* Image */}
-                <div className="w-full h-28 bg-[#111] overflow-hidden">
+                <div className="w-full h-24 sm:h-28 bg-[#111] overflow-hidden">
                   <img
                     src={img}
                     alt={item.categoryName}
@@ -118,7 +118,7 @@ export default function CategoryGrid({ selectedCategoryId, onSelectCategory }: P
 
                 {/* Body */}
                 <div className="px-3 pt-2.5 pb-3">
-                  <p className={`text-sm font-semibold leading-tight mb-0.5
+                  <p className={`text-sm font-semibold leading-tight mb-0.5 pr-6 break-words
                                  ${isSelected ? "text-yellow-700" : "text-gray-800"}`}>
                     {item.categoryName}
                   </p>
@@ -143,7 +143,7 @@ export default function CategoryGrid({ selectedCategoryId, onSelectCategory }: P
 
         {/* Selected category bar */}
         {selectedCategoryId && selectedCat && (
-          <div className="mt-4 flex items-center gap-3 bg-white border-2 border-yellow-500
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 bg-white border-2 border-yellow-500
                           rounded-xl px-4 py-3">
             <div className="w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0" />
             <p className="text-sm font-semibold text-yellow-700">

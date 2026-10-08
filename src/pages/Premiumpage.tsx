@@ -221,7 +221,7 @@ export default function PremiumPage() {
       <div style={styles.bgOrb1} />
       <div style={styles.bgOrb2} />
 
-      <div style={styles.container}>
+      <div style={styles.container} className="px-4 sm:px-6 pb-12">
 
         {/* ── Header ── */}
         <header style={styles.header}>
@@ -237,7 +237,7 @@ export default function PremiumPage() {
         </header>
 
         {/* ── Hero ── */}
-        <section ref={heroRef} style={styles.hero}>
+        <section ref={heroRef} style={styles.hero} className="pt-10 pb-8 sm:pt-14 sm:pb-12">
           <div style={styles.heroPill}>✦ Premium Membership</div>
           <h1 style={styles.heroTitle}>
             Go premium.<br />
@@ -250,12 +250,12 @@ export default function PremiumPage() {
         </section>
 
         {/* ── Main layout ── */}
-        <div style={styles.mainGrid}>
+        <div style={styles.mainGrid} className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 lg:gap-8">
 
           {/* ── Left: Features + Testimonials ── */}
           <div style={styles.leftCol}>
             <p style={styles.sectionLabel}>Everything included</p>
-            <div style={styles.featureGrid}>
+            <div style={styles.featureGrid} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {FEATURES.map((f) => (
                 <div key={f.title} style={styles.featureCard}>
                   <span style={styles.featureIcon}>{f.icon}</span>
@@ -291,7 +291,7 @@ export default function PremiumPage() {
           </div>
 
           {/* ── Right: Pricing card ── */}
-          <div style={styles.rightCol}>
+          <div style={styles.rightCol} className="lg:sticky lg:top-6">
             <div style={styles.pricingCard}>
 
               <p style={styles.sectionLabel}>Premium Membership</p>
@@ -405,7 +405,7 @@ export default function PremiumPage() {
         </div>
 
         {/* ── Stats bar ── */}
-        <div style={styles.statsBar}>
+        <div style={styles.statsBar} className="grid grid-cols-2 md:grid-cols-4">
           {[
             { val: "50K+", label: "Premium members" },
             { val: "4.9★", label: "Average rating" },
@@ -438,7 +438,7 @@ function SuccessScreen({ success }: { success: any }) {
     <div style={styles.page}>
       <div style={styles.bgOrb1} />
       <div style={styles.bgOrb2} />
-      <div style={{ ...styles.container, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", textAlign: "center" }}>
+      <div className="px-4 sm:px-6 pb-12" style={{ ...styles.container, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", textAlign: "center" }}>
         <div style={styles.successIconWrap}>
           <span style={{ fontSize: 40 }}>✓</span>
         </div>
@@ -488,12 +488,12 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     maxWidth: 1100,
     margin: "0 auto",
-    padding: "0 24px 48px",
     position: "relative",
     zIndex: 1,
   },
   header: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
+    flexWrap: "wrap", gap: 12,
     padding: "24px 0 0",
   },
   logo: { display: "flex", alignItems: "center", gap: 8 },
@@ -503,7 +503,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#FEF3C7", border: "1px solid #FDE68A",
     borderRadius: 20, padding: "6px 14px",
   },
-  hero: { textAlign: "center", padding: "56px 0 48px" },
+  hero: { textAlign: "center" },
   heroPill: {
     display: "inline-block",
     background: "#FEF3C7", color: "#92400E",
@@ -536,9 +536,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 400,
   },
   mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 420px",
-    gap: 32,
     alignItems: "start",
   },
   leftCol: { display: "flex", flexDirection: "column", gap: 24 },
@@ -551,11 +548,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 12,
     fontFamily: "sans-serif",
   },
-  featureGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 12,
-  },
+  featureGrid: {},
   featureCard: {
     background: "#FFFFFF",
     border: "1px solid #E7E5E4",
@@ -600,8 +593,9 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 0, transition: "background 0.2s, width 0.2s",
   },
   dotActive: { background: "#B45309", width: 18, borderRadius: 3 },
-  rightCol: { position: "sticky", top: 24, display: "flex", flexDirection: "column", gap: 12 },
+  rightCol: { display: "flex", flexDirection: "column", gap: 12 },
   pricingCard: {
+    minWidth: 0,
     background: "#FFFFFF",
     border: "1px solid #E7E5E4",
     borderRadius: 20,
@@ -730,8 +724,6 @@ const styles: Record<string, React.CSSProperties> = {
   guaranteeTitle: { fontSize: 14, fontWeight: 600, color: "#14532D", marginBottom: 3, fontFamily: "sans-serif" },
   guaranteeDesc: { fontSize: 12, color: "#166534", lineHeight: 1.5, fontFamily: "sans-serif" },
   statsBar: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
     gap: 1,
     background: "#E7E5E4",
     border: "1px solid #E7E5E4",
@@ -751,6 +743,7 @@ const styles: Record<string, React.CSSProperties> = {
   statLabel: { fontSize: 12, color: "#78716C", fontFamily: "sans-serif" },
   footer: {
     display: "flex", alignItems: "center", justifyContent: "center",
+    flexWrap: "wrap",
     gap: 12, fontSize: 13, color: "#A8A29E",
     fontFamily: "sans-serif",
   },

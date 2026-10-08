@@ -69,9 +69,9 @@ const TransactionApprovalModal: React.FC<TransactionApprovalModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               Transaction Approval
             </h2>
             <button
@@ -108,7 +108,7 @@ const TransactionApprovalModal: React.FC<TransactionApprovalModalProps> = ({
           {walletData && (
             <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Current Wallet Balances</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 <p><span className="font-medium">Mine Wallet:</span> ${walletData.mineWallet.toFixed(2)}</p>
                 <p><span className="font-medium">Node Wallet:</span> ${walletData.nodeWallet.toFixed(2)}</p>
                 <p><span className="font-medium">Capital Wallet:</span> ${walletData.capitalWallet.toFixed(2)}</p>
@@ -179,7 +179,7 @@ const TransactionApprovalModal: React.FC<TransactionApprovalModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-6">
+          <div className="flex flex-wrap justify-end gap-3 pt-6">
             <button
               type="button"
               onClick={handleClose}

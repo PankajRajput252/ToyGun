@@ -338,14 +338,14 @@ export default function Support() {
           {/* ── LEFT: Form ── */}
           {!isUserAdmin(user) && (
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm sticky top-6">
-                <div className="px-6 py-5 border-b border-gray-100">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm lg:sticky lg:top-6">
+                <div className="px-4 sm:px-6 py-5 border-b border-gray-100">
                   <h3 className="font-semibold text-gray-900 text-lg">Raise a Ticket</h3>
                   <p className="text-xs text-gray-500 mt-0.5">Fill in the details below</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                  <div className="p-6 space-y-5">
+                  <div className="p-4 sm:p-6 space-y-5">
 
                     {error && (
                       <div className="rounded-lg border border-red-200 bg-red-50 p-3">
@@ -437,13 +437,13 @@ export default function Support() {
           {/* ── RIGHT: Tickets list ── */}
           <div className={isUserAdmin(user) ? "lg:col-span-3" : "lg:col-span-2"}>
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+              <div className="px-4 sm:px-6 py-5 border-b border-gray-100 flex items-center justify-between gap-2">
                 <h3 className="font-semibold text-gray-900 text-lg">All Tickets</h3>
                 <span className="text-xs text-gray-400">{supportTickets.length} total</span>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full text-sm whitespace-nowrap">
                   <thead>
                     <tr className="border-b border-gray-100 text-left">
                       <th className="py-3 px-6 font-medium text-gray-500 text-xs uppercase tracking-wide">#</th>
@@ -545,16 +545,16 @@ export default function Support() {
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        className="max-w-[700px] m-4"
+        className="max-w-[700px] m-4 max-h-[90vh] overflow-y-auto"
       >
         <div className="w-full max-w-[700px] rounded-2xl bg-white overflow-hidden">
 
-          <div className="flex flex-col px-6 py-5 bg-gradient-to-r from-black to-yellow-500">
+          <div className="flex flex-col px-4 sm:px-6 py-5 bg-gradient-to-r from-black to-yellow-500">
             <h4 className="text-xl font-semibold text-white">Edit Support Ticket</h4>
             <p className="text-sm text-gray-100 mt-1">Update the support ticket details.</p>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {error && (
               <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
                 <p className="text-sm text-red-700">{error}</p>

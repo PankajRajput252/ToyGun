@@ -193,10 +193,10 @@ export default function ProductDetailsPage() {
       : 0;
 
   return (
-    <div className="max-w-7xl mt-20 mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-4 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 overflow-x-hidden">
 
       {/* LEFT — Images + Details + Reviews */}
-      <div className="md:col-span-2 space-y-4">
+      <div className="md:col-span-2 space-y-4 min-w-0">
 
         {/* Product Type Badge + View Count */}
         <div className="flex items-center justify-between">
@@ -229,7 +229,7 @@ export default function ProductDetailsPage() {
           <img
             src={images[currentIndex]}
             alt={item.title}
-            className="max-h-[500px] object-contain w-full"
+            className="max-h-[300px] sm:max-h-[400px] md:max-h-[500px] object-contain w-full"
             onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/300"; }}
           />
           {images.length > 1 && (
@@ -285,14 +285,14 @@ export default function ProductDetailsPage() {
             </div>
           )}
           <h2 className="text-xl font-semibold mt-4">Description</h2>
-          <p className="text-gray-700 mt-2">{item.description || "No description provided."}</p>
+          <p className="text-gray-700 mt-2 break-words">{item.description || "No description provided."}</p>
         </div>
 
         {/* ── REVIEWS SECTION ───────────────────────────────────────────── */}
         <div className="bg-white p-4 rounded-lg border">
 
           {/* Header with average */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <h2 className="text-xl font-semibold">
               Reviews ({reviews.length})
             </h2>
@@ -350,17 +350,17 @@ export default function ProductDetailsPage() {
             <div className="space-y-4">
               {reviews.map((r, i) => (
                 <div key={r.reviewId ?? i} className="border-b pb-4 last:border-0 last:pb-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-teal-400 flex items-center
+                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-8 h-8 shrink-0 rounded-full bg-teal-400 flex items-center
                                       justify-center text-white text-sm font-bold">
                         {(r.userName || r.userId || "U").charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-sm font-medium">{r.userName || r.userId}</span>
+                      <span className="text-sm font-medium truncate">{r.userName || r.userId}</span>
                     </div>
                     <StarRating value={r.rating} readonly size="w-4 h-4" />
                   </div>
-                  <p className="text-sm text-gray-600 ml-10">{r.comment}</p>
+                  <p className="text-sm text-gray-600 ml-10 break-words">{r.comment}</p>
                   {r.createdAt && (
                     <p className="text-xs text-gray-400 ml-10 mt-1">
                       {new Date(r.createdAt).toLocaleDateString()}
@@ -374,10 +374,10 @@ export default function ProductDetailsPage() {
       </div>
 
       {/* RIGHT — Price + Actions (unchanged structure, wishlist now uses context) */}
-      <div className="space-y-4">
+      <div className="space-y-4 min-w-0">
         <div className="bg-white p-4 rounded-lg border">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">₹ {Number(item.price).toLocaleString()}</h1>
+          <div className="flex justify-between items-center gap-3">
+            <h1 className="text-xl sm:text-2xl font-bold break-all">₹ {Number(item.price).toLocaleString()}</h1>
             <div className="flex gap-3">
               <button title="Share">
                 <Share2 className="w-5 h-5 cursor-pointer text-gray-500 hover:text-black transition" />
@@ -398,8 +398,8 @@ export default function ProductDetailsPage() {
             </div>
           </div>
 
-          <p className="text-gray-700 mt-2">{item.title}</p>
-          <div className="flex justify-between text-sm text-gray-500 mt-3">
+          <p className="text-gray-700 mt-2 break-words">{item.title}</p>
+          <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm text-gray-500 mt-3">
             <span>{item.location}</span>
             <span>{item.date}</span>
           </div>
@@ -458,12 +458,12 @@ export default function ProductDetailsPage() {
         {/* Seller Card — unchanged */}
         <div className="bg-white p-4 rounded-lg border">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-teal-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-12 h-12 shrink-0 bg-teal-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
               {(item.sellerName || item.sellerId || "S").charAt(0).toUpperCase()}
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-gray-500">{isStoreProduct ? "Sold by" : "Posted By"}</p>
-              <p className="font-semibold">{item.sellerName || item.sellerId || "Seller"}</p>
+              <p className="font-semibold truncate">{item.sellerName || item.sellerId || "Seller"}</p>
               <p className="text-xs text-gray-500">Member since Today</p>
             </div>
           </div>

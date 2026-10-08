@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
-import { Send, Wifi, WifiOff, MessageSquare } from "lucide-react";
+import { Send, Wifi, WifiOff, MessageSquare, ArrowLeft } from "lucide-react";
 import  { WS_URL, API_URL} from "../services/api";
 
 
@@ -49,6 +49,8 @@ export default function ChatUI({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvId, setActiveConvId] = useState(conversationId);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  // Mobile only: toggles between the conversation list and the chat window
+  const [showListMobile, setShowListMobile] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
@@ -200,10 +202,10 @@ const loadConversations = async () => {
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex h-[calc(100dvh-114px)] lg:h-[calc(100dvh-90px)] overflow-hidden bg-gray-100 dark:bg-gray-900">
 
       {/* SIDEBAR */}
-      <div className="w-1/4 bg-white dark:bg-gray-800 border-r dark:border-gray-700 flex flex-col">
+      <div className={`${showListMobile ? "flex" : "hidden"} md:flex w-full md:w-1/3 lg:w-1/4 bg-white dark:bg-gray-800 border-r dark:border-gray-700 flex-col overflow-y-auto`}>
 
         {/* Sidebar Header */}
         <div className="p-4 font-bold text-lg border-b dark:border-gray-700
@@ -214,7 +216,7 @@ const loadConversations = async () => {
 
         {/* Current conversation (from product) */}
         <div
-          onClick={() => switchConversation(conversationId)}
+          onClick={() => { switchConversation(conversationId); setShowListMobile(false); }}
           className={`p-4 cursor-pointer border-b dark:border-gray-700 transition
             ${activeConvId === conversationId
               ? "bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-l-yellow-500"
@@ -247,7 +249,7 @@ const loadConversations = async () => {
           .map((conv) => (
             <div
               key={conv.conversationId}
-              onClick={() => switchConversation(conv.conversationId)}
+              onClick={() => { switchConversation(conv.conversationId); setShowListMobile(false); }}
               className={`p-4 cursor-pointer border-b dark:border-gray-700 transition
                 ${activeConvId === conv.conversationId
                   ? "bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-l-yellow-500"
@@ -265,11 +267,19 @@ const loadConversations = async () => {
       </div>
 
       {/* CHAT WINDOW */}
-      <div className="flex flex-col flex-1">
+      <div className={`${showListMobile ? "hidden" : "flex"} md:flex flex-col flex-1 min-w-0`}>
 
         {/* Chat Header */}
-        <div className="p-4 bg-white dark:bg-gray-800 border-b dark:border-gray-700
-                        flex items-center gap-3 shadow-sm">
+        <div className="p-3 md:p-4 bg-white dark:bg-gray-800 border-b dark:border-gray-700
+                        flex items-center gap-2 md:gap-3 shadow-sm">
+          {/* Back to chats list — mobile only */}
+          <button
+            onClick={() => setShowListMobile(true)}
+            className="md:hidden text-gray-500 hover:text-black dark:hover:text-white transition flex-shrink-0"
+            aria-label="Show chats"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           {productImage && (
             <img
               src={productImage}
@@ -279,18 +289,18 @@ const loadConversations = async () => {
             />
           )}
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-800 dark:text-white">{sellerName}</p>
+            <p className="font-semibold text-gray-800 dark:text-white truncate">{sellerName}</p>
             <p className="text-xs text-gray-400 truncate">Re: {productTitle}</p>
           </div>
 
           {/* Connection badge */}
           {isConnected ? (
-            <span className="flex items-center gap-1 text-xs text-green-500 bg-green-50
+            <span className="flex flex-shrink-0 items-center gap-1 text-xs text-green-500 bg-green-50
                              dark:bg-green-900/20 px-2 py-1 rounded-full">
               <Wifi className="w-3 h-3" /> Live
             </span>
           ) : (
-            <span className="flex items-center gap-1 text-xs text-red-400 bg-red-50
+            <span className="flex flex-shrink-0 items-center gap-1 text-xs text-red-400 bg-red-50
                              dark:bg-red-900/20 px-2 py-1 rounded-full">
               <WifiOff className="w-3 h-3" /> Offline
             </span>
@@ -298,7 +308,7 @@ const loadConversations = async () => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3">
+        <div className="flex-1 p-3 md:p-4 overflow-y-auto space-y-3">
           {isLoadingHistory ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500" />
@@ -319,7 +329,7 @@ const loadConversations = async () => {
                   className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`px-4 py-2 rounded-2xl max-w-xs text-sm shadow-sm
+                    className={`px-4 py-2 rounded-2xl max-w-[80%] md:max-w-xs text-sm shadow-sm break-words
                       ${isMe
                         ? "bg-gradient-to-r from-black to-yellow-500 text-white rounded-br-none"
                         : "bg-white dark:bg-gray-800 text-gray-800 dark:text-white border dark:border-gray-700 rounded-bl-none"
@@ -347,20 +357,20 @@ const loadConversations = async () => {
         </div>
 
         {/* Input */}
-        <div className="p-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex gap-2">
+        <div className="p-3 md:p-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:pb-4 bg-white dark:bg-gray-800 border-t dark:border-gray-700 flex gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="flex-1 border dark:border-gray-600 rounded-full px-4 py-2
-                       text-sm bg-gray-50 dark:bg-gray-700 dark:text-white
+            className="flex-1 min-w-0 border dark:border-gray-600 rounded-full px-4 py-2
+                       text-base md:text-sm bg-gray-50 dark:bg-gray-700 dark:text-white
                        focus:outline-none focus:ring-2 focus:ring-yellow-400"
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim()}
-            className="w-10 h-10 rounded-full bg-gradient-to-r from-black to-yellow-500
+            className="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-r from-black to-yellow-500
                        flex items-center justify-center text-white
                        disabled:opacity-40 disabled:cursor-not-allowed
                        hover:opacity-90 transition"
