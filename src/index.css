@@ -64,6 +64,27 @@
   }
 }
 @layer utilities {
+  /* Gentle float on the front image of the hero carousel */
+  .hero-float {
+    animation: hero-float 4s ease-in-out infinite;
+  }
+  @keyframes hero-float {
+    0%, 100% { transform: scale(1.02) translateY(0); }
+    50% { transform: scale(1.06) translateY(-4px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-float { animation: none; }
+  }
+
+  /* Toast slide-up (ToastContext) */
+  .toast-in {
+    animation: toast-in 0.25s ease-out;
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;

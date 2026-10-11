@@ -3,9 +3,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart, MessageCircle, Heart, Loader2,
-  Pencil, Trash2, Store, ChevronLeft, ChevronRight
+  Pencil, Trash2, Store, ChevronLeft, ChevronRight, MapPin, Sparkles
 } from "lucide-react";
 import { useWishlist } from "./Wishlistcontext";
+import { addRecentlyViewed } from "./recentlyViewed";
+import { productUrl } from "./productUtils";
+import { useToast } from "../context/ToastContext";
+import PLACEHOLDER_IMAGE from "../components/images/BandookwaleLogo.jpeg";
+
+export { PLACEHOLDER_IMAGE };
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 import { sellProductApi } from "../services/api";
 
 export interface Product {
@@ -14,6 +22,7 @@ export interface Product {
   title: string;
   location: string;
   date: string;
+  createdAt?: string;
   id?: number;
   sellerId?: string;
   sellerName?: string;
@@ -43,12 +52,19 @@ export default function ProductCard({ item, onDeleted }: Props) {
   const { toggleFavorite, isFavorited, isLoading, isInitialized } = useWishlist();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { showToast } = useToast();
 
   const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
   const loggedInUserId = user?.nodeId;
   const isOwner = !!loggedInUserId && loggedInUserId === item.sellerId;
 
-  const images = item.images?.length ? item.images : ["https://via.placeholder.com/300"];
+  const images = item.images?.length ? item.images : [PLACEHOLDER_IMAGE];
+  const isNew = !!item.createdAt && Date.now() - new Date(item.createdAt).getTime() < ONE_DAY_MS;
+
+  const openDetails = () => {
+    addRecentlyViewed(item);
+    navigate(productUrl(item.id), { state: item });
+  };
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -60,7 +76,9 @@ export default function ProductCard({ item, onDeleted }: Props) {
   };
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (item.id != null) toggleFavorite(item.id);
+    if (item.id == null) return;
+    showToast(isFavorited(item.id) ? "Removed from wishlist" : "Added to wishlist ❤️");
+    toggleFavorite(item.id);
   };
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,8 +96,9 @@ export default function ProductCard({ item, onDeleted }: Props) {
       await sellProductApi.delete(item.id);
       setShowDeleteModal(false);
       onDeleted?.(item.id);
+      showToast("Product deleted");
     } catch (error: any) {
-      alert(`Failed to delete: ${error.message || "Please try again."}`);
+      showToast(`Failed to delete: ${error.message || "Please try again."}`, "error");
     } finally {
       setIsDeleting(false);
     }
@@ -142,59 +161,52 @@ export default function ProductCard({ item, onDeleted }: Props) {
 
       {/* ── Card ── */}
       <div
-        onClick={() => navigate("/bandookwale/productdetails", { state: item })}
-        className="group cursor-pointer rounded-xl overflow-hidden flex flex-col"
-        style={{
-          background: "#1a1a1a",
-          border: "0.5px solid #2a2a2a",
-          transition: "border-color 0.15s",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#c9931a")}
-        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#2a2a2a")}
+        onClick={openDetails}
+        className="group cursor-pointer rounded-2xl overflow-hidden flex flex-col
+                   bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800
+                   shadow-sm transition-all duration-300
+                   hover:-translate-y-1 hover:border-gold-500/70 hover:shadow-xl hover:shadow-gold-500/10"
       >
         {/* IMAGE */}
-        <div className="relative">
+        <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
           <img
             src={images[index]}
             alt={item.title}
-            className="w-full object-cover h-[130px] sm:h-[160px]"
+            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = "https://via.placeholder.com/300";
+              (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_IMAGE;
             }}
           />
 
-          {/* Store / Listing badge — prominently styled */}
-          <div className="absolute top-2.5 left-2.5">
+          {/* Bottom fade so badges and dots stay readable on bright photos */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
+
+          {/* Store / Listing / New / Negotiable badges */}
+          <div className="absolute top-2.5 left-2.5 flex flex-col items-start gap-1">
             {item.isStoreProduct ? (
-              <span
-                className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-lg"
-                style={{ background: "#c9931a", color: "#fff", letterSpacing: "0.01em" }}
-              >
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-lg bg-gold-500 text-white">
                 <Store className="w-3 h-3" />
                 Store
               </span>
             ) : (
-              <span
-                className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-lg"
-                style={{ background: "#1d4480", color: "#93c5fd" }}
-              >
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-lg bg-blue-900/90 text-blue-200">
                 <MessageCircle className="w-3 h-3" />
                 Listing
               </span>
             )}
-          </div>
-
-          {/* Negotiable badge */}
-          {item.isNegotiable && (
-            <div className="absolute top-10 left-2.5">
-              <span
-                className="text-[10px] font-semibold px-2 py-0.5 rounded-md"
-                style={{ background: "#14532d", color: "#86efac" }}
-              >
+            {isNew && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md shadow-lg bg-red-600 text-white uppercase tracking-wide">
+                <Sparkles className="w-3 h-3" />
+                New
+              </span>
+            )}
+            {item.isNegotiable && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-green-900/90 text-green-300">
                 Negotiable
               </span>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Owner controls / wishlist */}
           <div className="absolute top-2.5 right-2.5 flex gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -203,16 +215,14 @@ export default function ProductCard({ item, onDeleted }: Props) {
                 <button
                   onClick={handleEdit}
                   title="Edit"
-                  className="w-7 h-7 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-black/60 backdrop-blur-sm hover:bg-black/80 transition"
                 >
-                  <Pencil className="w-3.5 h-3.5" style={{ color: "#fbbf24" }} />
+                  <Pencil className="w-3.5 h-3.5 text-amber-400" />
                 </button>
                 <button
                   onClick={handleDeleteClick}
                   title="Delete"
-                  className="w-7 h-7 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-black/60 backdrop-blur-sm hover:bg-black/80 transition"
                 >
                   <Trash2 className="w-3.5 h-3.5 text-red-400" />
                 </button>
@@ -223,18 +233,14 @@ export default function ProductCard({ item, onDeleted }: Props) {
                   onClick={handleWishlistClick}
                   disabled={!isInitialized || loading}
                   title={favorited ? "Remove from wishlist" : "Add to wishlist"}
-                  className="w-7 h-7 rounded-full flex items-center justify-center disabled:opacity-60"
-                  style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-black/60 backdrop-blur-sm
+                             hover:bg-black/80 hover:scale-110 active:scale-95 transition disabled:opacity-60"
                 >
                   {loading ? (
-                    <Loader2 className="w-3.5 h-3.5 text-gray-400 animate-spin" />
+                    <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
                   ) : (
                     <Heart
-                      className="w-3.5 h-3.5 transition-colors"
-                      style={{
-                        fill: favorited ? "#ef4444" : "transparent",
-                        color: favorited ? "#ef4444" : "#aaa",
-                      }}
+                      className={`w-4 h-4 transition-colors ${favorited ? "fill-red-500 text-red-500" : "fill-transparent text-gray-200"}`}
                     />
                   )}
                 </button>
@@ -242,20 +248,20 @@ export default function ProductCard({ item, onDeleted }: Props) {
             )}
           </div>
 
-          {/* Carousel */}
+          {/* Carousel — arrows show on hover (always visible on touch screens) */}
           {images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ background: "rgba(0,0,0,0.5)" }}
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center
+                           bg-black/50 hover:bg-black/75 transition sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <ChevronLeft className="w-4 h-4 text-white" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center"
-                style={{ background: "rgba(0,0,0,0.5)" }}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center
+                           bg-black/50 hover:bg-black/75 transition sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <ChevronRight className="w-4 h-4 text-white" />
               </button>
@@ -263,13 +269,7 @@ export default function ProductCard({ item, onDeleted }: Props) {
                 {images.map((_, i) => (
                   <div
                     key={i}
-                    className="rounded-full"
-                    style={{
-                      width: i === index ? "16px" : "6px",
-                      height: "6px",
-                      background: i === index ? "#c9931a" : "rgba(255,255,255,0.4)",
-                      transition: "all 0.2s",
-                    }}
+                    className={`h-1.5 rounded-full transition-all duration-200 ${i === index ? "w-4 bg-gold-500" : "w-1.5 bg-white/50"}`}
                   />
                 ))}
               </div>
@@ -279,41 +279,29 @@ export default function ProductCard({ item, onDeleted }: Props) {
 
         {/* BODY */}
         <div className="p-3 flex flex-col gap-1 flex-1">
-          <p className="text-base sm:text-lg font-semibold break-words" style={{ color: "#fff", lineHeight: 1.2 }}>
-            ₹ {Number(item.price).toLocaleString()}
+          <p className="text-lg sm:text-xl font-bold break-words leading-tight text-gold-600 dark:text-gold-400">
+            ₹ {Number(item.price).toLocaleString("en-IN")}
           </p>
-          <p className="text-sm truncate" style={{ color: "#aaa" }}>{item.title}</p>
+          <p className="text-sm font-medium line-clamp-2 min-h-[2.5rem] text-gray-800 dark:text-gray-200">
+            {item.title}
+          </p>
 
-          <div className="flex justify-between gap-1 text-[11px] mt-1" style={{ color: "#555" }}>
-            <span className="truncate max-w-[60%]">{item.location}</span>
+          <div className="flex justify-between gap-2 text-[11px] mt-auto pt-1 text-gray-500">
+            <span className="flex items-center gap-1 min-w-0">
+              <MapPin className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{item.location || "India"}</span>
+            </span>
             <span className="whitespace-nowrap">{item.date}</span>
           </div>
 
           {/* CTA */}
           <button
-            onClick={(e) => { e.stopPropagation(); navigate("/bandookwale/productdetails", { state: item }); }}
-            className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold transition-colors whitespace-nowrap"
-            style={
-              item.isStoreProduct
-                ? { background: "transparent", border: "0.5px solid #c9931a", color: "#c9931a" }
-                : { background: "transparent", border: "0.5px solid #3b5898", color: "#93c5fd" }
-            }
-            onMouseEnter={(e) => {
-              if (item.isStoreProduct) {
-                (e.currentTarget as HTMLButtonElement).style.background = "#c9931a";
-                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
-              } else {
-                (e.currentTarget as HTMLButtonElement).style.background = "#1d3a6e";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (item.isStoreProduct) {
-                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                (e.currentTarget as HTMLButtonElement).style.color = "#c9931a";
-              } else {
-                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-              }
-            }}
+            onClick={(e) => { e.stopPropagation(); openDetails(); }}
+            className={`mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold
+                        transition-colors whitespace-nowrap border
+                        ${item.isStoreProduct
+                          ? "border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-white"
+                          : "border-blue-700 text-blue-300 hover:bg-blue-900/60"}`}
           >
             {item.isStoreProduct ? (
               <><ShoppingCart className="w-3.5 h-3.5" /> Add to cart & buy</>

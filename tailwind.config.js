@@ -29,6 +29,14 @@ export default {
         transparent: "transparent",
         white: "#FFFFFF",
         black: "#101828",
+        // Bandookwale brand accent
+        gold: {
+          300: "#f2c45a",
+          400: "#e0ab2c",
+          500: "#c9931a",
+          600: "#a87912",
+          700: "#835e0e",
+        },
         brand: {
           25: "#F2F7FF",
           50: "#ECF3FF",

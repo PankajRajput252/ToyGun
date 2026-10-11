@@ -29,6 +29,7 @@ type Props = {
   productTitle?: string;
   productImage?: string;
   sellerName?: string;
+  initialMessage?: string; // pre-fills the input, e.g. "Make an offer" from the product page
 };
 
 // const WS_URL = "https://api.bandookwale.com/ws"; // ← update to your backend URL
@@ -41,9 +42,10 @@ export default function ChatUI({
   productTitle = "Product",
   productImage = "",
   sellerName = "Seller",
+  initialMessage = "",
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(initialMessage);
   const [stompClient, setStompClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);

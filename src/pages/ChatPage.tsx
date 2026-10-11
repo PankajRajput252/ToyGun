@@ -34,6 +34,7 @@ export default function ChatPage() {
       productTitle={productTitle}
       productImage={productImage}
       sellerName={sellerName}
+      initialMessage={state.initialMessage}
     />
   );
 }

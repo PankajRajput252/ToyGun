@@ -39,8 +39,8 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
   }, []);
 
   return (
-    <div className="w-full bg-black border-b sticky top-0 z-40 pt-2">
-      <div className="max-w-7xl mx-auto px-3 py-3 flex items-center gap-2 overflow-x-auto scrollbar-hide">
+    <div className="w-full bg-black/95 backdrop-blur border-b border-gray-800 pt-2">
+      <div className="max-w-7xl mx-auto px-3 py-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
 
         {/* All Categories */}
         <button
@@ -48,8 +48,8 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
           className={`flex items-center gap-2 px-4 lg:px-5 py-2 rounded-full whitespace-nowrap
                       transition font-medium text-sm flex-shrink-0
                       ${selectedCategoryId === null
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white"
+                        ? "bg-gold-500 text-white shadow-md shadow-gold-500/25"
+                        : "bg-gray-800 text-gray-200 hover:bg-gray-700"
                       }`}
         >
           <Menu className="w-4 h-4" />
@@ -68,8 +68,8 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
             className={`px-4 py-2 border rounded-full text-sm whitespace-nowrap
                         transition flex-shrink-0
                         ${selectedCategoryId === cat.categoryPkId
-                          ? "bg-yellow-500 text-white border-yellow-500 font-semibold"
-                          : "text-gray-800 bg-white border-gray-300 hover:bg-gray-100"
+                          ? "bg-gold-500 text-white border-gold-500 font-semibold shadow-md shadow-gold-500/25"
+                          : "text-gray-300 bg-gray-900 border-gray-700 hover:border-gold-500 hover:text-white"
                         }`}
           >
             {cat.categoryName}

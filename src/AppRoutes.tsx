@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router";
 import AppHeader from "./layout/AppHeader";
 import { ScrollToTop } from "./components/common/ScrollToTop";
@@ -8,35 +9,35 @@ import SignUp from "./pages/AuthPages/SignUp";
 
 // Core Pages
 import Home from "./pages/Dashboard/Home";
-import UserProfiles from "./pages/UserProfiles";
-import Buy from "./pages/Buy";
-import UserWallet from "./pages/UserWallet";
-import WithdrawFund from "./pages/WithdrawFund";
-import Support from "./pages/Support";
-import RentContainer from "./pages/RentContainer";
-import ProductDetailsPage from "./pages/ProductDetailsPage";
-import DepositConfirmation from "./pages/DepositConfirmation";
+const UserProfiles = lazy(() => import("./pages/UserProfiles"));
+const Buy = lazy(() => import("./pages/Buy"));
+const UserWallet = lazy(() => import("./pages/UserWallet"));
+const WithdrawFund = lazy(() => import("./pages/WithdrawFund"));
+const Support = lazy(() => import("./pages/Support"));
+const RentContainer = lazy(() => import("./pages/RentContainer"));
+const ProductDetailsPage = lazy(() => import("./pages/ProductDetailsPage"));
+const DepositConfirmation = lazy(() => import("./pages/DepositConfirmation"));
 
 // UI Pages
-import Videos from "./pages/UiElements/Videos";
-import Images from "./pages/UiElements/Images";
-import Alerts from "./pages/UiElements/Alerts";
-import Badges from "./pages/UiElements/Badges";
-import Avatars from "./pages/UiElements/Avatars";
-import Buttons from "./pages/UiElements/Buttons";
+const Videos = lazy(() => import("./pages/UiElements/Videos"));
+const Images = lazy(() => import("./pages/UiElements/Images"));
+const Alerts = lazy(() => import("./pages/UiElements/Alerts"));
+const Badges = lazy(() => import("./pages/UiElements/Badges"));
+const Avatars = lazy(() => import("./pages/UiElements/Avatars"));
+const Buttons = lazy(() => import("./pages/UiElements/Buttons"));
 
 // Charts & Tables
-import LineChart from "./pages/Charts/LineChart";
-import BarChart from "./pages/Charts/BarChart";
-import BasicTables from "./pages/Tables/BasicTables";
-import FormElements from "./pages/Forms/FormElements";
+const LineChart = lazy(() => import("./pages/Charts/LineChart"));
+const BarChart = lazy(() => import("./pages/Charts/BarChart"));
+const BasicTables = lazy(() => import("./pages/Tables/BasicTables"));
+const FormElements = lazy(() => import("./pages/Forms/FormElements"));
 
 // Admin Pages
-import AdminDashboard from "./pages/Admin/AdminDashboard";
-import AdminUsers from "./pages/Admin/AdminUsers";
-import ManageSubscription from "./pages/Admin/ManageSubscription";
-import SellRequests from "./pages/Admin/ManageWithdrawal";
-import WithdrawBankDetailsForm from "./pages/Admin/WithdrawBankDetailsForm";
+const AdminDashboard = lazy(() => import("./pages/Admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("./pages/Admin/AdminUsers"));
+const ManageSubscription = lazy(() => import("./pages/Admin/ManageSubscription"));
+const SellRequests = lazy(() => import("./pages/Admin/ManageWithdrawal"));
+const WithdrawBankDetailsForm = lazy(() => import("./pages/Admin/WithdrawBankDetailsForm"));
 
 // Layout & Guards
 import AppLayout from "./layout/AppLayout";
@@ -46,19 +47,28 @@ import ConditionalHome from "./components/auth/ConditionalHome";
 
 // Fallback
 import NotFound from "./pages/OtherPage/NotFound";
-import WishlistPage from "./pages/WishlistPage";
-import SellProductPage from "./pages/SellProductPage";
-import SellerStorePage from "./pages/Sellerstorepage";
-import CartPage from "./pages/Cartpage";
-import MyOrdersPage from "./pages/Myorderspage";
-import OrderDetailPage from "./pages/Orderdetailpage";
-import ChatPage from "./pages/ChatPage";
-import AdminSellerStorePage from "./pages/AdminSellerStorePage";
-import AdminSellProductPage from "./pages/AdminSellProductPage";
+const WishlistPage = lazy(() => import("./pages/WishlistPage"));
+const SellProductPage = lazy(() => import("./pages/SellProductPage"));
+const SellerStorePage = lazy(() => import("./pages/Sellerstorepage"));
+const CartPage = lazy(() => import("./pages/Cartpage"));
+const MyOrdersPage = lazy(() => import("./pages/Myorderspage"));
+const OrderDetailPage = lazy(() => import("./pages/Orderdetailpage"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
+const AdminSellerStorePage = lazy(() => import("./pages/AdminSellerStorePage"));
+const AdminSellProductPage = lazy(() => import("./pages/AdminSellProductPage"));
 import { WishlistProvider } from "./pages/Wishlistcontext";
-import PremiumPage from "./pages/Premiumpage";
-import TrackOrderPage from "./pages/Trackorderpage";
+const PremiumPage = lazy(() => import("./pages/Premiumpage"));
+const TrackOrderPage = lazy(() => import("./pages/Trackorderpage"));
 
+
+// Shown while a page's code downloads (pages load on demand to keep the first visit fast)
+function PageLoader() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-gold-500" />
+    </div>
+  );
+}
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -80,6 +90,7 @@ export default function AppRoutes() {
 
       {/* PAGE CONTENT */}
 
+      <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<Home />} />
@@ -162,6 +173,7 @@ export default function AppRoutes() {
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
 
     </>
   );
