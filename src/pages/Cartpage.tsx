@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, ShoppingCart, ArrowLeft, CheckCircle, Package } from "lucide-react";
+import { Trash2, ShoppingCart, ArrowLeft, CheckCircle, Package, Clock, Landmark } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { Order } from "./Cartcontext";
+import ManualPaymentModal from "../components/payment/ManualPaymentModal";
+import type { PaymentSubmission } from "../services/paymentApi";
+import { formatInr } from "../services/paymentApi";
 
 // ─── Razorpay type declaration ────────────────────────────────────────────────
 declare global {
@@ -32,6 +35,11 @@ export default function CartPage() {
   const { cartItems, removeFromCart, clearCart, totalItems, totalPrice, addOrder } = useCart();
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+
+  // Manual payment (bank transfer / UPI QR + receipt upload, verified by admin)
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manualOrderId, setManualOrderId] = useState("");
+  const [manualPayment, setManualPayment] = useState<PaymentSubmission | null>(null);
 
   const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
   const buyerId = user?.nodeId;
@@ -186,6 +194,61 @@ export default function CartPage() {
       setIsOrdering(false);
     }
   };
+
+  // ─── Manual payment flow ──────────────────────────────────────────────────────
+  const openManualPayment = () => {
+    if (cartItems.length === 0) return;
+    setManualOrderId(`ORD-${Date.now()}`); // sent with the payment so the admin can match it
+    setManualOpen(true);
+  };
+
+  const handleManualSubmitted = (payment: PaymentSubmission) => {
+    const newOrder: Order = {
+      orderId: manualOrderId,
+      razorpayOrderId: null,
+      razorpayPaymentId: null,
+      items: [...cartItems],
+      totalAmount: totalPrice,
+      status: "PENDING", // becomes PAID once the admin approves the payment
+      createdAt: new Date().toISOString(),
+    };
+    addOrder(newOrder);
+    clearCart();
+    setManualOpen(false);
+    setManualPayment(payment);
+  };
+
+  // ─── Manual Payment Submitted Screen ──────────────────────────────────────────
+  if (manualPayment) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-10 flex flex-col items-center max-w-md w-full text-center">
+          <Clock className="text-yellow-500 w-20 h-20 mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+            Payment submitted
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-2">
+            We've received your receipt for {formatInr(manualPayment.amount)} (ref. {manualPayment.transactionReference}).
+          </p>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">
+            Your order {manualPayment.orderReference} will be confirmed once we verify the payment.
+          </p>
+          <button
+            onClick={() => navigate("/bandookwale/payments")}
+            className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-black to-yellow-500 hover:opacity-90 transition mb-3"
+          >
+            Track Payment Status
+          </button>
+          <button
+            onClick={() => navigate("/bandookwale")}
+            className="w-full py-2 rounded-xl border border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ─── Order Success Screen ─────────────────────────────────────────────────────
   if (orderPlaced) {
@@ -360,6 +423,27 @@ export default function CartPage() {
                 {isOrdering ? "Opening Payment..." : "Pay with Razorpay"}
               </button>
 
+              <div className="my-3 flex items-center gap-3 text-xs text-gray-400">
+                <span className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+                or
+                <span className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+              </div>
+
+              <button
+                onClick={openManualPayment}
+                disabled={isOrdering}
+                className="w-full py-3 rounded-xl font-semibold border-2 border-gray-900 dark:border-gray-200
+                           text-gray-900 dark:text-white inline-flex items-center justify-center gap-2
+                           disabled:opacity-50 disabled:cursor-not-allowed
+                           hover:bg-gray-900 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900 transition"
+              >
+                <Landmark className="w-4 h-4" />
+                Pay via Bank Transfer / UPI
+              </button>
+              <p className="text-xs text-gray-400 mt-2 text-center">
+                Pay directly and upload your receipt — we'll verify it.
+              </p>
+
               <button
                 onClick={clearCart}
                 className="mt-3 w-full py-2 rounded-xl text-red-500 border border-red-300
@@ -367,6 +451,14 @@ export default function CartPage() {
               >
                 Clear Cart
               </button>
+
+              <ManualPaymentModal
+                isOpen={manualOpen}
+                onClose={() => setManualOpen(false)}
+                amount={totalPrice}
+                orderReference={manualOrderId}
+                onSubmitted={handleManualSubmitted}
+              />
             </div>
           </div>
 

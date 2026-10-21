@@ -18,9 +18,11 @@ const AppHeader: React.FC = () => {
   const navigate = useNavigate();
   const usersRef = useRef(null);
   const manageUsersRef = useRef(null);
+  const paymentsRef = useRef<HTMLDivElement>(null);
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isManageUserOpen, setIsManageUserOpen] = useState(false);
+  const [isPaymentsOpen, setIsPaymentsOpen] = useState(false);
   const [withdrawl, setWithdrawl] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -65,6 +67,10 @@ const AppHeader: React.FC = () => {
       if (manageUsersRef.current && !manageUsersRef.current.contains(target)) {
         setIsManageUserOpen(false);
       }
+
+      if (paymentsRef.current && !paymentsRef.current.contains(target)) {
+        setIsPaymentsOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -79,6 +85,7 @@ const AppHeader: React.FC = () => {
       if (e.key === "Escape") {
         setIsUsersOpen(false);
         setIsManageUserOpen(false);
+        setIsPaymentsOpen(false);
       }
     };
 
@@ -231,6 +238,44 @@ const AppHeader: React.FC = () => {
 
                   </div>
                 )}
+
+                {/* PAYMENTS (manual bank / UPI payments) */}
+                {isUserAdmin(user) && (
+                  <div className="relative" ref={paymentsRef}>
+                    <button
+                      onClick={() => {
+                        setIsPaymentsOpen(!isPaymentsOpen);
+                        setIsUsersOpen(false);
+                        setIsManageUserOpen(false);
+                      }}
+                      className="flex items-center gap-1 text-white hover:text-blue-600 text-sm font-medium transition"
+                    >
+                      Payments
+                      <span className={`transition-transform ${isPaymentsOpen ? "rotate-180" : ""}`}>
+                        ▼
+                      </span>
+                    </button>
+
+                    {isPaymentsOpen && (
+                      <div className="absolute top-10 left-0 w-52 bg-white border rounded-lg shadow-lg py-2">
+                        <Link
+                          to="/bandookwale/admin/payments"
+                          onClick={() => setIsPaymentsOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Payment Approvals
+                        </Link>
+                        <Link
+                          to="/bandookwale/admin/payment-methods"
+                          onClick={() => setIsPaymentsOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Payment Methods
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )}
               </nav>
             </div>
 
@@ -304,6 +349,14 @@ const AppHeader: React.FC = () => {
               </Link>
               <Link to="/bandookwale/admin/store" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
                 Add Store Items
+              </Link>
+
+              <p className="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Payments</p>
+              <Link to="/bandookwale/admin/payments" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                Payment Approvals
+              </Link>
+              <Link to="/bandookwale/admin/payment-methods" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-lg text-white text-sm hover:bg-white/10">
+                Payment Methods
               </Link>
             </nav>
           )}

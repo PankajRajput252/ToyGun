@@ -59,6 +59,10 @@ const AdminSellProductPage = lazy(() => import("./pages/AdminSellProductPage"));
 import { WishlistProvider } from "./pages/Wishlistcontext";
 const PremiumPage = lazy(() => import("./pages/Premiumpage"));
 const TrackOrderPage = lazy(() => import("./pages/Trackorderpage"));
+// Manual payments (bank transfer / UPI + receipt)
+const MyPaymentsPage = lazy(() => import("./pages/MyPaymentsPage"));
+const AdminPaymentMethods = lazy(() => import("./pages/Admin/AdminPaymentMethods"));
+const AdminPaymentApprovals = lazy(() => import("./pages/Admin/AdminPaymentApprovals"));
 
 
 // Shown while a page's code downloads (pages load on demand to keep the first visit fast)
@@ -119,6 +123,7 @@ export default function AppRoutes() {
             <Route path="/bandookwale/orders" element={<MyOrdersPage />} />
             <Route path="/bandookwale/premiumPage" element={<PremiumPage />} />
             <Route path="/bandookwale/orders/:orderId" element={<OrderDetailPage />} />
+            <Route path="/bandookwale/payments" element={<MyPaymentsPage />} />
             <Route path="/bandookwale/chat" element={<ChatPage />} />
             {/* USER FEATURES */}
             <Route path="profile" element={<UserProfiles />} />
@@ -167,6 +172,8 @@ export default function AppRoutes() {
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="subscription" element={<ManageSubscription />} />
+            <Route path="payment-methods" element={<AdminPaymentMethods />} />
+            <Route path="payments" element={<AdminPaymentApprovals />} />
           </Route>
         </Route>
 

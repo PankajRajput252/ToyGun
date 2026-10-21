@@ -12,7 +12,7 @@ const STATUS_STYLES: Record<Order["status"], string> = {
 
 const STATUS_LABEL: Record<Order["status"], string> = {
   PAID: "✅ Paid",
-  PENDING: "⏳ Pending",
+  PENDING: "⏳ Verifying payment",
   FAILED: "❌ Failed",
   CANCELLED: "🚫 Cancelled",
 };

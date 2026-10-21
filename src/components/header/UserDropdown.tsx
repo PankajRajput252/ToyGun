@@ -11,7 +11,8 @@ import {
   Settings,
   Package,
   Crown,
-  LogOut
+  LogOut,
+  ReceiptText
 } from "lucide-react";
 
 export default function UserDropdown() {
@@ -167,6 +168,19 @@ export default function UserDropdown() {
             {/* <button onClick={() => navigate("/bandookwale/orders")}>
               My Orders
             </button> */}
+          </li>
+          <li>
+            <DropdownItem
+              onItemClick={closeDropdown}
+              tag="a"
+              to="/bandookwale/payments"
+              className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+            >
+              <div className="flex items-center gap-3">
+                <ReceiptText size={20} />
+                <span>My Payments</span>
+              </div>
+            </DropdownItem>
           </li>
           <li>
             <DropdownItem

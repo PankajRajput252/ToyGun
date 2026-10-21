@@ -11,7 +11,7 @@ const STATUS_STYLES: Record<Order["status"], string> = {
 
 const STATUS_LABEL: Record<Order["status"], string> = {
   PAID: "✅ Payment Successful",
-  PENDING: "⏳ Payment Pending",
+  PENDING: "⏳ Payment pending — we're verifying your receipt (see My Payments)",
   FAILED: "❌ Payment Failed",
   CANCELLED: "🚫 Order Cancelled",
 };
