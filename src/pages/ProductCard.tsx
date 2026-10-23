@@ -294,21 +294,32 @@ export default function ProductCard({ item, onDeleted }: Props) {
             <span className="whitespace-nowrap">{item.date}</span>
           </div>
 
-          {/* CTA */}
-          <button
-            onClick={(e) => { e.stopPropagation(); openDetails(); }}
-            className={`mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold
-                        transition-colors whitespace-nowrap border
-                        ${item.isStoreProduct
-                          ? "border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-white"
-                          : "border-blue-700 text-blue-300 hover:bg-blue-900/60"}`}
-          >
-            {item.isStoreProduct ? (
-              <><ShoppingCart className="w-3.5 h-3.5" /> Add to cart & buy</>
-            ) : (
-              <><MessageCircle className="w-3.5 h-3.5" /> Chat with seller</>
-            )}
-          </button>
+          {/* CTA — owners edit their own item instead of buying it */}
+          {isOwner ? (
+            <button
+              onClick={handleEdit}
+              className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold
+                         transition-colors whitespace-nowrap bg-gold-500/10 border border-gold-500/40 text-gold-400
+                         hover:bg-gold-500 hover:text-white"
+            >
+              <Pencil className="w-3.5 h-3.5" /> Edit item
+            </button>
+          ) : (
+            <button
+              onClick={(e) => { e.stopPropagation(); openDetails(); }}
+              className={`mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold
+                          transition-colors whitespace-nowrap border
+                          ${item.isStoreProduct
+                            ? "border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-white"
+                            : "border-blue-700 text-blue-300 hover:bg-blue-900/60"}`}
+            >
+              {item.isStoreProduct ? (
+                <><ShoppingCart className="w-3.5 h-3.5" /> Add to cart & buy</>
+              ) : (
+                <><MessageCircle className="w-3.5 h-3.5" /> Chat with seller</>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </>

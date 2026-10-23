@@ -76,6 +76,16 @@
     .hero-float { animation: none; }
   }
 
+  /* Admin header dropdown pop-in (AdminNav) */
+  .dropdown-in {
+    animation: dropdown-in 0.18s ease-out;
+    transform-origin: top left;
+  }
+  @keyframes dropdown-in {
+    from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
   /* Toast slide-up (ToastContext) */
   .toast-in {
     animation: toast-in 0.25s ease-out;

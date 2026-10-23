@@ -38,7 +38,7 @@ const HOW_IT_WORKS = [
 const TRUST_POINTS = [
   { icon: Store, title: "Seller stores", text: "Shop from sellers with their own store page and catalogue." },
   { icon: Lock, title: "Secure payments", text: "Store checkout is handled by Razorpay." },
-  { icon: Truck, title: "Order tracking", text: "Follow your store orders from dispatch to delivery." },
+  { icon: Truck, title: "Doorstep delivery", text: "Store orders are delivered straight to your door." },
   { icon: ShieldCheck, title: "Safety first", text: "Meet in public and inspect before you pay for listings." },
 ];
 
@@ -84,7 +84,12 @@ export default function Home() {
   const fetchByCategory = async (categoryId: number) => {
     try {
       setIsLoading(true);
-      setAllProducts(await fetchProductsByCategory(categoryId));
+      // The API only returns one kind per call (isStoreProduct=null errors), so fetch store + listings together
+      const [listings, storeItems] = await Promise.all([
+        fetchProductsByCategory(categoryId, 200, false),
+        fetchProductsByCategory(categoryId, 200, true),
+      ]);
+      setAllProducts([...storeItems, ...listings]);
       setHasMore(false); // category view loads everything in one request
     } catch (error) {
       console.error("Error fetching category products:", error);
@@ -414,31 +419,78 @@ export default function Home() {
               </h2>
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {HOW_IT_WORKS.map(({ icon: Icon, title, text }, i) => (
+                  // Same gradient-border card style as TRUST_POINTS below
                   <div
                     key={title}
-                    className="relative rounded-2xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
+                    className="group rounded-2xl p-px bg-gradient-to-br from-gold-500/50 via-gray-800 to-gray-800
+                               hover:from-gold-400 hover:via-gold-600/40 transition-all duration-300
+                               hover:-translate-y-1 hover:shadow-xl hover:shadow-gold-500/15"
                   >
-                    <span className="absolute top-4 right-5 text-5xl font-bold text-gray-100 dark:text-gray-800 select-none">
-                      {i + 1}
-                    </span>
-                    <div className="relative w-12 h-12 rounded-xl flex items-center justify-center bg-gold-500/15 text-gold-400">
-                      <Icon className="w-6 h-6" />
+                    <div className="relative h-full flex flex-col overflow-hidden rounded-[15px] p-5 sm:p-6 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950">
+                      {/* Large faded step number as background decoration */}
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute -right-1 -bottom-8 text-[8rem] leading-none font-bold text-gold-500/[0.06] select-none
+                                   transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6"
+                      >
+                        {i + 1}
+                      </span>
+                      {/* Soft glow that appears on hover */}
+                      <div className="pointer-events-none absolute -top-10 -left-10 w-32 h-32 rounded-full bg-gold-500/0 blur-2xl
+                                      transition-colors duration-300 group-hover:bg-gold-500/15" />
+
+                      <div
+                        className="relative w-12 h-12 rounded-xl flex items-center justify-center
+                                   bg-gradient-to-br from-gold-300 via-gold-500 to-gold-700 text-white
+                                   shadow-lg shadow-gold-500/30 transition-transform duration-300
+                                   group-hover:scale-110 group-hover:rotate-3"
+                      >
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="relative mt-4 text-base font-semibold text-white">{title}</h3>
+                      <p className="relative mt-1 text-sm leading-relaxed text-gray-400 group-hover:text-gray-300 transition-colors">
+                        {text}
+                      </p>
+                      <div className="relative mt-auto pt-4"><div className="h-0.5 w-8 rounded-full bg-gold-500/60 transition-all duration-300 group-hover:w-14 group-hover:bg-gold-400" /></div>
                     </div>
-                    <h3 className="relative mt-4 font-semibold text-gray-900 dark:text-white">{title}</h3>
-                    <p className="relative mt-1 text-sm text-gray-500 dark:text-gray-400">{text}</p>
                   </div>
                 ))}
               </div>
 
               <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {TRUST_POINTS.map(({ icon: Icon, title, text }) => (
+                  // Outer div is a 1px gradient "border" that brightens on hover
                   <div
                     key={title}
-                    className="rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-gray-900 to-gray-800/60 border border-gray-800"
+                    className="group rounded-2xl p-px bg-gradient-to-br from-gold-500/50 via-gray-800 to-gray-800
+                               hover:from-gold-400 hover:via-gold-600/40 transition-all duration-300
+                               hover:-translate-y-1 hover:shadow-xl hover:shadow-gold-500/15"
                   >
-                    <Icon className="w-6 h-6 text-gold-400" />
-                    <h3 className="mt-3 text-sm sm:text-base font-semibold text-white">{title}</h3>
-                    <p className="mt-1 text-xs sm:text-sm text-gray-400">{text}</p>
+                    <div className="relative h-full flex flex-col overflow-hidden rounded-[15px] p-4 sm:p-5 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950">
+                      {/* Large faded icon as background decoration */}
+                      <Icon
+                        aria-hidden
+                        className="pointer-events-none absolute -right-4 -bottom-4 w-24 h-24 sm:w-28 sm:h-28 text-gold-500/[0.06]
+                                   transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6"
+                      />
+                      {/* Soft glow that appears on hover */}
+                      <div className="pointer-events-none absolute -top-10 -left-10 w-32 h-32 rounded-full bg-gold-500/0 blur-2xl
+                                      transition-colors duration-300 group-hover:bg-gold-500/15" />
+
+                      <div
+                        className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center
+                                   bg-gradient-to-br from-gold-300 via-gold-500 to-gold-700 text-white
+                                   shadow-lg shadow-gold-500/30 transition-transform duration-300
+                                   group-hover:scale-110 group-hover:rotate-3"
+                      >
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                      <h3 className="relative mt-4 text-sm sm:text-base font-semibold text-white">{title}</h3>
+                      <p className="relative mt-1 text-xs sm:text-sm leading-relaxed text-gray-400 group-hover:text-gray-300 transition-colors">
+                        {text}
+                      </p>
+                      <div className="relative mt-auto pt-4"><div className="h-0.5 w-8 rounded-full bg-gold-500/60 transition-all duration-300 group-hover:w-14 group-hover:bg-gold-400" /></div>
+                    </div>
                   </div>
                 ))}
               </div>
