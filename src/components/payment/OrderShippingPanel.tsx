@@ -131,12 +131,12 @@ export default function OrderShippingPanel({
         </p>
       </div>
 
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-        <div><dt className="text-xs text-gray-500">Shiprocket order</dt><dd className="font-mono">{s.shiprocketOrderId ?? "—"}</dd></div>
-        <div><dt className="text-xs text-gray-500">Shipment</dt><dd className="font-mono">{s.shiprocketShipmentId ?? "—"}</dd></div>
-        <div><dt className="text-xs text-gray-500">Courier</dt><dd>{s.courierName ?? "—"}</dd></div>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-900 dark:text-gray-100">
+        <div><dt className="text-xs text-gray-500 dark:text-gray-400">Shiprocket order</dt><dd className="font-mono">{s.shiprocketOrderId ?? "—"}</dd></div>
+        <div><dt className="text-xs text-gray-500 dark:text-gray-400">Shipment</dt><dd className="font-mono">{s.shiprocketShipmentId ?? "—"}</dd></div>
+        <div><dt className="text-xs text-gray-500 dark:text-gray-400">Courier</dt><dd>{s.courierName ?? "—"}</dd></div>
         <div>
-          <dt className="text-xs text-gray-500">AWB</dt>
+          <dt className="text-xs text-gray-500 dark:text-gray-400">AWB</dt>
           <dd className="font-mono">
             {s.awbCode ? (
               <a href={s.trackingUrl ?? "#"} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-gold-600 hover:underline">
@@ -145,18 +145,18 @@ export default function OrderShippingPanel({
             ) : "—"}
           </dd>
         </div>
-        {s.pickupScheduledDate && <div><dt className="text-xs text-gray-500">Pickup</dt><dd>{s.pickupScheduledDate}</dd></div>}
-        {s.lastAttemptAt && <div><dt className="text-xs text-gray-500">Last attempt</dt><dd>{formatDateTime(s.lastAttemptAt)} ({s.attempts})</dd></div>}
+        {s.pickupScheduledDate && <div><dt className="text-xs text-gray-500 dark:text-gray-400">Pickup</dt><dd>{s.pickupScheduledDate}</dd></div>}
+        {s.lastAttemptAt && <div><dt className="text-xs text-gray-500 dark:text-gray-400">Last attempt</dt><dd>{formatDateTime(s.lastAttemptAt)} ({s.attempts})</dd></div>}
       </dl>
 
       {s.error && (
-        <p className={`rounded-lg p-3 text-sm ${s.status === "MANUAL_REVIEW" ? "bg-orange-50 text-orange-800 dark:bg-orange-500/10 dark:text-orange-300" : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"}`}>
+        <p className={`whitespace-pre-wrap break-words rounded-lg p-3 text-sm ${s.status === "MANUAL_REVIEW" ? "bg-orange-50 text-orange-800 dark:bg-orange-500/10 dark:text-orange-300" : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"}`}>
           {s.error}
         </p>
       )}
       {inFlight && <p className="text-xs text-gray-500">Creating the Shiprocket shipment in the background…</p>}
       {retryError && retryError !== s.error && (
-        <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">{retryError}</p>
+        <p className="whitespace-pre-wrap break-words rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">{retryError}</p>
       )}
 
       {canRetry && (
