@@ -3,6 +3,7 @@ import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, RefreshCw, XCircle } 
 import { Modal } from "../../components/ui/modal";
 import PaymentStatusBadge from "../../components/payment/PaymentStatusBadge";
 import { ReceiptPreview } from "../../components/payment/AuthFilePreview";
+import OrderShippingPanel from "../../components/payment/OrderShippingPanel";
 import { useToast } from "../../context/ToastContext";
 import {
   PageResponse,
@@ -58,8 +59,14 @@ export default function AdminPaymentApprovals() {
   }, [load]);
 
   const onReviewed = (updated: PaymentSubmission) => {
-    setReviewing(null);
-    showToast(updated.status === "APPROVED" ? "Payment approved" : "Payment rejected", updated.status === "APPROVED" ? "success" : "info");
+    if (updated.status === "APPROVED" && updated.orderReference) {
+      // Keep the dialog open so the admin can watch the Shiprocket order being placed
+      setReviewing(updated);
+      showToast("Payment approved — placing the Shiprocket order");
+    } else {
+      setReviewing(null);
+      showToast(updated.status === "APPROVED" ? "Payment approved" : "Payment rejected", updated.status === "APPROVED" ? "success" : "info");
+    }
     load();
   };
 
@@ -260,6 +267,17 @@ function ReviewModal({
         </dl>
         <ReceiptPreview path={payment.receiptUrl} fileName={payment.receiptFileName} />
       </div>
+
+      {payment.orderReference && (
+        <div className="mt-6">
+          <h3 className="mb-2 text-sm font-semibold text-gray-800 dark:text-gray-200">
+            Order &amp; shipping{" "}
+            {isPending && <span className="font-normal text-gray-500">— approving places this order with Shiprocket automatically</span>}
+          </h3>
+          {/* key: remount after approval so the panel reloads and follows the background shipment */}
+          <OrderShippingPanel key={`${payment.orderReference}-${payment.status}`} orderReference={payment.orderReference} />
+        </div>
+      )}
 
       {isPending && mode === "reject" && (
         <div className="mt-6">

@@ -227,6 +227,87 @@ export const paymentAdminApi = {
     sendJson<PaymentSubmission>("PUT", `/api/admin/payments/${id}/reject`, { reason: reason.trim() }),
 };
 
+// ─── Shop orders (checkout address + items, Shiprocket status) ───────────────
+
+export type OrderStatus = "PENDING_PAYMENT" | "PAID" | "CANCELLED";
+export type ShippingStatus =
+  | "NOT_STARTED"
+  | "MANUAL_REVIEW"
+  | "PROCESSING"
+  | "ORDER_CREATED"
+  | "AWB_ASSIGNED"
+  | "PICKUP_SCHEDULED"
+  | "FAILED";
+
+export interface ShippingAddressInput {
+  fullName: string;
+  phone: string;
+  email?: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
+export interface ShopOrder {
+  orderReference: string;
+  userId: string | null; // admin view only
+  status: OrderStatus;
+  subtotal: number;
+  items: {
+    productId: number;
+    productName: string;
+    units: number;
+    unitPrice: number;
+    licenceRequired: boolean;
+    storeProduct: boolean;
+  }[];
+  shippingAddress: ShippingAddressInput & { country: string };
+  paidPaymentSubmissionId: number | null;
+  paidAt: string | null;
+  shipping: {
+    status: ShippingStatus;
+    awbCode: string | null;
+    courierName: string | null;
+    pickupScheduledDate: string | null;
+    trackingUrl: string | null;
+    // admin view only
+    shiprocketOrderId: number | null;
+    shiprocketShipmentId: number | null;
+    error: string | null;
+    attempts: number | null;
+    lastAttemptAt: string | null;
+  };
+  createdAt: string;
+}
+
+export const shopOrderApi = {
+  /** Creates the order on the server; prices come from the products table. */
+  create: (items: { productId: number; quantity: number }[], shipping: ShippingAddressInput) =>
+    sendJson<ShopOrder>("POST", "/api/shop-orders", { items, shipping }),
+  myOrders: () => getJson<ShopOrder[]>("/api/shop-orders"),
+  get: (orderReference: string) => getJson<ShopOrder>(`/api/shop-orders/${encodeURIComponent(orderReference)}`),
+};
+
+export const adminShopOrderApi = {
+  list: (q: { status?: OrderStatus; shippingStatus?: ShippingStatus; page?: number; size?: number } = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(q).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) params.set(k, String(v));
+    });
+    return getJson<PageResponse<ShopOrder>>(`/api/admin/shop-orders?${params}`);
+  },
+  get: (orderReference: string) =>
+    getJson<ShopOrder>(`/api/admin/shop-orders/${encodeURIComponent(orderReference)}`),
+  /** Runs the remaining Shiprocket steps now. */
+  ship: (orderReference: string) =>
+    sendJson<ShopOrder>("POST", `/api/admin/shop-orders/${encodeURIComponent(orderReference)}/ship`),
+};
+
+export const PHONE_PATTERN = /^(\+?91[\s-]?|0)?[6-9]\d{9}$/;
+export const PINCODE_PATTERN = /^[1-9]\d{5}$/;
+
 // ─── Shared client-side rules (mirror the server's validation) ────────────────
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;

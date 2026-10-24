@@ -4,7 +4,8 @@ import { Trash2, ShoppingCart, ArrowLeft, CheckCircle, Package, Clock, Landmark 
 import { useCart } from "./Cartcontext";
 import { Order } from "./Cartcontext";
 import ManualPaymentModal from "../components/payment/ManualPaymentModal";
-import type { PaymentSubmission } from "../services/paymentApi";
+import CheckoutAddressModal from "../components/payment/CheckoutAddressModal";
+import type { PaymentSubmission, ShopOrder } from "../services/paymentApi";
 import { formatInr } from "../services/paymentApi";
 
 // ─── Razorpay type declaration ────────────────────────────────────────────────
@@ -37,9 +38,17 @@ export default function CartPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   // Manual payment (bank transfer / UPI QR + receipt upload, verified by admin)
+  // Step 1: delivery address → server creates the order. Step 2: pay + upload receipt.
+  // When the admin approves the payment, the backend places the Shiprocket order automatically.
+  const [addressOpen, setAddressOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
-  const [manualOrderId, setManualOrderId] = useState("");
+  const [checkoutOrder, setCheckoutOrder] = useState<ShopOrder | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [manualPayment, setManualPayment] = useState<PaymentSubmission | null>(null);
+
+  // Cart ids are backend product ids (productPkId) for items added from a product page
+  const orderLines = cartItems.map((i) => ({ productId: Number(i.id), quantity: i.quantity }));
+  const allLinesOrderable = orderLines.every((l) => Number.isInteger(l.productId) && l.productId > 0);
 
   const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
   const buyerId = user?.nodeId;
@@ -198,17 +207,28 @@ export default function CartPage() {
   // ─── Manual payment flow ──────────────────────────────────────────────────────
   const openManualPayment = () => {
     if (cartItems.length === 0) return;
-    setManualOrderId(`ORD-${Date.now()}`); // sent with the payment so the admin can match it
+    if (!allLinesOrderable) {
+      setCheckoutError("Some items in your cart can't be ordered online. Remove them and add them again from the product page.");
+      return;
+    }
+    setCheckoutError(null);
+    setAddressOpen(true);
+  };
+
+  const handleOrderCreated = (order: ShopOrder) => {
+    setCheckoutOrder(order);
+    setAddressOpen(false);
     setManualOpen(true);
   };
 
   const handleManualSubmitted = (payment: PaymentSubmission) => {
+    if (!checkoutOrder) return;
     const newOrder: Order = {
-      orderId: manualOrderId,
+      orderId: checkoutOrder.orderReference,
       razorpayOrderId: null,
       razorpayPaymentId: null,
       items: [...cartItems],
-      totalAmount: totalPrice,
+      totalAmount: checkoutOrder.subtotal,
       status: "PENDING", // becomes PAID once the admin approves the payment
       createdAt: new Date().toISOString(),
     };
@@ -231,7 +251,8 @@ export default function CartPage() {
             We've received your receipt for {formatInr(manualPayment.amount)} (ref. {manualPayment.transactionReference}).
           </p>
           <p className="text-gray-500 dark:text-gray-400 mb-8">
-            Your order {manualPayment.orderReference} will be confirmed once we verify the payment.
+            Order {manualPayment.orderReference} will be confirmed and shipped once we verify the payment.
+            You'll get a tracking number under My Orders.
           </p>
           <button
             onClick={() => navigate("/bandookwale/payments")}
@@ -441,8 +462,11 @@ export default function CartPage() {
                 Pay via Bank Transfer / UPI
               </button>
               <p className="text-xs text-gray-400 mt-2 text-center">
-                Pay directly and upload your receipt — we'll verify it.
+                Pay directly and upload your receipt — we'll verify it and ship your order.
               </p>
+              {checkoutError && (
+                <p className="text-xs text-red-500 mt-2 text-center">{checkoutError}</p>
+              )}
 
               <button
                 onClick={clearCart}
@@ -452,11 +476,19 @@ export default function CartPage() {
                 Clear Cart
               </button>
 
+              <CheckoutAddressModal
+                isOpen={addressOpen}
+                onClose={() => setAddressOpen(false)}
+                items={orderLines}
+                cartTotal={totalPrice}
+                onCreated={handleOrderCreated}
+              />
+
               <ManualPaymentModal
                 isOpen={manualOpen}
                 onClose={() => setManualOpen(false)}
-                amount={totalPrice}
-                orderReference={manualOrderId}
+                amount={checkoutOrder?.subtotal}
+                orderReference={checkoutOrder?.orderReference}
                 onSubmitted={handleManualSubmitted}
               />
             </div>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ChevronDown, LayoutDashboard, Users, UserCheck, UserX, ShieldCheck,
-  BadgeIndianRupee, PackagePlus, CheckCircle2, Landmark, type LucideIcon,
+  BadgeIndianRupee, PackagePlus, CheckCircle2, Landmark, Truck, type LucideIcon,
 } from "lucide-react";
 
 // Admin header navigation: links + dropdown menus, shared by desktop and mobile.
@@ -42,6 +42,7 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/bandookwale/admin/payments", label: "Payment Approvals", description: "Review manual bank / UPI payments", icon: CheckCircle2 },
       { to: "/bandookwale/admin/payment-methods", label: "Payment Methods", description: "Bank and UPI details buyers pay to", icon: Landmark },
+      { to: "/bandookwale/admin/shipments", label: "Shipments", description: "Shiprocket status of paid orders; retry failures", icon: Truck },
     ],
   },
 ];
