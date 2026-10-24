@@ -8,7 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import { DropdownItem } from "../components/ui/dropdown/DropdownItem";
 import SupportSidebar from "../components/ui/support/SupportSidebar";
 import Header from "../pages/Header";
-import bandookwaleImage from "../components/images/bandg.png";
+import realLogo from "../components/images/RealLogo.jpeg";
 import { AdminDesktopNav, AdminMobileNav } from "./AdminNav";
 import { useNavigate } from "react-router-dom";
 
@@ -62,16 +62,24 @@ const AppHeader: React.FC = () => {
 
             {/* LEFT: LOGO + NAV */}
             <div className="flex items-center gap-4 lg:gap-10">
-                  <div
-          className="w-16 h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer flex items-center justify-center bg-black"
-          onClick={() => navigate("/bandookwale/")}
-        >
-          <img
-            src={bandookwaleImage}
-            alt="Store Logo"
-            className="w-full h-full object-contain"
-          />
-        </div>
+              <button
+                type="button"
+                aria-label="Go to Bandookwale home"
+                onClick={() => navigate("/bandookwale/")}
+                className="group relative flex-shrink-0 rounded-full p-[3px] cursor-pointer
+                           bg-gradient-to-br from-yellow-300 via-amber-500 to-yellow-700
+                           shadow-[0_0_18px_rgba(234,179,8,0.35)]
+                           transition-all duration-300 hover:scale-105 hover:shadow-[0_0_28px_rgba(234,179,8,0.6)]
+                           focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70"
+              >
+                <span className="block w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-white ring-2 ring-black/60">
+                  <img
+                    src={realLogo}
+                    alt="Bandookwale logo"
+                    className="w-full h-full object-cover scale-110 transition-transform duration-500 group-hover:scale-125 group-hover:rotate-6"
+                  />
+                </span>
+              </button>
 
               {/* LOGO */}
               {/* <div className="text-xl font-semibold text-gray-800 cursor-pointer">

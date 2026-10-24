@@ -24,10 +24,10 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
   {
     label: "Users",
     items: [
-      { to: "/bandookwale/all-user", label: "All Users", description: "Everyone registered on Bandookwale", icon: Users },
-      { to: "/bandookwale/active-user", label: "Active Users", description: "Accounts that are currently active", icon: UserCheck },
-      { to: "/bandookwale/inactive-user", label: "Inactive Users", description: "Deactivated or pending accounts", icon: UserX },
-      { to: "/bandookwale/admin-user", label: "Admin Users", description: "Team members with admin access", icon: ShieldCheck },
+      { to: "/bandookwale/admin/users", label: "All Users", description: "Everyone registered on Bandookwale", icon: Users },
+      { to: "/bandookwale/admin/users?status=active", label: "Active Users", description: "Accounts that are currently active", icon: UserCheck },
+      { to: "/bandookwale/admin/users?status=inactive", label: "Inactive Users", description: "Deactivated or pending accounts", icon: UserX },
+      { to: "/bandookwale/admin/users?role=admin", label: "Admin Users", description: "Team members with admin access", icon: ShieldCheck },
     ],
   },
   {
@@ -119,7 +119,8 @@ function NavDropdown({
 
 // Desktop nav (lg and up): Dashboard link + one dropdown per group, only one open at a time.
 export function AdminDesktopNav() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const current = pathname + search; // menu links include ?status= / ?role= filters
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
 
@@ -147,7 +148,7 @@ export function AdminDesktopNav() {
         <NavDropdown
           key={group.label}
           group={group}
-          pathname={pathname}
+          pathname={current}
           isOpen={openMenu === group.label}
           onToggle={() => setOpenMenu((m) => (m === group.label ? null : group.label))}
           onClose={() => setOpenMenu(null)}
@@ -159,7 +160,8 @@ export function AdminDesktopNav() {
 
 // Mobile / tablet nav: same links as the desktop dropdowns, listed in sections.
 export function AdminMobileNav({ onNavigate }: { onNavigate: () => void }) {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const current = pathname + search; // menu links include ?status= / ?role= filters
   return (
     <nav className="lg:hidden border-t border-white/10 px-3 sm:px-4 pb-3 pt-2 max-h-[calc(100vh-6rem)] overflow-y-auto">
       <Link
@@ -177,7 +179,7 @@ export function AdminMobileNav({ onNavigate }: { onNavigate: () => void }) {
             {group.label}
           </p>
           {group.items.map((item) => (
-            <NavMenuItem key={item.to} item={item} active={item.to === pathname} onSelect={onNavigate} />
+            <NavMenuItem key={item.to} item={item} active={item.to === current} onSelect={onNavigate} />
           ))}
         </div>
       ))}

@@ -4,6 +4,7 @@ import PageMeta from '../../components/common/PageMeta';
 import UserManagementTable from '../../components/admin/UserManagementTable';
 import TransactionApprovalModal from '../../components/admin/TransactionApprovalModal';
 //  import { User, WalletData, usersApi, walletDataApi } from '../../services/api';
+import { usersApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 interface User {
   userPkId: number;
@@ -81,12 +82,8 @@ export default function AdminUsers() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const apiStatusFilter =
-        statusFilter === "active"
-          ? "ACTIVE"
-          : statusFilter === "inactive"
-            ? "INACTIVE"
-            : null;
+      // Active/inactive filtering is done by the API via filterBy
+      const apiStatusFilter = statusFilter === "inactive" ? "INACTIVE" : "ACTIVE";
       // const [usersResponse, walletResponse] = await Promise.all([
       //   usersApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null),
       // walletDataApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null)
@@ -94,29 +91,23 @@ export default function AdminUsers() {
       let page = 0;
       let size = 100;
 
-      const url = `https://api.bandookwale.com/api/users/getUser?page=0&size=25&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
-      const response = await fetch(url);
-      const data = await response.json();
+      // Same API the Admin Dashboard uses for its user counts
+      const data = await usersApi.getAll(page, size, apiStatusFilter, user?.nodeId || null);
 
-      if (data.status === "SUCCESS" && data.data?.length > 0) {
-        const userData = data.data;
+      if (data?.data?.length > 0) {
+        const userData = data.data as unknown as User[];
         let filteredUsers = userData;
 
+        // Role filtering: ADMIN_USER = admin, NORMAL_USER = normal user
         if (roleFilter === 'admin') {
           filteredUsers = filteredUsers.filter(usr =>
             usr.roles?.some(role => role.name === 'ADMIN_USER')
           );
-        }
-        if (statusFilter === 'active') {
-          filteredUsers = filteredUsers.filter(user =>
-            user.activeStateCodeFkId === "ACTIVE"
-          );
-        } else if (statusFilter === 'inactive') {
-          filteredUsers = filteredUsers.filter(user =>
-            user.activeStateCodeFkId === "INACTIVE"
+        } else if (roleFilter === 'normal') {
+          filteredUsers = filteredUsers.filter(usr =>
+            usr.roles?.some(role => role.name === 'NORMAL_USER')
           );
         }
-        
 
         setUsers(filteredUsers);
       }
@@ -164,6 +155,7 @@ export default function AdminUsers() {
     if (statusFilter === 'active') return 'Active Users';
     if (statusFilter === 'inactive') return 'Inactive Users';
     if (roleFilter === 'admin') return 'Admin Users';
+    if (roleFilter === 'normal') return 'Normal Users';
     return 'All Users';
   };
 
@@ -171,6 +163,7 @@ export default function AdminUsers() {
     if (statusFilter === 'active') return 'Showing only active users';
     if (statusFilter === 'inactive') return 'Showing only inactive users';
     if (roleFilter === 'admin') return 'Showing only admin users';
+    if (roleFilter === 'normal') return 'Showing only normal users';
     return 'Showing all users';
   };
 
