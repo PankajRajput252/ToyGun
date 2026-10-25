@@ -695,6 +695,7 @@ export interface User {
   mobile: string;
   referralCode: string;
   position: string;
+  activeStatusCode: string,
   isUserIsAdmin: boolean;
   roles: Array<{ roleId: number; name: string }>;
   enabled: boolean;
@@ -780,8 +781,8 @@ export const usersApi = {
     apiCall<void>(`/api/admin/deleteUser/${userId}`, 'DELETE'),
 
   // Update user status (active/inactive)
-  updateStatus: (userId: number, enabled: boolean): Promise<User> =>
-    apiCall<User>(`/api/admin/updateUserStatus/${userId}`, 'PUT', { enabled }),
+  updateStatus: (userId: number, activeStatusCode: string): Promise<User> =>
+    apiCall<User>(`/api/users/updateUserStatus/${userId}/${activeStatusCode}`, 'PUT'),
 
   // Approve transaction
   approveTransaction: (data: ApproveTransactionRequest): Promise<void> =>
