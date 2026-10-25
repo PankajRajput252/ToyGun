@@ -216,7 +216,6 @@ export default function AdminUsers() {
         {/* User Management Table */}
         <UserManagementTable
           users={users}
-          walletData={walletData}
           loading={isLoading}
           loadUsers={fetchData}
           onTransactionApproval={handleTransactionApproval}

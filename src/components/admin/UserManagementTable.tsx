@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { User, WalletData ,usersApi} from "../../services/api";
+import { User, usersApi } from "../../services/api";
 
 
 interface UserManagementTableProps {
   users?: User[];                // optional to avoid undefined crash
-  walletData?: WalletData[];     // optional to avoid undefined crash
   loading: boolean;
   loadUsers: () => void; // <-- NEW
   onTransactionApproval?: (userId: number) => void;
@@ -12,7 +11,6 @@ interface UserManagementTableProps {
 
 const UserManagementTable: React.FC<UserManagementTableProps> = ({
   users = [],
-  walletData = [],
   loadUsers,
   onTransactionApproval
 }) => {
@@ -31,22 +29,19 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
     );
   });
  
-  const handleConfirmUser = async (nodeId:string)=>{
-    console.log("Calling API for:", nodeId);
-    
+  const isUserActiveStatus = (user: User) => user.activeStateCodeFkId === "ACTIVE";
+
+  // Toggle: send the opposite of the user's current status
+  const handleToggleUser = async (user: User) => {
     try {
-      await usersApi.confirmUser(nodeId);
-      
+      const nextStatus = isUserActiveStatus(user) ? "INACTIVE" : "ACTIVE";
+      await usersApi.updateStatus(user.userPkId, nextStatus);
+
       loadUsers(); // reload table data
     } catch (e) {
       setIsUserActive(false);
     }
-
   }
-
-  const getWallet = (userId: number) => {
-    return walletData.find((w) => w.userFkId === userId);
-  };
 
   return (
     <div className="w-full">
@@ -71,7 +66,6 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
             <th className="p-3 whitespace-nowrap">Email</th>
             <th className="p-3 whitespace-nowrap">Node ID</th>
             <th className="p-3 whitespace-nowrap">Status</th>
-            <th className="p-3 whitespace-nowrap">Wallet</th>
             <th className="p-3 whitespace-nowrap">Actions</th>
           </tr>
         </thead>
@@ -79,15 +73,12 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
         <tbody>
           {filteredUsers.length === 0 ? (
             <tr>
-              <td colSpan={7} className="text-center p-4 text-gray-400">
+              <td colSpan={6}className="text-center p-4 text-gray-400">
                 No users found.
               </td>
             </tr>
           ) : (
             filteredUsers.map((user) => {
-              const wallet = getWallet(user.userPkId);
-              console.log("Rendering user: all is well", wallet);
-
               return (
                 <tr
                   key={user.userPkId}
@@ -99,7 +90,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                   <td className="p-3 whitespace-nowrap">{user.nodeId}</td>
 
                   <td className="p-3 whitespace-nowrap">
-                    {user.enabled ? (
+                    {isUserActiveStatus(user) ? (
                       <span className="text-green-400">Active</span>
                     ) : (
                       <span className="text-red-400">Inactive</span>
@@ -107,24 +98,16 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
                   </td>
 
                   <td className="p-3 whitespace-nowrap">
-                    {wallet ? (
-                      <>
-                        <p>Mine: {wallet.mineWallet}</p>
-                        <p>Node: {wallet.nodeWallet}</p>
-                        <p>Capital: {wallet.capitalWallet}</p>
-                      </>
-                    ) : (
-                      <span className="text-gray-400">No wallet</span>
-                    )}
-                  </td>
-
-                  <td className="p-3 whitespace-nowrap">
                     <button
                       // onClick={() => onTransactionApproval?.(user.userPkId)}
-                      onClick={() => handleConfirmUser(user.nodeId)}
-                      className="px-3 py-1 bg-blue-500 rounded text-white hover:bg-blue-600"
+                      onClick={() => handleToggleUser(user)}
+                      className={`px-3 py-1 rounded text-white ${
+                        isUserActiveStatus(user)
+                          ? "bg-red-500 hover:bg-red-600"
+                          : "bg-green-500 hover:bg-green-600"
+                      }`}
                     >
-                    {user?.userStatus==="ACTIVE" ? "Active" : "Confirm User"}
+                    {isUserActiveStatus(user) ? "Inactive" : "Active"}
 
                     </button>
                   </td>
