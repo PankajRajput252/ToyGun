@@ -10,7 +10,7 @@ import SupportSidebar from "../components/ui/support/SupportSidebar";
 import Header from "../pages/Header";
 // import realLogo from "../components/images/RealLogo.jpeg";
 import realLogo from "../components/images/RealLogo2-white.png";
-import { AdminDesktopNav, AdminMobileNav } from "./AdminNav";
+import { AdminDesktopNav, AdminMobileNav, DASHBOARD_LINK } from "./AdminNav";
 import { useNavigate } from "react-router-dom";
 
 
@@ -65,8 +65,8 @@ const AppHeader: React.FC = () => {
             <div className="flex items-center gap-4 lg:gap-10">
               <button
                 type="button"
-                aria-label="Go to Bandookwale home"
-                onClick={() => navigate("/")}
+                aria-label="Go to admin dashboard"
+                onClick={() => navigate(DASHBOARD_LINK.to)}
                 className="logo-badge group relative flex-shrink-0 cursor-pointer rounded-xl
                            focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70"
               >

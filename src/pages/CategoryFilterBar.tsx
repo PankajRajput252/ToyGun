@@ -40,7 +40,8 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
 
   return (
     <div className="w-full bg-black/95 backdrop-blur border-b border-gray-800 pt-2">
-      <div className="max-w-7xl mx-auto px-3 py-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      {/* same width and side padding as Header so "All Categories" lines up under the logo */}
+      <div className="w-full px-3 sm:px-4 lg:px-6 py-3 flex items-center gap-2 overflow-x-auto no-scrollbar">
 
         {/* All Categories */}
         <button
