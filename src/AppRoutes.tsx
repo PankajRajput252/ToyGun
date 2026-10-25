@@ -56,7 +56,8 @@ const OrderDetailPage = lazy(() => import("./pages/Orderdetailpage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const AdminSellerStorePage = lazy(() => import("./pages/AdminSellerStorePage"));
 const AdminSellProductPage = lazy(() => import("./pages/AdminSellProductPage"));
-const PremiumPage = lazy(() => import("./pages/Premiumpage"));
+// Premium page no longer used
+// const PremiumPage = lazy(() => import("./pages/Premiumpage"));
 const TrackOrderPage = lazy(() => import("./pages/Trackorderpage"));
 // Manual payments (bank transfer / UPI + receipt)
 const MyPaymentsPage = lazy(() => import("./pages/MyPaymentsPage"));
@@ -126,7 +127,8 @@ export default function AppRoutes() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/orders" element={<MyOrdersPage />} />
-            <Route path="/premiumPage" element={<PremiumPage />} />
+            {/* Premium page no longer used */}
+            {/* <Route path="/premiumPage" element={<PremiumPage />} /> */}
             <Route path="/orders/:orderId" element={<OrderDetailPage />} />
             <Route path="/payments" element={<MyPaymentsPage />} />
             <Route path="/chat" element={<ChatPage />} />

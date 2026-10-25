@@ -10,7 +10,7 @@ import {
   User,
   Settings,
   Package,
-  Crown,
+  // Crown, // Premium page no longer used
   LogOut,
   ReceiptText
 } from "lucide-react";
@@ -182,6 +182,7 @@ export default function UserDropdown() {
               </div>
             </DropdownItem>
           </li>
+          {/* Premium page no longer used
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
@@ -196,6 +197,7 @@ export default function UserDropdown() {
 
             </DropdownItem>
           </li>
+          */}
         </ul>
         <button
           onClick={handleSignOut}
