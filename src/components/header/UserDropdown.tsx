@@ -62,24 +62,25 @@ export default function UserDropdown() {
     <div className="relative">
       <button
         onClick={toggleDropdown}
-        className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
+        className="flex items-center text-white dropdown-toggle hover:text-amber-400 transition"
       >
 
-        <span className="mr-1 lg:mr-3 overflow-hidden rounded-full h-11 w-11 flex-shrink-0">
+        <span className="mr-1 lg:mr-2 overflow-hidden rounded-full h-11 w-11 flex-shrink-0">
           {user?.profileImageUrl || user?.imageUrl ? (
             <img src={(user.profileImageUrl || user.imageUrl) || ''} alt="User" className="w-full h-full object-cover" />
           ) : (
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+            <div className="h-full w-full rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
               {initials}
             </div>
           )}
         </span>
 
-        <span className="hidden lg:block mr-1 font-medium text-theme-sm">
+        {/* long names truncate instead of squeezing the header's search bar */}
+        <span className="hidden lg:block mr-1 max-w-[120px] truncate whitespace-nowrap font-medium text-theme-sm">
           {user?.name ? user.name : user?.username || "User"}
         </span>
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+          className={`flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
             }`}
           width="18"
           height="20"

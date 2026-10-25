@@ -71,7 +71,8 @@ export default function Header() {
     // <header className="fixed top-0 left-0 w-full z-50 bg-slate-900 border-b border-slate-700 shadow-lg">
     // <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-amber-500/20 shadow-lg">
     <header className="sticky top-0 w-full z-50 bg-[#111827] border-b-2 border-[#f5b301] shadow-lg">
-      <div className="max-w-7xl mx-auto px-3 py-2 lg:px-6 lg:py-3 flex flex-wrap lg:flex-nowrap items-center gap-x-2 gap-y-1 lg:gap-4">
+      {/* full width with the same side padding as the admin header (AppHeader) */}
+      <div className="w-full px-3 sm:px-4 py-2 lg:px-6 lg:py-3 flex flex-wrap lg:flex-nowrap items-center gap-x-2 gap-y-1 lg:gap-4">
 
         {/* Logo */}
         <div
@@ -180,7 +181,8 @@ export default function Header() {
         </div>
 
         {/* ── Search Bar ── */}
-        <div className="order-5 lg:order-3 flex flex-1 min-w-0 items-center bg-white rounded-full border overflow-hidden
+        {/* capped on desktop so a gap opens up before the actions, as in the admin header */}
+        <div className="order-5 lg:order-3 flex flex-1 lg:max-w-xl min-w-0 items-center bg-white rounded-full border overflow-hidden
                         focus-within:ring-2 focus-within:ring-blue-400 transition">
           <input
             type="text"
@@ -206,7 +208,7 @@ export default function Header() {
 
         {/* ── Actions ── */}
         {/* ── Actions ── */}
-        <div className="order-2 lg:order-4 flex items-center gap-3 sm:gap-4 lg:gap-7 ml-auto lg:ml-4">
+        <div className="order-2 lg:order-4 flex flex-shrink-0 items-center gap-3 sm:gap-4 lg:gap-5 ml-auto">
 
           {/* Wishlist */}
           <div
@@ -272,7 +274,7 @@ export default function Header() {
 
            {/* Store */}
           <button
-            className="hidden lg:block"
+            className="hidden lg:block flex-shrink-0 hover:scale-105 transition duration-200"
             onClick={() => navigate("/store")}
           // className="text-black hover:scale-110 transition duration-200"
           // className="hover:scale-110 transition duration-200"
@@ -280,7 +282,7 @@ export default function Header() {
             <img
               src={Finallogo}
               alt="Store"
-               className="w-15 h-15 rounded-full object-cover"
+               className="w-14 h-14 rounded-full object-cover"
               // className="w-15 h-15 rounded-full object-cover animate-pulse"
               // className="w-16 h-16 rounded-full object-cover animate-bounce"
               // className="store-attention w-15 h-15 rounded-full object-cover"
