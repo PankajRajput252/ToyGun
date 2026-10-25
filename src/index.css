@@ -76,6 +76,35 @@
     .hero-float { animation: none; }
   }
 
+  /* Header logo: pop-in on load, gentle float, periodic light sweep */
+  .logo-badge {
+    animation: logo-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+      logo-float 4s ease-in-out 0.7s infinite;
+  }
+  .logo-badge:hover {
+    animation-play-state: paused;
+  }
+  .logo-shine {
+    background: linear-gradient(115deg, transparent 35%, rgba(245, 179, 1, 0.95) 50%, transparent 65%);
+    background-size: 250% 100%;
+    animation: logo-shine 3.5s ease-in-out 1s infinite;
+  }
+  @keyframes logo-pop {
+    from { opacity: 0; transform: scale(0.6) rotate(-12deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+  }
+  @keyframes logo-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  @keyframes logo-shine {
+    0% { background-position: 150% 0; }
+    40%, 100% { background-position: -50% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-badge, .logo-shine { animation: none; }
+  }
+
   /* Admin header dropdown pop-in (AdminNav) */
   .dropdown-in {
     animation: dropdown-in 0.18s ease-out;

@@ -10,7 +10,7 @@ import { FaStore } from "react-icons/fa";
 import { useFilter } from "./Filtercontext";
 // import bandookwaleImage from "../components/images/BandookwaleLogo.jpeg";
 // import bandookwaleImage from "../components/images/bandg.png";
-import bandookwaleImage from "../components/images/RealLogo2.jpg";
+import bandookwaleImage from "../components/images/RealLogo2-white.png";
 import storeImg from "../components/images/storeImg1.jpg"
 import storeNewImg from "../components/images/StoreNewLogo.jpeg"
 import Finallogo from "../components/images/Finallogo.jpeg"
@@ -75,20 +75,34 @@ export default function Header() {
 
         {/* Logo */}
         <div
-          className="group relative order-1 flex-shrink-0 cursor-pointer rounded-full p-[3px]
-                     bg-gradient-to-br from-yellow-300 via-amber-500 to-yellow-700
-                     shadow-[0_0_18px_rgba(234,179,8,0.35)]
-                     transition-all duration-300 hover:scale-105 hover:shadow-[0_0_28px_rgba(234,179,8,0.6)]"
+          className="logo-badge group relative order-1 flex-shrink-0 cursor-pointer"
           onClick={() => navigate("/")}
         >
-          {/* soft pulsing glow behind the logo */}
-          <span className="absolute inset-0 rounded-full bg-amber-400/40 blur-md animate-pulse" />
-          <span className="relative block w-12 h-12 lg:w-16 lg:h-16 rounded-full overflow-hidden bg-white ring-2 ring-black/60">
-            <img
-              src={bandookwaleImage}
-              alt="Store Logo"
-              className="w-full h-full object-cover scale-110 transition-transform duration-500 group-hover:scale-125 group-hover:rotate-6"
-            />
+          <span
+            className="relative flex items-center justify-center w-14 h-14 lg:w-[72px] lg:h-[72px] rounded-xl
+                       border-2 border-white bg-black/40 shadow-[0_2px_10px_rgba(0,0,0,0.6)]
+                       transition-transform duration-300 group-hover:scale-110"
+          >
+            {/* logo sized to fit inside the box without touching the border */}
+            <span className="relative block w-[88%] aspect-[695/512] group-hover:-rotate-3 transition-transform duration-300">
+              {/* 512px white-on-transparent version of RealLogo2 with bolder lines, frame and lettering removed */}
+              <img
+                src={bandookwaleImage}
+                alt="Bandookwale Logo"
+                className="w-full h-full object-contain"
+                draggable={false}
+              />
+              {/* light sweep, masked to the logo's lines */}
+              <span
+                className="logo-shine pointer-events-none absolute inset-0"
+                style={{
+                  WebkitMaskImage: `url(${bandookwaleImage})`,
+                  maskImage: `url(${bandookwaleImage})`,
+                  WebkitMaskSize: "100% 100%",
+                  maskSize: "100% 100%",
+                }}
+              />
+            </span>
           </span>
         </div>
 
