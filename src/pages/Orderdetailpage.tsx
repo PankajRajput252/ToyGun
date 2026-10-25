@@ -28,7 +28,7 @@ export default function OrderDetailPage() {
           <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500">Order not found.</p>
           <button
-            onClick={() => navigate("/bandookwale/orders")}
+            onClick={() => navigate("/orders")}
             className="mt-4 text-yellow-600 hover:underline text-sm"
           >
             ← Back to Orders
@@ -45,7 +45,7 @@ export default function OrderDetailPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <button
-            onClick={() => navigate("/bandookwale/orders")}
+            onClick={() => navigate("/orders")}
             className="text-gray-500 hover:text-black dark:hover:text-white transition"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -82,6 +82,7 @@ export default function OrderDetailPage() {
                 {order.orderId}
               </span>
             </div>
+            {/* Razorpay IDs — disabled
             {order.razorpayOrderId && (
               <div className="flex justify-between gap-3">
                 <span className="text-gray-500 shrink-0">Razorpay Order ID</span>
@@ -98,6 +99,7 @@ export default function OrderDetailPage() {
                 </span>
               </div>
             )}
+            */}
           </div>
         </div>
 
@@ -159,7 +161,7 @@ export default function OrderDetailPage() {
 
         {/* Actions */}
         <button
-          onClick={() => navigate("/bandookwale")}
+          onClick={() => navigate("/")}
           className="w-full py-3 rounded-xl text-white font-semibold
                      bg-gradient-to-r from-black to-yellow-500
                      hover:opacity-90 transition"

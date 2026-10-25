@@ -17,7 +17,7 @@ const SORT_LABELS: Record<SortKey, string> = {
   "price-desc": "Price: high to low",
 };
 
-const POST_ITEM_PATH = "/bandookwale/admin/sellProductPage";
+const POST_ITEM_PATH = "/admin/sellProductPage";
 
 type Props = {
   // The public store page reuses this layout but hides the post/upload actions
@@ -145,13 +145,13 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
                       <Store className="w-3 h-3" /> {isOwnStore ? "Your store" : "Store"}
                     </span>
                     <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-green-300 bg-green-500/10 border border-green-500/30 px-2.5 py-0.5 rounded-full">
-                      <ShieldCheck className="w-3 h-3" /> Cart + Razorpay enabled
+                      <ShieldCheck className="w-3 h-3" /> Cart enabled{/* Cart + Razorpay enabled */}
                     </span>
                   </div>
                   <h1 className="mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-white break-words">
                     Luthra Gun House Private Limited's Store
                   </h1>
-                  <p className="text-sm text-gray-400 mt-1">Customers add these items to cart and pay securely via Razorpay.</p>
+                  <p className="text-sm text-gray-400 mt-1">Customers add these items to cart and pay securely.{/* via Razorpay */}</p>
                 </div>
               </div>
 

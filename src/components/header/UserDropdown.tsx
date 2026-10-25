@@ -32,13 +32,13 @@ export default function UserDropdown() {
   function handleSignOut() {
     signOut();
     closeDropdown();
-    navigate("/bandookwale/signin");
+    navigate("/signin");
   }
 
   if (!isAuthenticated) {
     return (
       <Link
-        to="/bandookwale/signin"
+        to="/signin"
         className="px-4 py-2 text-sm font-medium text-white transition rounded-lg bg-brand-500 hover:bg-brand-600"
       >
         Sign In
@@ -116,7 +116,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/bandookwale/profile"
+              to="/profile"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg
@@ -141,7 +141,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/bandookwale/support"
+              to="/support"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <Headset
@@ -155,7 +155,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/bandookwale/orders"
+              to="/orders"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
 
@@ -165,7 +165,7 @@ export default function UserDropdown() {
               </div>
               {/* My Orders */}
             </DropdownItem>
-            {/* <button onClick={() => navigate("/bandookwale/orders")}>
+            {/* <button onClick={() => navigate("/orders")}>
               My Orders
             </button> */}
           </li>
@@ -173,7 +173,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/bandookwale/payments"
+              to="/payments"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <div className="flex items-center gap-3">
@@ -186,7 +186,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              to="/bandookwale/premiumPage"
+              to="/premiumPage"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <div className="flex items-center gap-3">

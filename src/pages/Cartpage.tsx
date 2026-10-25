@@ -9,33 +9,33 @@ import type { PaymentSubmission, ShopOrder } from "../services/paymentApi";
 import { formatInr } from "../services/paymentApi";
 
 // ─── Razorpay type declaration ────────────────────────────────────────────────
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
-
-// ─── Load Razorpay script dynamically ────────────────────────────────────────
-const loadRazorpayScript = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    if (document.getElementById("razorpay-script")) {
-      resolve(true);
-      return;
-    }
-    const script = document.createElement("script");
-    script.id = "razorpay-script";
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
+// declare global {
+  // interface Window {
+    // Razorpay: any;
+  // }
+// }
+// 
+// // ─── Load Razorpay script dynamically ────────────────────────────────────────
+// const loadRazorpayScript = (): Promise<boolean> => {
+  // return new Promise((resolve) => {
+    // if (document.getElementById("razorpay-script")) {
+      // resolve(true);
+      // return;
+    // }
+    // const script = document.createElement("script");
+    // script.id = "razorpay-script";
+    // script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    // script.onload = () => resolve(true);
+    // script.onerror = () => resolve(false);
+    // document.body.appendChild(script);
+  // });
+// };
 
 export default function CartPage() {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, clearCart, totalItems, totalPrice, addOrder } = useCart();
-  const [isOrdering, setIsOrdering] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [isOrdering /* , setIsOrdering */] = useState(false); // was used by the Razorpay flow
+  const [orderPlaced /* , setOrderPlaced */] = useState(false); // was set by the Razorpay flow
 
   // Manual payment (bank transfer / UPI QR + receipt upload, verified by admin)
   // Step 1: delivery address → server creates the order. Step 2: pay + upload receipt.
@@ -52,9 +52,9 @@ export default function CartPage() {
 
   const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
   const buyerId = user?.nodeId;
-  const buyerName = user?.name || user?.fullName || "Customer";
-  const buyerEmail = user?.email || "";
-  const buyerPhone = user?.phone || user?.mobile || "";
+  // const buyerName = user?.name || user?.fullName || "Customer";  // Razorpay prefill
+  // const buyerEmail = user?.email || "";  // Razorpay prefill
+  // const buyerPhone = user?.phone || user?.mobile || "";  // Razorpay prefill
 
 //   handler: async (razorpayResponse) => {
 //   await fetch(`${API_URL}/api/orders/verify`, {
@@ -73,136 +73,136 @@ export default function CartPage() {
 // }
 
   // ─── Razorpay Payment Flow ───────────────────────────────────────────────────
-  const handlePlaceOrder = async () => {
-    if (cartItems.length === 0) return;
+  // const handlePlaceOrder = async () => {
+    // if (cartItems.length === 0) return;
 
-    try {
-      setIsOrdering(true);
+    // try {
+      // setIsOrdering(true);
 
-      // STEP 1: Load Razorpay SDK
-      const sdkLoaded = await loadRazorpayScript();
-      if (!sdkLoaded) {
-        alert("Failed to load Razorpay. Please check your internet connection.");
-        return;
-      }
+      // // STEP 1: Load Razorpay SDK
+      // const sdkLoaded = await loadRazorpayScript();
+      // if (!sdkLoaded) {
+        // alert("Failed to load Razorpay. Please check your internet connection.");
+        // return;
+      // }
 
-      // STEP 2: Create order on your backend
-      // ── When your API is ready, replace this block ────────────────────────
-      // const backendOrder = await fetch("http://localhost:5000/api/orders/create", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "Authorization": `Bearer ${localStorage.getItem("token")}`,
-      //   },
-      //   body: JSON.stringify({
-      //     buyerId,
-      //     amount: totalPrice * 100, // Razorpay expects paise
-      //     currency: "INR",
-      //     items: cartItems,
-      //   }),
-      // }).then((r) => r.json());
-      //
-      // const razorpayOrderId = backendOrder.razorpayOrderId; // from your backend
-      // ─────────────────────────────────────────────────────────────────────
+      // // STEP 2: Create order on your backend
+      // // ── When your API is ready, replace this block ────────────────────────
+      // // const backendOrder = await fetch("http://localhost:5000/api/orders/create", {
+      // //   method: "POST",
+      // //   headers: {
+      // //     "Content-Type": "application/json",
+      // //     "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      // //   },
+      // //   body: JSON.stringify({
+      // //     buyerId,
+      // //     amount: totalPrice * 100, // Razorpay expects paise
+      // //     currency: "INR",
+      // //     items: cartItems,
+      // //   }),
+      // // }).then((r) => r.json());
+      // //
+      // // const razorpayOrderId = backendOrder.razorpayOrderId; // from your backend
+      // // ─────────────────────────────────────────────────────────────────────
 
-      // TEMPORARY: dummy order ID until backend is ready
-      const razorpayOrderId: string | null = null;
-      const localOrderId = `ORD-${Date.now()}`;
+      // // TEMPORARY: dummy order ID until backend is ready
+      // const razorpayOrderId: string | null = null;
+      // const localOrderId = `ORD-${Date.now()}`;
 
-      // STEP 3: Open Razorpay checkout
-      const razorpayOptions = {
-        // ── Replace with your actual Razorpay Key ID from dashboard ──────────
-        key: "rzp_test_Sk36cjHZNLcY5o",
-        amount: totalPrice * 100,         // in paise
-        currency: "INR",
-        name: "Bandookwale",
-        description: `Order #${localOrderId}`,
-        order_id: razorpayOrderId,        // null until backend is ready
-        prefill: {
-          name: buyerName,
-          email: buyerEmail,
-          contact: buyerPhone,
-        },
-        theme: {
-          color: "#EAB308",               // yellow-500 to match your brand
-        },
+      // // STEP 3: Open Razorpay checkout
+      // const razorpayOptions = {
+        // // ── Replace with your actual Razorpay Key ID from dashboard ──────────
+        // key: "rzp_test_Sk36cjHZNLcY5o",
+        // amount: totalPrice * 100,         // in paise
+        // currency: "INR",
+        // name: "Bandookwale",
+        // description: `Order #${localOrderId}`,
+        // order_id: razorpayOrderId,        // null until backend is ready
+        // prefill: {
+          // name: buyerName,
+          // email: buyerEmail,
+          // contact: buyerPhone,
+        // },
+        // theme: {
+          // color: "#EAB308",               // yellow-500 to match your brand
+        // },
 
-        // ── PAYMENT SUCCESS ────────────────────────────────────────────────
-        handler: async (razorpayResponse: any) => {
-          console.log("Razorpay success response:", razorpayResponse);
+        // // ── PAYMENT SUCCESS ────────────────────────────────────────────────
+        // handler: async (razorpayResponse: any) => {
+          // console.log("Razorpay success response:", razorpayResponse);
 
-          // STEP 4: Verify payment on your backend
-          // ── When your API is ready, replace this block ──────────────────
-          // await fetch("http://localhost:5000/api/orders/verify", {
-          //   method: "POST",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //     "Authorization": `Bearer ${localStorage.getItem("token")}`,
-          //   },
-          //   body: JSON.stringify({
-          //     razorpay_order_id: razorpayResponse.razorpay_order_id,
-          //     razorpay_payment_id: razorpayResponse.razorpay_payment_id,
-          //     razorpay_signature: razorpayResponse.razorpay_signature,
-          //   }),
-          // });
-          // ────────────────────────────────────────────────────────────────
+          // // STEP 4: Verify payment on your backend
+          // // ── When your API is ready, replace this block ──────────────────
+          // // await fetch("http://localhost:5000/api/orders/verify", {
+          // //   method: "POST",
+          // //   headers: {
+          // //     "Content-Type": "application/json",
+          // //     "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          // //   },
+          // //   body: JSON.stringify({
+          // //     razorpay_order_id: razorpayResponse.razorpay_order_id,
+          // //     razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+          // //     razorpay_signature: razorpayResponse.razorpay_signature,
+          // //   }),
+          // // });
+          // // ────────────────────────────────────────────────────────────────
 
-          // Save order locally
-          const newOrder: Order = {
-            orderId: localOrderId,
-            razorpayOrderId: razorpayResponse.razorpay_order_id || null,
-            razorpayPaymentId: razorpayResponse.razorpay_payment_id || null,
-            items: [...cartItems],
-            totalAmount: totalPrice,
-            status: "PAID",
-            createdAt: new Date().toISOString(),
-          };
+          // // Save order locally
+          // const newOrder: Order = {
+            // orderId: localOrderId,
+            // razorpayOrderId: razorpayResponse.razorpay_order_id || null,
+            // razorpayPaymentId: razorpayResponse.razorpay_payment_id || null,
+            // items: [...cartItems],
+            // totalAmount: totalPrice,
+            // status: "PAID",
+            // createdAt: new Date().toISOString(),
+          // };
 
-          addOrder(newOrder);
-          clearCart();
-          setOrderPlaced(true);
-        },
+          // addOrder(newOrder);
+          // clearCart();
+          // setOrderPlaced(true);
+        // },
 
-        // ── PAYMENT MODAL DISMISSED ────────────────────────────────────────
-        modal: {
-          ondismiss: () => {
-            console.log("Razorpay modal dismissed by user");
-            setIsOrdering(false);
-          },
-        },
-      };
+        // // ── PAYMENT MODAL DISMISSED ────────────────────────────────────────
+        // modal: {
+          // ondismiss: () => {
+            // console.log("Razorpay modal dismissed by user");
+            // setIsOrdering(false);
+          // },
+        // },
+      // };
 
-      const razorpay = new window.Razorpay(razorpayOptions);
+      // const razorpay = new window.Razorpay(razorpayOptions);
 
-      // ── PAYMENT FAILED ─────────────────────────────────────────────────────
-      razorpay.on("payment.failed", (response: any) => {
-        console.error("Payment failed:", response.error);
+      // // ── PAYMENT FAILED ─────────────────────────────────────────────────────
+      // razorpay.on("payment.failed", (response: any) => {
+        // console.error("Payment failed:", response.error);
 
-        // Save failed order
-        const failedOrder: Order = {
-          orderId: localOrderId,
-          razorpayOrderId: response.error.metadata?.order_id || null,
-          razorpayPaymentId: response.error.metadata?.payment_id || null,
-          items: [...cartItems],
-          totalAmount: totalPrice,
-          status: "FAILED",
-          createdAt: new Date().toISOString(),
-        };
+        // // Save failed order
+        // const failedOrder: Order = {
+          // orderId: localOrderId,
+          // razorpayOrderId: response.error.metadata?.order_id || null,
+          // razorpayPaymentId: response.error.metadata?.payment_id || null,
+          // items: [...cartItems],
+          // totalAmount: totalPrice,
+          // status: "FAILED",
+          // createdAt: new Date().toISOString(),
+        // };
 
-        addOrder(failedOrder);
-        alert(`Payment failed: ${response.error.description}`);
-        setIsOrdering(false);
-      });
+        // addOrder(failedOrder);
+        // alert(`Payment failed: ${response.error.description}`);
+        // setIsOrdering(false);
+      // });
 
-      razorpay.open();
+      // razorpay.open();
 
-    } catch (error: any) {
-      console.error("Order error:", error);
-      alert(`Something went wrong: ${error.message || "Please try again."}`);
-    } finally {
-      setIsOrdering(false);
-    }
-  };
+    // } catch (error: any) {
+      // console.error("Order error:", error);
+      // alert(`Something went wrong: ${error.message || "Please try again."}`);
+    // } finally {
+      // setIsOrdering(false);
+    // }
+  // };
 
   // ─── Manual payment flow ──────────────────────────────────────────────────────
   const openManualPayment = () => {
@@ -225,8 +225,8 @@ export default function CartPage() {
     if (!checkoutOrder) return;
     const newOrder: Order = {
       orderId: checkoutOrder.orderReference,
-      razorpayOrderId: null,
-      razorpayPaymentId: null,
+      // razorpayOrderId: null,
+      // razorpayPaymentId: null,
       items: [...cartItems],
       totalAmount: checkoutOrder.subtotal,
       status: "PENDING", // becomes PAID once the admin approves the payment
@@ -255,13 +255,13 @@ export default function CartPage() {
             You'll get a tracking number under My Orders.
           </p>
           <button
-            onClick={() => navigate("/bandookwale/payments")}
+            onClick={() => navigate("/payments")}
             className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-black to-yellow-500 hover:opacity-90 transition mb-3"
           >
             Track Payment Status
           </button>
           <button
-            onClick={() => navigate("/bandookwale")}
+            onClick={() => navigate("/")}
             className="w-full py-2 rounded-xl border border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
           >
             Continue Shopping
@@ -284,7 +284,7 @@ export default function CartPage() {
             Your order has been placed. The seller will contact you shortly.
           </p>
           <button
-            onClick={() => navigate("/bandookwale/orders")}
+            onClick={() => navigate("/orders")}
             className="w-full py-3 rounded-xl text-white font-semibold
                        bg-gradient-to-r from-black to-yellow-500
                        hover:opacity-90 transition mb-3"
@@ -292,7 +292,7 @@ export default function CartPage() {
             View My Orders
           </button>
           <button
-            onClick={() => navigate("/bandookwale")}
+            onClick={() => navigate("/")}
             className="w-full py-2 rounded-xl border border-gray-300 text-gray-600
                        hover:bg-gray-50 transition text-sm"
           >
@@ -316,7 +316,7 @@ export default function CartPage() {
             Browse listings and add items to your cart.
           </p>
           <button
-            onClick={() => navigate("/bandookwale")}
+            onClick={() => navigate("/")}
             className="w-full py-3 rounded-xl text-white font-semibold
                        bg-gradient-to-r from-black to-yellow-500
                        hover:opacity-90 transition mb-3"
@@ -324,7 +324,7 @@ export default function CartPage() {
             Browse Listings
           </button>
           <button
-            onClick={() => navigate("/bandookwale/orders")}
+            onClick={() => navigate("/orders")}
             className="w-full py-2 rounded-xl border border-gray-300 text-gray-600
                        hover:bg-gray-50 transition text-sm flex items-center justify-center gap-2"
           >
@@ -357,7 +357,7 @@ export default function CartPage() {
 
           {/* My Orders shortcut */}
           <button
-            onClick={() => navigate("/bandookwale/orders")}
+            onClick={() => navigate("/orders")}
             className="ml-auto flex items-center gap-1 text-sm text-yellow-600 hover:underline"
           >
             <Package className="w-4 h-4" /> My Orders
@@ -428,7 +428,7 @@ export default function CartPage() {
                 <span>₹ {totalPrice.toLocaleString()}</span>
               </div>
 
-              {/* Razorpay note */}
+              {/* Razorpay note + Pay with Razorpay button — disabled
               <p className="text-xs text-gray-400 mt-3 text-center">
                 🔒 Secured by Razorpay
               </p>
@@ -449,11 +449,12 @@ export default function CartPage() {
                 or
                 <span className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
               </div>
+              */}
 
               <button
                 onClick={openManualPayment}
                 disabled={isOrdering}
-                className="w-full py-3 rounded-xl font-semibold border-2 border-gray-900 dark:border-gray-200
+                className="mt-4 w-full py-3 rounded-xl font-semibold border-2 border-gray-900 dark:border-gray-200
                            text-gray-900 dark:text-white inline-flex items-center justify-center gap-2
                            disabled:opacity-50 disabled:cursor-not-allowed
                            hover:bg-gray-900 hover:text-white dark:hover:bg-gray-200 dark:hover:text-gray-900 transition"

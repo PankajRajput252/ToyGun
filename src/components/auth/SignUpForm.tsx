@@ -6,19 +6,19 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { useAuth } from "../../context/AuthContext";
 
-declare global { interface Window { Razorpay: any; } }
+// declare global { interface Window { Razorpay: any; } }
 
-const loadRazorpayScript = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    if (document.getElementById("razorpay-script")) { resolve(true); return; }
-    const script = document.createElement("script");
-    script.id = "razorpay-script";
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
+// const loadRazorpayScript = (): Promise<boolean> => {
+//   return new Promise((resolve) => {
+//     if (document.getElementById("razorpay-script")) { resolve(true); return; }
+//     const script = document.createElement("script");
+//     script.id = "razorpay-script";
+//     script.src = "https://checkout.razorpay.com/v1/checkout.js";
+//     script.onload = () => resolve(true);
+//     script.onerror = () => resolve(false);
+//     document.body.appendChild(script);
+//   });
+// };
 
 interface SubscriptionDefinition {
   subscriptionDefinitionPkId: number;
@@ -27,7 +27,7 @@ interface SubscriptionDefinition {
 }
 
 const API_URL = "https://api.bandookwale.com";
-const RAZORPAY_KEY = "rzp_test_Sk36cjHZNLcY5o"; // ← your key
+// const RAZORPAY_KEY = "rzp_test_Sk36cjHZNLcY5o"; // ← your key
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +46,7 @@ export default function SignUpForm() {
   const [success, setSuccess] = useState("");
   const [generatedUsername, setGeneratedUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+  // const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [subscriptionDef, setSubscriptionDef] = useState<SubscriptionDefinition | null>(null);
   const [isFetchingCharge, setIsFetchingCharge] = useState(false);
 
@@ -93,74 +93,76 @@ export default function SignUpForm() {
     setError(""); setSuccess(""); setGeneratedUsername("");
     const validationError = validateForm();
     if (validationError) { setError(validationError); return; }
-    if (!subscriptionDef || subscriptionDef.subscriptionAmount <= 0) {
-      await registerUser(); return;
-    }
-    await initiateRegistrationPayment();
+    // Razorpay disabled — register directly without the registration-fee payment
+    // if (!subscriptionDef || subscriptionDef.subscriptionAmount <= 0) {
+    //   await registerUser(); return;
+    // }
+    // await initiateRegistrationPayment();
+    await registerUser();
   };
 
   // ─── Open Razorpay ────────────────────────────────────────────────────────────
-  const initiateRegistrationPayment = async () => {
-    try {
-      setIsPaymentLoading(true);
-      const sdkLoaded = await loadRazorpayScript();
-      if (!sdkLoaded) {
-        setError("Failed to load payment gateway. Please check your internet connection.");
-        setIsPaymentLoading(false);
-        return;
-      }
-      const options = {
-        key: RAZORPAY_KEY,
-        amount: Math.round(subscriptionDef!.subscriptionAmount * 100),
-        currency: "INR",
-        name: "Bandookwale",
-        description: subscriptionDef!.subscriptionName || "Registration Fee",
-        prefill: { name, email, contact: mobile },
-        notes: {
-          subscriptionCode: subscriptionDef!.subscriptionCode,
-          subscriptionId: subscriptionDef!.subscriptionDefinitionPkId,
-          purpose: "registration",
-        },
-        theme: { color: "#EAB308" },
-        handler: async (razorpayResponse: any) => {
-          console.log("Registration payment success:", razorpayResponse);
-          setIsPaymentLoading(false);
-          await registerUser(razorpayResponse);
-        },
-        modal: {
-          ondismiss: () => {
-            setIsPaymentLoading(false);
-            setError("Payment was cancelled. Please complete payment to register.");
-          },
-        },
-      };
-      const razorpay = new window.Razorpay(options);
-      razorpay.on("payment.failed", (response: any) => {
-        setIsPaymentLoading(false);
-        setError(`Payment failed: ${response.error.description}. Please try again.`);
-      });
-      razorpay.open();
-    } catch (err: any) {
-      setIsPaymentLoading(false);
-      setError(`Payment error: ${err.message || "Please try again."}`);
-    }
-  };
+  // const initiateRegistrationPayment = async () => {
+  //   try {
+  //     setIsPaymentLoading(true);
+  //     const sdkLoaded = await loadRazorpayScript();
+  //     if (!sdkLoaded) {
+  //       setError("Failed to load payment gateway. Please check your internet connection.");
+  //       setIsPaymentLoading(false);
+  //       return;
+  //     }
+  //     const options = {
+  //       key: RAZORPAY_KEY,
+  //       amount: Math.round(subscriptionDef!.subscriptionAmount * 100),
+  //       currency: "INR",
+  //       name: "Bandookwale",
+  //       description: subscriptionDef!.subscriptionName || "Registration Fee",
+  //       prefill: { name, email, contact: mobile },
+  //       notes: {
+  //         subscriptionCode: subscriptionDef!.subscriptionCode,
+  //         subscriptionId: subscriptionDef!.subscriptionDefinitionPkId,
+  //         purpose: "registration",
+  //       },
+  //       theme: { color: "#EAB308" },
+  //       handler: async (razorpayResponse: any) => {
+  //         console.log("Registration payment success:", razorpayResponse);
+  //         setIsPaymentLoading(false);
+  //         await registerUser(razorpayResponse);
+  //       },
+  //       modal: {
+  //         ondismiss: () => {
+  //           setIsPaymentLoading(false);
+  //           setError("Payment was cancelled. Please complete payment to register.");
+  //         },
+  //       },
+  //     };
+  //     const razorpay = new window.Razorpay(options);
+  //     razorpay.on("payment.failed", (response: any) => {
+  //       setIsPaymentLoading(false);
+  //       setError(`Payment failed: ${response.error.description}. Please try again.`);
+  //     });
+  //     razorpay.open();
+  //   } catch (err: any) {
+  //     setIsPaymentLoading(false);
+  //     setError(`Payment error: ${err.message || "Please try again."}`);
+  //   }
+  // };
 
-  // ─── Register user (after payment or directly) ────────────────────────────────
-  const registerUser = async (razorpayResponse?: any) => {
+  // ─── Register user ────────────────────────────────────────────────────────────
+  const registerUser = async (/* razorpayResponse?: any */) => {
     setIsLoading(true);
     try {
       console.log("Registering with referral:", referralCode);
       const result = await signUp(
         name, email, password, mobile, country,
         referralCode, position, nationalIdType, nationalId,
-        razorpayResponse ? {
-          razorpayPaymentId: razorpayResponse.razorpay_payment_id,
-          razorpayOrderId: razorpayResponse.razorpay_order_id,
-          razorpaySignature: razorpayResponse.razorpay_signature,
-          subscriptionId: subscriptionDef?.subscriptionDefinitionPkId,
-          amountPaid: subscriptionDef?.subscriptionAmount,
-        } : undefined
+        // razorpayResponse ? {
+        //   razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+        //   razorpayOrderId: razorpayResponse.razorpay_order_id,
+        //   razorpaySignature: razorpayResponse.razorpay_signature,
+        //   subscriptionId: subscriptionDef?.subscriptionDefinitionPkId,
+        //   amountPaid: subscriptionDef?.subscriptionAmount,
+        // } : undefined
       );
       if (result.success) {
         setSuccess(result.message || "Registration successful!");
@@ -185,8 +187,8 @@ export default function SignUpForm() {
             <div className="mb-4 h-16 animate-pulse bg-yellow-50 rounded-xl border border-yellow-100" />
           )}
 
-          {/* Registration fee banner */}
-          {!isFetchingCharge && subscriptionDef && subscriptionDef.subscriptionAmount > 0 && (
+          {/* Registration fee banner — disabled along with Razorpay */}
+          {/* {!isFetchingCharge && subscriptionDef && subscriptionDef.subscriptionAmount > 0 && (
             <div className="mb-5 flex items-center justify-between
                             bg-yellow-50 dark:bg-yellow-900/20
                             border border-yellow-200 dark:border-yellow-800
@@ -208,7 +210,7 @@ export default function SignUpForm() {
                 </p>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Error */}
           {error && (
@@ -360,7 +362,7 @@ export default function SignUpForm() {
               <div>
                 {generatedUsername ? (
                   <div className="space-y-3">
-                    <button type="button" onClick={() => navigate("/bandookwale/signin")}
+                    <button type="button" onClick={() => navigate("/signin")}
                       className="flex items-center justify-center w-full px-4 py-3 text-sm
                                  font-medium text-white transition rounded-lg bg-green-500
                                  shadow-theme-xs hover:bg-green-600">
@@ -377,16 +379,16 @@ export default function SignUpForm() {
                   </div>
                 ) : (
                   <button type="submit"
-                    disabled={isLoading || isPaymentLoading || isFetchingCharge}
+                    disabled={isLoading /* || isPaymentLoading */ || isFetchingCharge}
                     className="flex items-center justify-center w-full px-4 py-3 text-sm
                                font-medium text-white transition rounded-lg bg-brand-500
                                shadow-theme-xs hover:bg-brand-600
                                disabled:opacity-50 disabled:cursor-not-allowed">
-                    {isPaymentLoading ? "Opening Payment..."
-                      : isLoading ? "Creating account..."
+                    {/* isPaymentLoading ? "Opening Payment..." : */}
+                    {isLoading ? "Creating account..."
                       : isFetchingCharge ? "Loading..."
-                      : subscriptionDef && subscriptionDef.subscriptionAmount > 0
-                      ? `Pay ₹${subscriptionDef.subscriptionAmount.toLocaleString()} & Sign Up`
+                      // : subscriptionDef && subscriptionDef.subscriptionAmount > 0
+                      // ? `Pay ₹${subscriptionDef.subscriptionAmount.toLocaleString()} & Sign Up`
                       : "Sign Up"}
                   </button>
                 )}
@@ -398,7 +400,7 @@ export default function SignUpForm() {
           <div className="mt-5">
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
               Already have an account?{" "}
-              <Link to="/bandookwale/signin"
+              <Link to="/signin"
                 className="text-brand-500 hover:text-brand-600 dark:text-brand-400">
                 Sign In
               </Link>

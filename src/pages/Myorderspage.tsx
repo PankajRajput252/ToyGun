@@ -75,7 +75,7 @@ export default function MyOrdersPage() {
               Items you purchase will appear here.
             </p>
             <button
-              onClick={() => navigate("/bandookwale")}
+              onClick={() => navigate("/")}
               className="bg-gradient-to-r from-black to-yellow-500 text-white
                          px-6 py-3 rounded-xl font-medium hover:opacity-90 transition
                          flex items-center gap-2"
@@ -92,7 +92,7 @@ export default function MyOrdersPage() {
               <div
                 key={order.orderId}
                 onClick={() =>
-                  navigate(`/bandookwale/orders/${order.orderId}`, { state: order })
+                  navigate(`/orders/${order.orderId}`, { state: order })
                 }
                 className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700
                            shadow-sm p-4 cursor-pointer hover:shadow-md transition"

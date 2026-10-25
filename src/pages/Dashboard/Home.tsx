@@ -11,7 +11,7 @@ import { sellProductApi } from "../../services/api";
 import { useFilter } from "../Filtercontext";
 import {
   ShoppingCart, MessageCircle, LayoutGrid, PlusCircle, Store, History, Loader2, ShieldCheck,
-  Search, Handshake, Lock, Truck,
+  Search, Handshake, /* Lock, */ Truck,
 } from "lucide-react";
 import HeroCarousel3D from "../HeroCarousel3D";
 import heroImg1 from "../../components/images/hero/scroll_1.jpg";
@@ -37,7 +37,7 @@ const HOW_IT_WORKS = [
 
 const TRUST_POINTS = [
   { icon: Store, title: "Seller stores", text: "Shop from sellers with their own store page and catalogue." },
-  { icon: Lock, title: "Secure payments", text: "Store checkout is handled by Razorpay." },
+  // { icon: Lock, title: "Secure payments", text: "Store checkout is handled by Razorpay." },
   { icon: Truck, title: "Doorstep delivery", text: "Store orders are delivered straight to your door." },
   { icon: ShieldCheck, title: "Safety first", text: "Meet in public and inspect before you pay for listings." },
 ];
@@ -210,7 +210,7 @@ export default function Home() {
                     Shop the store
                   </button>
                   <button
-                    onClick={() => navigate("/bandookwale/sellProductPage")}
+                    onClick={() => navigate("/sellProductPage")}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
                                bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm transition"
                   >
@@ -312,7 +312,7 @@ export default function Home() {
                               bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200
                               dark:border-yellow-800 px-3 py-2 rounded-lg w-fit max-w-full">
                 <ShoppingCart className="w-3.5 h-3.5" />
-                Store products — Add to cart and pay via Razorpay
+                Store products — Add to cart and checkout{/* pay via Razorpay */}
               </div>
             )}
             {activeTab === "listing" && (

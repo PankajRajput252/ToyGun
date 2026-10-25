@@ -82,7 +82,7 @@ export default function ProductCard({ item, onDeleted }: Props) {
   };
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate("/bandookwale/admin/sellProductPage", { state: { product: item } });
+    navigate("/admin/sellProductPage", { state: { product: item } });
   };
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();

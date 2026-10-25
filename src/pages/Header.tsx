@@ -75,7 +75,7 @@ export default function Header() {
         {/* Logo */}
         <div
           className="order-1 w-12 h-12 lg:w-16 lg:h-16 rounded-full overflow-hidden shadow-lg flex-shrink-0 cursor-pointer flex items-center justify-center bg-black"
-          onClick={() => navigate("/bandookwale/")}
+          onClick={() => navigate("/")}
         >
           <img
             src={bandookwaleImage}
@@ -189,7 +189,7 @@ export default function Header() {
           {/* Wishlist */}
           <div
             className="hidden lg:flex flex-col items-center text-sm cursor-pointer text-white hover:text-amber-400 hover:scale-110 transition duration-200"
-            onClick={() => navigate("/bandookwale/wishlistPage")}
+            onClick={() => navigate("/wishlistPage")}
           >
             <Heart
               className="w-7 h-7 drop-shadow-md"
@@ -200,7 +200,7 @@ export default function Header() {
 
           {/* Cart */}
           <button
-            onClick={() => navigate("/bandookwale/cart")}
+            onClick={() => navigate("/cart")}
             className="relative text-white hover:text-amber-400 hover:scale-110 transition duration-200"
           >
             <ShoppingCart
@@ -224,7 +224,7 @@ export default function Header() {
             className="hidden sm:flex items-center gap-2 px-4 lg:px-6 py-2 lg:py-2.5 rounded-full
                font-bold text-black bg-white border-2 border-black
                shadow-lg hover:scale-105 hover:bg-gray-100 transition duration-200"
-            onClick={() => navigate("/bandookwale/sellProductPage")}
+            onClick={() => navigate("/sellProductPage")}
           >
             <Plus className="w-5 h-5" strokeWidth={3} />
             SELL
@@ -237,7 +237,7 @@ export default function Header() {
             <UserDropdown />
           ) : (
             <div
-              onClick={() => navigate("/bandookwale/signin")}
+              onClick={() => navigate("/signin")}
               className="flex flex-col items-center text-sm cursor-pointer text-black hover:scale-110 transition duration-200"
             >
               <User
@@ -251,7 +251,7 @@ export default function Header() {
            {/* Store */}
           <button
             className="hidden lg:block"
-            onClick={() => navigate("/bandookwale/store")}
+            onClick={() => navigate("/store")}
           // className="text-black hover:scale-110 transition duration-200"
           // className="hover:scale-110 transition duration-200"
           >
@@ -282,21 +282,21 @@ export default function Header() {
         <div className="lg:hidden border-t border-white/10 px-3 pb-3 pt-2">
           <div className="flex flex-col gap-1">
             <button
-              onClick={() => handleMobileNav("/bandookwale/wishlistPage")}
+              onClick={() => handleMobileNav("/wishlistPage")}
               className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-white font-semibold text-sm hover:bg-white/10 hover:text-amber-400 transition"
             >
               <Heart className="w-5 h-5" strokeWidth={2.5} />
               Wishlist
             </button>
             <button
-              onClick={() => handleMobileNav("/bandookwale/sellProductPage")}
+              onClick={() => handleMobileNav("/sellProductPage")}
               className="sm:hidden flex items-center gap-3 w-full px-3 py-3 rounded-lg text-white font-semibold text-sm hover:bg-white/10 hover:text-amber-400 transition"
             >
               <Plus className="w-5 h-5" strokeWidth={3} />
               SELL
             </button>
             <button
-              onClick={() => handleMobileNav("/bandookwale/store")}
+              onClick={() => handleMobileNav("/store")}
               className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-white font-semibold text-sm hover:bg-white/10 hover:text-amber-400 transition"
             >
               <img src={Finallogo} alt="Store" className="w-7 h-7 rounded-full object-cover" />

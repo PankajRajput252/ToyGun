@@ -65,7 +65,7 @@ const AppHeader: React.FC = () => {
               <button
                 type="button"
                 aria-label="Go to Bandookwale home"
-                onClick={() => navigate("/bandookwale/")}
+                onClick={() => navigate("/")}
                 className="group relative flex-shrink-0 rounded-full p-[3px] cursor-pointer
                            bg-gradient-to-br from-yellow-300 via-amber-500 to-yellow-700
                            shadow-[0_0_18px_rgba(234,179,8,0.35)]
@@ -86,7 +86,7 @@ const AppHeader: React.FC = () => {
                 AdminPanel
               </div> */}
               {/* <Link
-                to="/bandookwale"
+                to="/"
                 className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
               >
                 AdminPanel

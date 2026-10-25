@@ -43,7 +43,7 @@ export default function SignInForm() {
     try {
       const success = await signIn(username, password, isChecked);
       if (success) {
-        navigate("/bandookwale/");
+        navigate("/home");
       } else {
         setError("Login failed. Please check your credentials and try again. If the problem persists, contact support.");
       }
@@ -147,7 +147,7 @@ export default function SignInForm() {
           <p className="text-sm text-gray-700 dark:text-gray-400">
             Don&apos;t have an account?{" "}
             <Link
-              to="/bandookwale/signup"
+              to="/signup"
               className="text-brand-500 hover:text-brand-600"
             >
               Sign Up

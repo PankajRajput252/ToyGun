@@ -358,7 +358,7 @@ function ProductDetails({ item }: { item: Product }) {
   };
 
   const handleChat = (initialMessage?: string) => {
-    navigate("/bandookwale/chat", {
+    navigate("/chat", {
       state: {
         productId: item.id?.toString(),
         productTitle: item.title,
@@ -603,13 +603,13 @@ function ProductDetails({ item }: { item: Product }) {
             {isStoreProduct && !isOwner && (
               <div className="mt-5 space-y-2">
                 <button
-                  onClick={() => { if (!alreadyInCart) handleAddToCart(); navigate("/bandookwale/cart"); }}
+                  onClick={() => { if (!alreadyInCart) handleAddToCart(); navigate("/cart"); }}
                   className="w-full py-3 rounded-xl font-semibold bg-gold-500 text-white hover:bg-gold-400 shadow-lg shadow-gold-500/20 transition"
                 >
                   Buy now
                 </button>
                 <button
-                  onClick={alreadyInCart ? () => navigate("/bandookwale/cart") : handleAddToCart}
+                  onClick={alreadyInCart ? () => navigate("/cart") : handleAddToCart}
                   className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border-2 transition
                     ${alreadyInCart
                       ? "border-green-500 text-green-500 hover:bg-green-500/10"
@@ -708,7 +708,7 @@ function ProductDetails({ item }: { item: Product }) {
             </div>
             {isStoreProduct ? (
               <button
-                onClick={() => navigate(`/bandookwale/store/${item.sellerId}`)}
+                onClick={() => navigate(`/store/${item.sellerId}`)}
                 className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-gold-500 text-gold-500 text-sm font-medium hover:bg-gold-500/10 transition"
               >
                 <Store className="w-4 h-4" /> View store

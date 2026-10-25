@@ -14,7 +14,7 @@ export default function ProtectedRoute() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/bandookwale/signin" replace />;
+    return <Navigate to="/signin" replace />;
   }
 
   return <Outlet />;

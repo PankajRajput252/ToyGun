@@ -18,31 +18,31 @@ interface NavGroup {
   items: NavItem[];
 }
 
-export const DASHBOARD_LINK = { to: "/bandookwale/admin", label: "Dashboard", icon: LayoutDashboard };
+export const DASHBOARD_LINK = { to: "/admin", label: "Dashboard", icon: LayoutDashboard };
 
 export const ADMIN_NAV_GROUPS: NavGroup[] = [
   {
     label: "Users",
     items: [
-      { to: "/bandookwale/admin/users", label: "All Users", description: "Everyone registered on Bandookwale", icon: Users },
-      { to: "/bandookwale/admin/users?status=active", label: "Active Users", description: "Accounts that are currently active", icon: UserCheck },
-      { to: "/bandookwale/admin/users?status=inactive", label: "Inactive Users", description: "Deactivated or pending accounts", icon: UserX },
-      { to: "/bandookwale/admin/users?role=admin", label: "Admin Users", description: "Team members with admin access", icon: ShieldCheck },
+      { to: "/admin/users", label: "All Users", description: "Everyone registered on Bandookwale", icon: Users },
+      { to: "/admin/users?status=active", label: "Active Users", description: "Accounts that are currently active", icon: UserCheck },
+      { to: "/admin/users?status=inactive", label: "Inactive Users", description: "Deactivated or pending accounts", icon: UserX },
+      { to: "/admin/users?role=admin", label: "Admin Users", description: "Team members with admin access", icon: ShieldCheck },
     ],
   },
   {
     label: "Manage Users",
     items: [
-      { to: "/bandookwale/admin/subscription", label: "Subscription", description: "Plans and user subscriptions", icon: BadgeIndianRupee },
-      { to: "/bandookwale/admin/store", label: "Add Store Items", description: "List products in the store", icon: PackagePlus },
+      { to: "/admin/subscription", label: "Subscription", description: "Plans and user subscriptions", icon: BadgeIndianRupee },
+      { to: "/admin/store", label: "Add Store Items", description: "List products in the store", icon: PackagePlus },
     ],
   },
   {
     label: "Payments",
     items: [
-      { to: "/bandookwale/admin/payments", label: "Payment Approvals", description: "Review manual bank / UPI payments", icon: CheckCircle2 },
-      { to: "/bandookwale/admin/payment-methods", label: "Payment Methods", description: "Bank and UPI details buyers pay to", icon: Landmark },
-      { to: "/bandookwale/admin/shipments", label: "Shipments", description: "Shiprocket status of paid orders; retry failures", icon: Truck },
+      { to: "/admin/payments", label: "Payment Approvals", description: "Review manual bank / UPI payments", icon: CheckCircle2 },
+      { to: "/admin/payment-methods", label: "Payment Methods", description: "Bank and UPI details buyers pay to", icon: Landmark },
+      { to: "/admin/shipments", label: "Shipments", description: "Shiprocket status of paid orders; retry failures", icon: Truck },
     ],
   },
 ];

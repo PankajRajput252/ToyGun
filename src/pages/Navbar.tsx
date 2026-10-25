@@ -54,7 +54,7 @@ export default function Navbar() {
 
         {/* ── LOGO ── */}
         <button
-          onClick={() => navigate("/bandookwale")}
+          onClick={() => navigate("/")}
           className="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-500/10 border border-yellow-500/30
                      flex items-center justify-center text-yellow-400 font-bold text-lg hover:bg-yellow-500/20 transition"
         >
@@ -146,7 +146,7 @@ export default function Navbar() {
 
           {/* Wishlist */}
           <button
-            onClick={() => navigate("/bandookwale/wishlist")}
+            onClick={() => navigate("/wishlist")}
             className="flex flex-col items-center text-white hover:text-yellow-400 transition group"
           >
             <Heart className="w-5 h-5 group-hover:fill-yellow-400/20" />
@@ -160,7 +160,7 @@ export default function Navbar() {
 
           {/* Sell button */}
           <button
-            onClick={() => navigate("/bandookwale/sell")}
+            onClick={() => navigate("/sell")}
             className="flex items-center gap-1.5 bg-white text-gray-900 font-semibold
                        text-sm px-4 py-2 rounded-full hover:bg-yellow-400 transition shadow"
           >

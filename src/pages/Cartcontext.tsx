@@ -13,8 +13,8 @@ export interface CartItem {
 
 export interface Order {
   orderId: string;
-  razorpayOrderId: string | null;   // from backend when API is ready
-  razorpayPaymentId: string | null; // from Razorpay after payment success
+  // razorpayOrderId: string | null;   // from backend when API is ready
+  // razorpayPaymentId: string | null; // from Razorpay after payment success
   items: CartItem[];
   totalAmount: number;
   status: "PENDING" | "PAID" | "FAILED" | "CANCELLED";

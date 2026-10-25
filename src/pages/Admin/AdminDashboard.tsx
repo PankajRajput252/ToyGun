@@ -216,7 +216,7 @@ export default function AdminDashboard() {
             value={totalUsers}
             sub={`${activeUsers} active`}
             subLabel="Status"
-            onClick={() => go('/bandookwale/admin/users')}
+            onClick={() => go('/admin/users')}
           />
           <StatCard
             icon={UserCheck}
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
             value={activeUsers}
             sub={inactiveUsers}
             subLabel="Inactive"
-            onClick={() => go('/bandookwale/admin/users?status=active')}
+            onClick={() => go('/admin/users?status=active')}
           />
           <StatCard
             icon={UserX}
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
             value={inactiveUsers}
             sub={totalUsers}
             subLabel="Total Users"
-            onClick={() => go('/bandookwale/admin/users?status=inactive')}
+            onClick={() => go('/admin/users?status=inactive')}
           />
         </div>
 
@@ -250,7 +250,7 @@ export default function AdminDashboard() {
             value={adminUsers}
             sub={normalUsers}
             subLabel="Normal Users"
-            onClick={() => go('/bandookwale/admin/users?role=admin')}
+            onClick={() => go('/admin/users?role=admin')}
           />
           <StatCard
             icon={UserIcon}
@@ -260,7 +260,7 @@ export default function AdminDashboard() {
             value={normalUsers}
             sub={adminUsers}
             subLabel="Admins"
-            onClick={() => go('/bandookwale/admin/users?role=normal')}
+            onClick={() => go('/admin/users?role=normal')}
           />
           <StatCard
             icon={Activity}
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
             value="—"
             sub="View all"
             subLabel="Status"
-            onClick={() => go('/bandookwale/admin/users')}
+            onClick={() => go('/admin/users')}
           />
         </div>
 
@@ -357,14 +357,14 @@ export default function AdminDashboard() {
             {/* Quick actions */}
             <div className="mt-6 pt-5 border-t border-gray-700 grid grid-cols-2 gap-3">
               <button
-                onClick={() => go('/bandookwale/admin/users')}
+                onClick={() => go('/admin/users')}
                 className="text-xs bg-yellow-500/10 border border-yellow-500/20 text-yellow-400
                            py-2 rounded-xl hover:bg-yellow-500/20 transition font-medium"
               >
                 Manage Users
               </button>
               <button
-                onClick={() => go('/bandookwale')}
+                onClick={() => go('/')}
                 className="text-xs bg-gray-800 border border-gray-700 text-gray-300
                            py-2 rounded-xl hover:bg-gray-700 transition font-medium"
               >

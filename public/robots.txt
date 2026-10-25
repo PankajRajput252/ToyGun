@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /cart
+Disallow: /orders
+Disallow: /payments
+Disallow: /wallet
+Disallow: /profile
+Disallow: /chat
+
+Sitemap: https://www.bandookwale.com/sitemap.xml

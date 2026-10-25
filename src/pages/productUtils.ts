@@ -74,4 +74,4 @@ export async function fetchProductById(id: number): Promise<Product | null> {
 }
 
 export const productUrl = (id?: number) =>
-  id != null ? `/bandookwale/productdetails?id=${id}` : "/bandookwale/productdetails";
+  id != null ? `/productdetails?id=${id}` : "/productdetails";

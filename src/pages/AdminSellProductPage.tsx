@@ -573,7 +573,7 @@ export default function AdminSellProductPage() {
                     <div className="px-4 sm:px-6 pt-4">
                         <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200
                                     rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm text-yellow-700 font-medium">
-                            🛒 This product will be listed as a <strong>Store Product</strong> — buyers can add to cart and pay via Razorpay.
+                            🛒 This product will be listed as a <strong>Store Product</strong> — buyers can add to cart and checkout.{/* pay via Razorpay */}
                         </div>
                     </div>
 

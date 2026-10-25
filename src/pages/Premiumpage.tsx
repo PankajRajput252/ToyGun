@@ -3,7 +3,7 @@ import { subscriptionIncomeTypeApi } from "../services/api"; // ← adjust path 
 
 // ─── CONFIG ─────────────────────────────────────────────────────────────────────
 const SUBSCRIPTION_CODE = "PREMIUM_MEMBERSHIP_CHARGE";
-const RAZORPAY_KEY = "rzp_test_Sk36cjHZNLcY5o"; // ← your key
+// const RAZORPAY_KEY = "rzp_test_Sk36cjHZNLcY5o"; // ← your key
 // ─────────────────────────────────────────────────────────────────────────────────
 
 interface SubscriptionType {
@@ -28,26 +28,26 @@ const TESTIMONIALS = [
   { name: "Rahul Dev", role: "CTO, Buildspace", text: "Switching to yearly was the best decision we made.", avatar: "RD" },
 ];
 
-declare global {
-  interface Window { Razorpay: any; }
-}
+// declare global {
+  // interface Window { Razorpay: any; }
+// }
 
-function loadRazorpay(): Promise<boolean> {
-  return new Promise((resolve) => {
-    if ((window as any).Razorpay) return resolve(true);
-    const script = document.createElement("script");
-    script.id = "razorpay-script";
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-}
+// function loadRazorpay(): Promise<boolean> {
+  // return new Promise((resolve) => {
+    // if ((window as any).Razorpay) return resolve(true);
+    // const script = document.createElement("script");
+    // script.id = "razorpay-script";
+    // script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    // script.onload = () => resolve(true);
+    // script.onerror = () => resolve(false);
+    // document.body.appendChild(script);
+  // });
+// }
 
 export default function PremiumPage() {
-  const [loading, setLoading] = useState(false);
+  const [loading /* , setLoading */] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState<any>(null);
+  const [success /* , setSuccess */] = useState<any>(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   // ─── Subscription / pricing state ────────────────────────────────────────────
@@ -99,7 +99,7 @@ export default function PremiumPage() {
   const gst = +(basePrice * 0.18).toFixed(2);
   const total = +(basePrice + gst).toFixed(2);
 
-  const getUser = () => JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+  // const getUser = () => JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
 
   // ─── Purchase flow — same pattern as CartPage ────────────────────────────────
   const handlePurchase = async () => {
@@ -110,108 +110,110 @@ export default function PremiumPage() {
       return;
     }
 
-    setLoading(true);
-    try {
-      const sdkLoaded = await loadRazorpay();
-      if (!sdkLoaded) throw new Error("Could not load Razorpay. Check your connection.");
+    // setLoading(true);
+    // try {
+      // const sdkLoaded = await loadRazorpay();
+      // if (!sdkLoaded) throw new Error("Could not load Razorpay. Check your connection.");
 
-      const user = getUser();
-      const buyerName  = user?.name || user?.fullName || "";
-      const buyerEmail = user?.email || "";
-      const buyerPhone = user?.phone || user?.mobile || "";
+      // const user = getUser();
+      // const buyerName  = user?.name || user?.fullName || "";
+      // const buyerEmail = user?.email || "";
+      // const buyerPhone = user?.phone || user?.mobile || "";
 
-      // ── STEP 1: Create order on backend ────────────────────────────────────
-      // ── When your backend order-create API is ready, replace this block ───
-      // const orderRes = await fetch(`${API_URL}/api/payments/orders`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //   },
-      //   body: JSON.stringify({
-      //     subscriptionId: subscriptionDef.subscriptionDefinitionPkId,
-      //     amount: total,
-      //     currency: "INR",
-      //     notes: `Premium membership - ${subscriptionDef.subscriptionName}`,
-      //   }),
-      // });
-      // const order = await orderRes.json();
-      // const razorpayOrderId = order.razorpayOrderId;
-      // ────────────────────────────────────────────────────────────────────────
+      // // ── STEP 1: Create order on backend ────────────────────────────────────
+      // // ── When your backend order-create API is ready, replace this block ───
+      // // const orderRes = await fetch(`${API_URL}/api/payments/orders`, {
+      // //   method: "POST",
+      // //   headers: {
+      // //     "Content-Type": "application/json",
+      // //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      // //   },
+      // //   body: JSON.stringify({
+      // //     subscriptionId: subscriptionDef.subscriptionDefinitionPkId,
+      // //     amount: total,
+      // //     currency: "INR",
+      // //     notes: `Premium membership - ${subscriptionDef.subscriptionName}`,
+      // //   }),
+      // // });
+      // // const order = await orderRes.json();
+      // // const razorpayOrderId = order.razorpayOrderId;
+      // // ────────────────────────────────────────────────────────────────────────
 
-      // TEMPORARY: until backend order-create API is ready
-      const razorpayOrderId: string | null = null;
-      const localOrderId = `PREM-${Date.now()}`;
+      // // TEMPORARY: until backend order-create API is ready
+      // const razorpayOrderId: string | null = null;
+      // const localOrderId = `PREM-${Date.now()}`;
 
-      // ── STEP 2: Open Razorpay checkout ──────────────────────────────────────
-      const options = {
-        key: RAZORPAY_KEY,
-        amount: Math.round(total * 100), // paise
-        currency: "INR",
-        name: "Bandookwale Premium",
-        description: subscriptionDef.subscriptionName || "Premium Membership",
-        order_id: razorpayOrderId, // null until backend ready
-        prefill: { name: buyerName, email: buyerEmail, contact: buyerPhone },
-        notes: {
-          subscriptionCode: subscriptionDef.subscriptionCode,
-          subscriptionId:   subscriptionDef.subscriptionDefinitionPkId,
-        },
-        theme: { color: "#B45309" },
+      // // ── STEP 2: Open Razorpay checkout ──────────────────────────────────────
+      // const options = {
+        // key: RAZORPAY_KEY,
+        // amount: Math.round(total * 100), // paise
+        // currency: "INR",
+        // name: "Bandookwale Premium",
+        // description: subscriptionDef.subscriptionName || "Premium Membership",
+        // order_id: razorpayOrderId, // null until backend ready
+        // prefill: { name: buyerName, email: buyerEmail, contact: buyerPhone },
+        // notes: {
+          // subscriptionCode: subscriptionDef.subscriptionCode,
+          // subscriptionId:   subscriptionDef.subscriptionDefinitionPkId,
+        // },
+        // theme: { color: "#B45309" },
 
-        // ── PAYMENT SUCCESS ────────────────────────────────────────────────────
-        handler: async (razorpayResponse: any) => {
-          console.log("Premium payment success:", razorpayResponse);
+        // // ── PAYMENT SUCCESS ────────────────────────────────────────────────────
+        // handler: async (razorpayResponse: any) => {
+          // console.log("Premium payment success:", razorpayResponse);
 
-          // ── STEP 3: Verify payment on backend ──────────────────────────────
-          // ── When your backend verify API is ready, replace this block ─────
-          // const verifyRes = await fetch(`${API_URL}/api/payments/verify`, {
-          //   method: "POST",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-          //   },
-          //   body: JSON.stringify({
-          //     razorpayOrderId: razorpayResponse.razorpay_order_id,
-          //     razorpayPaymentId: razorpayResponse.razorpay_payment_id,
-          //     razorpaySignature: razorpayResponse.razorpay_signature,
-          //     subscriptionId: subscriptionDef.subscriptionDefinitionPkId,
-          //   }),
+          // // ── STEP 3: Verify payment on backend ──────────────────────────────
+          // // ── When your backend verify API is ready, replace this block ─────
+          // // const verifyRes = await fetch(`${API_URL}/api/payments/verify`, {
+          // //   method: "POST",
+          // //   headers: {
+          // //     "Content-Type": "application/json",
+          // //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+          // //   },
+          // //   body: JSON.stringify({
+          // //     razorpayOrderId: razorpayResponse.razorpay_order_id,
+          // //     razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+          // //     razorpaySignature: razorpayResponse.razorpay_signature,
+          // //     subscriptionId: subscriptionDef.subscriptionDefinitionPkId,
+          // //   }),
+          // // });
+          // // const result = await verifyRes.json();
+          // // ────────────────────────────────────────────────────────────────────
+
+          // setSuccess({
+            // paymentId: razorpayResponse.razorpay_payment_id,
+            // plan: subscriptionDef.subscriptionName,
+            // amount: total,
           // });
-          // const result = await verifyRes.json();
-          // ────────────────────────────────────────────────────────────────────
+          // setLoading(false);
+        // },
 
-          setSuccess({
-            paymentId: razorpayResponse.razorpay_payment_id,
-            plan: subscriptionDef.subscriptionName,
-            amount: total,
-          });
-          setLoading(false);
-        },
+        // // ── MODAL DISMISSED ─────────────────────────────────────────────────────
+        // modal: {
+          // ondismiss: () => {
+            // console.log("Premium payment modal dismissed by user");
+            // setLoading(false);
+          // },
+        // },
+      // };
 
-        // ── MODAL DISMISSED ─────────────────────────────────────────────────────
-        modal: {
-          ondismiss: () => {
-            console.log("Premium payment modal dismissed by user");
-            setLoading(false);
-          },
-        },
-      };
+      // const razorpay = new window.Razorpay(options);
 
-      const razorpay = new window.Razorpay(options);
+      // // ── PAYMENT FAILED ───────────────────────────────────────────────────────
+      // razorpay.on("payment.failed", (response: any) => {
+        // console.error("Premium payment failed:", response.error);
+        // setError(`Payment failed: ${response.error.description}`);
+        // setLoading(false);
+      // });
 
-      // ── PAYMENT FAILED ───────────────────────────────────────────────────────
-      razorpay.on("payment.failed", (response: any) => {
-        console.error("Premium payment failed:", response.error);
-        setError(`Payment failed: ${response.error.description}`);
-        setLoading(false);
-      });
+      // razorpay.open();
 
-      razorpay.open();
-
-    } catch (e: any) {
-      setError(e.message || "Something went wrong. Please try again.");
-      setLoading(false);
-    }
+    // } catch (e: any) {
+      // setError(e.message || "Something went wrong. Please try again.");
+      // setLoading(false);
+    // }
+    // Razorpay disabled — no online payment gateway for premium right now
+    setError("Online payment is currently unavailable. Please contact support to upgrade.");
   };
 
   if (success) return <SuccessScreen success={success} />;
@@ -318,7 +320,7 @@ export default function PremiumPage() {
                     ₹{basePrice.toLocaleString()}
                   </div>
                   <div style={styles.planBtnNote}>
-                    One-time payment via Razorpay
+                    One-time payment{/* via Razorpay */}
                   </div>
                 </div>
               )}
@@ -367,7 +369,7 @@ export default function PremiumPage() {
                 ) : (
                   <>
                     <span>🔒</span>
-                    <span>Pay ₹{total.toFixed(2)} with Razorpay</span>
+                    <span>Pay ₹{total.toFixed(2)}{/* with Razorpay */}</span>
                   </>
                 )}
               </button>
@@ -386,10 +388,10 @@ export default function PremiumPage() {
                 ))}
               </div>
 
-              <p style={styles.razorpayNote}>
+              {/* <p style={styles.razorpayNote}>
                 Payments processed securely by{" "}
                 <strong style={{ color: "#92400E" }}>Razorpay</strong>
-              </p>
+              </p> */}
             </div>
 
             <div style={styles.guaranteeBox}>
@@ -451,11 +453,11 @@ function SuccessScreen({ success }: { success: any }) {
           <div style={{ fontFamily: "monospace", fontSize: 13, marginTop: 4, wordBreak: "break-all" }}>{success.paymentId}</div>
         </div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          <button style={styles.payBtn} onClick={() => window.location.href = "/bandookwale"}>
+          <button style={styles.payBtn} onClick={() => window.location.href = "/"}>
             Go to Dashboard →
           </button>
           <button style={{ ...styles.payBtn, background: "transparent", border: "1.5px solid #B45309", color: "#B45309" }}
-            onClick={() => window.location.href = "/bandookwale/profile"}>
+            onClick={() => window.location.href = "/profile"}>
             View Membership
           </button>
         </div>

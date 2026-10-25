@@ -15,12 +15,12 @@ export default function AdminRoute() {
 
   // Redirect to sign-in if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/bandookwale/signin" replace />;
+    return <Navigate to="/signin" replace />;
   }
 
   // Redirect to dashboard if not admin
   if (!isAdmin) {
-    return <Navigate to="/bandookwale/" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, useLocation } from "react-router";
+import { Routes, Route, Navigate, useLocation } from "react-router";
 import AppHeader from "./layout/AppHeader";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 
@@ -56,7 +56,6 @@ const OrderDetailPage = lazy(() => import("./pages/Orderdetailpage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const AdminSellerStorePage = lazy(() => import("./pages/AdminSellerStorePage"));
 const AdminSellProductPage = lazy(() => import("./pages/AdminSellProductPage"));
-import { WishlistProvider } from "./pages/Wishlistcontext";
 const PremiumPage = lazy(() => import("./pages/Premiumpage"));
 const TrackOrderPage = lazy(() => import("./pages/Trackorderpage"));
 // Manual payments (bank transfer / UPI + receipt)
@@ -67,6 +66,12 @@ const AdminShipments = lazy(() => import("./pages/Admin/AdminShipments"));
 
 
 // Shown while a page's code downloads (pages load on demand to keep the first visit fast)
+function LegacyPrefixRedirect() {
+  const { pathname, search, hash } = useLocation();
+  const target = pathname.replace(/^\/bandookwale/, "") || "/";
+  return <Navigate to={target + search + hash} replace />;
+}
+
 function PageLoader() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -80,8 +85,8 @@ export default function AppRoutes() {
 
   // Hide header for auth pages
   const hideHeaderRoutes = [
-    "/bandookwale/signin",
-    "/bandookwale/signup",
+    "/signin",
+    "/signup",
   ];
 
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
@@ -100,32 +105,31 @@ export default function AppRoutes() {
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<Home />} />
 
-        <Route path="/bandookwale/signin" element={<SignIn />} />
-        <Route path="/bandookwale/signup" element={<SignUp />} />
-        <Route path="wishlistPage" element={
-          <WishlistProvider>
-            <WishlistPage />
-          </WishlistProvider>
-        } />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+
+        {/* Old links/bookmarks used a /bandookwale prefix — send them to the root-based URL */}
+        <Route path="/bandookwale/*" element={<LegacyPrefixRedirect />} />
 
         {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/bandookwale/" element={<AppLayout />}>
+          <Route element={<AppLayout />}>
             // Own store
-            <Route path="/bandookwale/store" element={<SellerStorePage />} />
+            <Route path="/store" element={<SellerStorePage />} />
             // Any seller's store (from ProductDetailsPage "View Store" button)
-            <Route path="/bandookwale/store/:sellerId" element={<SellerStorePage />} />
-            <Route path="/bandookwale/track" element={<TrackOrderPage />} />
-            <Route index element={<ConditionalHome />} />
+            <Route path="/store/:sellerId" element={<SellerStorePage />} />
+            <Route path="/track" element={<TrackOrderPage />} />
+            {/* Post-login landing: sends admins to /admin, everyone else to /dashboard */}
+            <Route path="/home" element={<ConditionalHome />} />
             <Route path="dashboard" element={<Home />} />
-            <Route path="/bandookwale/store" element={<SellerStorePage />} />
-            <Route path="/bandookwale/cart" element={<CartPage />} />
-            <Route path="/bandookwale/cart" element={<CartPage />} />
-            <Route path="/bandookwale/orders" element={<MyOrdersPage />} />
-            <Route path="/bandookwale/premiumPage" element={<PremiumPage />} />
-            <Route path="/bandookwale/orders/:orderId" element={<OrderDetailPage />} />
-            <Route path="/bandookwale/payments" element={<MyPaymentsPage />} />
-            <Route path="/bandookwale/chat" element={<ChatPage />} />
+            <Route path="/store" element={<SellerStorePage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/orders" element={<MyOrdersPage />} />
+            <Route path="/premiumPage" element={<PremiumPage />} />
+            <Route path="/orders/:orderId" element={<OrderDetailPage />} />
+            <Route path="/payments" element={<MyPaymentsPage />} />
+            <Route path="/chat" element={<ChatPage />} />
             {/* USER FEATURES */}
             <Route path="profile" element={<UserProfiles />} />
             <Route path="productdetails" element={<ProductDetailsPage />} />
@@ -167,7 +171,7 @@ export default function AppRoutes() {
 
         {/* ADMIN ROUTES (STRICT ADMIN ONLY) */}
         <Route element={<AdminRoute />}>
-          <Route path="/bandookwale/admin" element={<AppLayout />}>
+          <Route path="/admin" element={<AppLayout />}>
             <Route path="store" element={<AdminSellerStorePage />} />
             <Route path="sellProductPage" element={<AdminSellProductPage />} />
             <Route index element={<AdminDashboard />} />
