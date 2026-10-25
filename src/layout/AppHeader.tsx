@@ -8,7 +8,8 @@ import { useAuth } from "../context/AuthContext";
 import { DropdownItem } from "../components/ui/dropdown/DropdownItem";
 import SupportSidebar from "../components/ui/support/SupportSidebar";
 import Header from "../pages/Header";
-import realLogo from "../components/images/RealLogo.jpeg";
+// import realLogo from "../components/images/RealLogo.jpeg";
+import realLogo from "../components/images/RealLogo2.jpg";
 import { AdminDesktopNav, AdminMobileNav } from "./AdminNav";
 import { useNavigate } from "react-router-dom";
 
@@ -72,7 +73,9 @@ const AppHeader: React.FC = () => {
                            transition-all duration-300 hover:scale-105 hover:shadow-[0_0_28px_rgba(234,179,8,0.6)]
                            focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70"
               >
-                <span className="block w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-white ring-2 ring-black/60">
+                {/* soft pulsing glow behind the logo */}
+                <span className="absolute inset-0 rounded-full bg-amber-400/40 blur-md animate-pulse" />
+                <span className="relative block w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-white ring-2 ring-black/60">
                   <img
                     src={realLogo}
                     alt="Bandookwale logo"
