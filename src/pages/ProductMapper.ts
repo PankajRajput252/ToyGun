@@ -13,6 +13,7 @@ export function mapApiToProduct(p: any): Product {
         : ["https://via.placeholder.com/300"],
 
     isStoreProduct: p.isStoreProduct,
+    productQuantity: p.productQuantity,
     isNegotiable: p.negotiable,
     description: p.notesGlinBigTxt,
     sellerId: p.userFkId,

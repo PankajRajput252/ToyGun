@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useWishlist } from "./Wishlistcontext";
 import { addRecentlyViewed } from "./recentlyViewed";
-import { productUrl } from "./productUtils";
+import { productUrl, isOutOfStock, stockLeftLabel } from "./productUtils";
 import { useToast } from "../context/ToastContext";
 import PLACEHOLDER_IMAGE from "../components/images/BandookwaleLogo.jpeg";
 
@@ -30,6 +30,8 @@ export interface Product {
   brand?: string;
   isNegotiable?: boolean;
   isStoreProduct?: boolean;
+  /** null/0 = out of stock; undefined = not sent by the API (treated as available) */
+  productQuantity?: number | null;
   categoryId?: number;
   subcategoryId?: number;
   city?: string;
@@ -60,6 +62,8 @@ export default function ProductCard({ item, onDeleted }: Props) {
 
   const images = item.images?.length ? item.images : [PLACEHOLDER_IMAGE];
   const isNew = !!item.createdAt && Date.now() - new Date(item.createdAt).getTime() < ONE_DAY_MS;
+  const outOfStock = isOutOfStock(item);
+  const stockLeft = stockLeftLabel(item);
 
   const openDetails = () => {
     addRecentlyViewed(item);
@@ -173,7 +177,7 @@ export default function ProductCard({ item, onDeleted }: Props) {
             src={images[index]}
             alt={item.title}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${outOfStock ? "grayscale opacity-60" : ""}`}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_IMAGE;
             }}
@@ -181,6 +185,14 @@ export default function ProductCard({ item, onDeleted }: Props) {
 
           {/* Bottom fade so badges and dots stay readable on bright photos */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
+
+          {outOfStock && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <span className="px-3 py-1.5 rounded-md bg-black/75 text-white text-xs sm:text-sm font-bold uppercase tracking-wide shadow-lg">
+                Out of stock
+              </span>
+            </div>
+          )}
 
           {/* Store / Listing / New / Negotiable badges */}
           <div className="absolute top-2.5 left-2.5 flex flex-col items-start gap-1">
@@ -285,6 +297,9 @@ export default function ProductCard({ item, onDeleted }: Props) {
           <p className="text-sm font-medium line-clamp-2 min-h-[2.5rem] text-gray-800 dark:text-gray-200">
             {item.title}
           </p>
+          {stockLeft && (
+            <p className="text-[11px] font-medium text-green-600 dark:text-green-400">{stockLeft}</p>
+          )}
 
           <div className="flex justify-between gap-2 text-[11px] mt-auto pt-1 text-gray-500">
             <span className="flex items-center gap-1 min-w-0">
@@ -303,6 +318,15 @@ export default function ProductCard({ item, onDeleted }: Props) {
                          hover:bg-gold-500 hover:text-white"
             >
               <Pencil className="w-3.5 h-3.5" /> Edit item
+            </button>
+          ) : outOfStock ? (
+            <button
+              disabled
+              onClick={(e) => e.stopPropagation()}
+              className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold
+                         whitespace-nowrap border border-gray-600 text-gray-500 cursor-not-allowed"
+            >
+              Out of stock
             </button>
           ) : (
             <button

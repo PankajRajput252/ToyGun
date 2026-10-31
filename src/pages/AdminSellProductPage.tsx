@@ -11,6 +11,7 @@ type ProductForm = {
     subcategoryId: string;
     price: string;
     isNegotiable: boolean;
+    quantity: string;
     isStoreProduct: boolean;
     location: string;
     city: string;
@@ -57,6 +58,7 @@ export default function AdminSellProductPage() {
         subcategoryId: "",
         price: "",
         isNegotiable: false,
+        quantity: "1",
         isStoreProduct: true,
         location: "",
         city: "",
@@ -82,6 +84,7 @@ export default function AdminSellProductPage() {
             subcategoryId: existingProduct.subcategoryId?.toString() || "",
             price: existingProduct.price?.toString() || "",
             isNegotiable: existingProduct.isNegotiable || false,
+            quantity: existingProduct.productQuantity?.toString() || "1",
             isStoreProduct: true,
             location: existingProduct.location || "",
             city: existingProduct.city || "",
@@ -194,6 +197,10 @@ export default function AdminSellProductPage() {
             );
             return;
         }
+        if (!/^[1-9]\d*$/.test(form.quantity)) {
+            showPopup("Invalid Quantity", "Product quantity must be a whole number of at least 1.");
+            return;
+        }
         if (isUploadingImage) {
             showPopup(
                 "Images Uploading",
@@ -220,6 +227,7 @@ export default function AdminSellProductPage() {
             subcategoryId: form.subcategoryId ? Number(form.subcategoryId) : null,
             price: Number(form.price),
             isNegotiable: false,
+            productQuantity: Number(form.quantity),
             isStoreProduct: true,
             sellerId: userNodeId,
             location: form.location,
@@ -607,6 +615,23 @@ export default function AdminSellProductPage() {
                             onChange={handleChange}
                             className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         />
+
+                        {/* Quantity */}
+                        <div>
+                            <label htmlFor="quantity" className="font-medium block mb-1">Product Quantity *</label>
+                            <input
+                                id="quantity"
+                                type="number"
+                                name="quantity"
+                                min={1}
+                                step={1}
+                                inputMode="numeric"
+                                placeholder="Number of items available"
+                                value={form.quantity}
+                                onChange={handleChange}
+                                className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            />
+                        </div>
 
                         {/* IMAGE UPLOAD */}
                         <div className="space-y-3">

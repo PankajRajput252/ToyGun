@@ -12,7 +12,7 @@ import { useToast } from "../context/ToastContext";
 import ProductCard, { type Product, PLACEHOLDER_IMAGE } from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { addRecentlyViewed } from "./recentlyViewed";
-import { mapProduct, fetchProductsByCategory, fetchProductById, productUrl } from "./productUtils";
+import { mapProduct, fetchProductsByCategory, fetchProductById, productUrl, isOutOfStock, stockLeftLabel } from "./productUtils";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 interface Review {
@@ -300,6 +300,8 @@ function ProductDetails({ item }: { item: Product }) {
   const images: string[] = item.images?.length > 0 ? item.images : [PLACEHOLDER_IMAGE];
   const isStoreProduct = item.isStoreProduct === true;
   const isOwner = !!user?.nodeId && user.nodeId === item.sellerId;
+  const outOfStock = isOutOfStock(item);
+  const stockLeft = stockLeftLabel(item);
   const cartId = item.id?.toString() || `${item.title}-${item.location}`;
   const alreadyInCart = cartItems.some((c) => c.id === cartId);
   const favorited = item.id != null ? isFavorited(item.id) : false;
@@ -345,6 +347,7 @@ function ProductDetails({ item }: { item: Product }) {
 
   // ── Actions ────────────────────────────────────────────────────────────
   const handleAddToCart = () => {
+    if (outOfStock) return showToast("This product is out of stock", "error");
     addToCart({
       id: cartId,
       title: item.title,
@@ -358,6 +361,8 @@ function ProductDetails({ item }: { item: Product }) {
   };
 
   const handleChat = (initialMessage?: string) => {
+    // The owner can still open their own chats; buyers can't start one on an out-of-stock item
+    if (outOfStock && !isOwner) return showToast("This product is out of stock", "error");
     navigate("/chat", {
       state: {
         productId: item.id?.toString(),
@@ -594,13 +599,24 @@ function ProductDetails({ item }: { item: Product }) {
             </div>
 
             <h1 className="text-base sm:text-lg font-medium mt-2 break-words">{item.title}</h1>
+            {stockLeft && (
+              <p className="mt-1 text-sm font-semibold text-green-600 dark:text-green-400">In stock · {stockLeft}</p>
+            )}
             <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm text-gray-500 mt-3">
               <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{item.location || "India"}</span>
               <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{item.date}</span>
             </div>
 
+            {/* Out of stock — replaces buy / chat actions for buyers */}
+            {outOfStock && !isOwner && (
+              <div className="mt-5 w-full py-3 rounded-xl font-semibold text-center border-2 border-gray-300 dark:border-gray-700 text-gray-500 bg-gray-100 dark:bg-gray-800/60">
+                Out of stock
+                <p className="mt-0.5 text-xs font-normal">This item is currently unavailable.</p>
+              </div>
+            )}
+
             {/* Store actions */}
-            {isStoreProduct && !isOwner && (
+            {isStoreProduct && !isOwner && !outOfStock && (
               <div className="mt-5 space-y-2">
                 <button
                   onClick={() => { if (!alreadyInCart) handleAddToCart(); navigate("/cart"); }}
@@ -623,7 +639,7 @@ function ProductDetails({ item }: { item: Product }) {
             )}
 
             {/* Marketplace actions */}
-            {!isStoreProduct && !isOwner && (
+            {!isStoreProduct && !isOwner && !outOfStock && (
               <div className="mt-5 space-y-2">
                 <button
                   onClick={() => handleChat()}
@@ -679,7 +695,7 @@ function ProductDetails({ item }: { item: Product }) {
                 >
                   <MessageCircle className="w-4 h-4" /> WhatsApp
                 </a>
-              ) : (
+              ) : (outOfStock && !isOwner) ? null : (
                 <button
                   onClick={() => handleChat()}
                   className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold bg-blue-600/15 text-blue-400 hover:bg-blue-600/25 transition"
@@ -722,7 +738,7 @@ function ProductDetails({ item }: { item: Product }) {
               >
                 <Store className="w-4 h-4" /> View store
               </button>
-            ) : !isOwner && (
+            ) : !isOwner && !outOfStock && (
               <button
                 onClick={() => handleChat()}
                 className="mt-4 w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-blue-600 text-blue-400 text-sm font-medium hover:bg-blue-600/10 transition"

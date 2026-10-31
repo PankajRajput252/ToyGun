@@ -40,8 +40,20 @@ export const mapProduct = (item: any): Product => ({
   brand: item.brand || "",
   isNegotiable: item.negotiable,
   isStoreProduct: item.isStoreProduct,
+  productQuantity: item.productQuantity,
   categoryId: item.categoryId,
 });
+
+// A product can't be bought or chatted about when its quantity is null or 0.
+// undefined means the API didn't send the field at all, so it isn't blocked.
+export const isOutOfStock = (p: Product): boolean =>
+  p.productQuantity === null || (p.productQuantity !== undefined && p.productQuantity <= 0);
+
+// "5 left" label for in-stock products; null when the quantity is unknown or out of stock.
+export const stockLeftLabel = (p: Product): string | null =>
+  typeof p.productQuantity === "number" && p.productQuantity > 0
+    ? `${p.productQuantity.toLocaleString("en-IN")} ${p.productQuantity === 1 ? "item" : "items"} left`
+    : null;
 
 // The getProduct endpoint wraps lists differently depending on filters.
 const extractList = (data: any): any[] =>

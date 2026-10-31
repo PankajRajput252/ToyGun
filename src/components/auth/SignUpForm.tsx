@@ -6,6 +6,8 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { useAuth } from "../../context/AuthContext";
 import { emailVerificationApi } from "../../services/api";
+import { Modal } from "../ui/modal";
+import TermsAndConditions from "./TermsAndConditions";
 
 // declare global { interface Window { Razorpay: any; } }
 
@@ -56,6 +58,20 @@ export default function SignUpForm() {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
   const [verifyLoading, setVerifyLoading] = useState(false);
+  // Terms preview — must be opened and read to the end before it can be accepted
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [hasReadTerms, setHasReadTerms] = useState(false);
+
+  const handleTermsScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 16) setHasReadTerms(true);
+  };
+
+  const handleTermsCheckbox = (checked: boolean) => {
+    // Accepting is only possible from the preview, after reading it
+    if (checked && !hasReadTerms) { setIsTermsOpen(true); return; }
+    setIsChecked(checked);
+  };
 
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -138,7 +154,7 @@ export default function SignUpForm() {
 
   // ─── Validate ─────────────────────────────────────────────────────────────────
   const validateForm = (): string | null => {
-    if (!isChecked) return "You must agree to the Terms and Conditions";
+    if (!isChecked) return "You must read and accept the Terms and Conditions";
     if (password !== confirmPassword) return "Passwords do not match";
     if (!name || !email || !password || !mobile || !country || !nationalId || !nationalIdType)
       return "Please fill in all required fields";
@@ -445,11 +461,15 @@ export default function SignUpForm() {
 
               {/* Terms */}
               <div className="flex items-start sm:items-center gap-3">
-                <Checkbox className="w-5 h-5" checked={isChecked} onChange={setIsChecked} />
+                <Checkbox className="w-5 h-5" checked={isChecked} onChange={handleTermsCheckbox} />
                 <p className="inline-block text-sm sm:text-base font-normal text-gray-500 dark:text-gray-400">
-                  By creating an account means you agree to the{" "}
-                  <span className="text-gray-800 dark:text-white/90">Terms and Conditions,</span>{" "}
+                  I have read and agree to the{" "}
+                  <button type="button" onClick={() => setIsTermsOpen(true)}
+                    className="font-medium text-brand-500 underline hover:text-brand-600 dark:text-brand-400">
+                    Terms and Conditions
+                  </button>{" "}
                   and our <span className="text-gray-800 dark:text-white">Privacy Policy</span>
+                  <span className="text-error-500">*</span>
                 </p>
               </div>
 
@@ -474,7 +494,7 @@ export default function SignUpForm() {
                   </div>
                 ) : (
                   <button type="submit"
-                    disabled={isLoading /* || isPaymentLoading */ || isFetchingCharge || !isEmailVerified}
+                    disabled={isLoading /* || isPaymentLoading */ || isFetchingCharge || !isEmailVerified || !isChecked}
                     className="flex items-center justify-center w-full px-4 py-3 text-sm
                                font-medium text-white transition rounded-lg bg-brand-500
                                shadow-theme-xs hover:bg-brand-600
@@ -483,6 +503,7 @@ export default function SignUpForm() {
                     {isLoading ? "Creating account..."
                       : isFetchingCharge ? "Loading..."
                       : !isEmailVerified ? "Verify Email to Sign Up"
+                      : !isChecked ? "Accept Terms to Sign Up"
                       // : subscriptionDef && subscriptionDef.subscriptionAmount > 0
                       // ? `Pay ₹${subscriptionDef.subscriptionAmount.toLocaleString()} & Sign Up`
                       : "Sign Up"}
@@ -492,6 +513,32 @@ export default function SignUpForm() {
 
             </div>
           </form>
+
+          {/* Terms preview */}
+          <Modal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} className="max-w-3xl p-5 sm:p-7">
+            <div onScroll={handleTermsScroll}
+              className="max-h-[65vh] overflow-y-auto pr-2 mt-8 sm:mt-6">
+              <TermsAndConditions />
+            </div>
+            <div className="flex flex-col-reverse gap-2 pt-4 mt-4 border-t border-gray-200 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-end">
+              {!hasReadTerms && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 sm:mr-auto">
+                  Scroll to the end to accept.
+                </p>
+              )}
+              <button type="button" onClick={() => { setIsChecked(false); setIsTermsOpen(false); }}
+                className="px-5 py-2.5 text-sm font-medium text-gray-700 rounded-lg border border-gray-300
+                           hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                Decline
+              </button>
+              <button type="button" disabled={!hasReadTerms}
+                onClick={() => { setIsChecked(true); setIsTermsOpen(false); }}
+                className="px-5 py-2.5 text-sm font-medium text-white rounded-lg bg-brand-500
+                           hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                I Agree
+              </button>
+            </div>
+          </Modal>
 
           <div className="mt-5">
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
