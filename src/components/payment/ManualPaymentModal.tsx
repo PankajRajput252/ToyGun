@@ -11,6 +11,7 @@ import {
   errorMessage,
   formatInr,
   paymentUserApi,
+  shopOrderApi,
   todayIso,
 } from "../../services/paymentApi";
 import PaymentMethodDetails from "./PaymentMethodDetails";
@@ -22,6 +23,8 @@ interface Props {
   amount?: number;
   /** Order id this payment is for, stored with the payment so admins can match it. */
   orderReference?: string;
+  /** Products in the order. If omitted, they are looked up from orderReference on submit. */
+  productIds?: number[];
   onSubmitted: (payment: PaymentSubmission) => void;
 }
 
@@ -32,7 +35,7 @@ const inputCls =
   "focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/30 " +
   "dark:border-gray-700 dark:bg-gray-900 dark:text-white";
 
-export default function ManualPaymentModal({ isOpen, onClose, amount, orderReference, onSubmitted }: Props) {
+export default function ManualPaymentModal({ isOpen, onClose, amount, orderReference, productIds, onSubmitted }: Props) {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [loadingMethods, setLoadingMethods] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -98,6 +101,11 @@ export default function ManualPaymentModal({ isOpen, onClose, amount, orderRefer
 
     setSubmitting(true);
     try {
+      const ids =
+        productIds ??
+        (orderReference
+          ? [...new Set((await shopOrderApi.get(orderReference)).items.map((i) => i.productId))]
+          : undefined);
       const payment = await paymentUserApi.submitPayment({
         paymentMethodId: selected.id,
         amount: amountNumber.toFixed(2),
@@ -105,6 +113,7 @@ export default function ManualPaymentModal({ isOpen, onClose, amount, orderRefer
         paymentDate,
         remarks,
         orderReference,
+        productIds: ids,
         receipt,
       });
       onSubmitted(payment);

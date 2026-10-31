@@ -71,6 +71,7 @@ export interface SubmitPaymentInput {
   paymentDate: string; // YYYY-MM-DD
   remarks?: string;
   orderReference?: string;
+  productIds?: number[];
   receipt: File;
 }
 
@@ -167,6 +168,8 @@ export const paymentUserApi = {
     form.append("paymentDate", input.paymentDate);
     if (input.remarks?.trim()) form.append("remarks", input.remarks.trim());
     if (input.orderReference) form.append("orderReference", input.orderReference);
+    // Repeated field → binds to List<Long> productIds on the backend
+    input.productIds?.forEach((id) => form.append("productIds", String(id)));
     form.append("receipt", input.receipt);
     // No Content-Type header: the browser sets multipart boundary itself.
     return getJson<PaymentSubmission>("/api/payments", { method: "POST", body: form });
@@ -221,10 +224,11 @@ export const paymentAdminApi = {
 
   getPayment: (id: number) => getJson<PaymentSubmission>(`/api/admin/payments/${id}`),
 
-  approve: (id: number) => sendJson<PaymentSubmission>("PUT", `/api/admin/payments/${id}/approve`),
+  approve: (id: number, productIds: number[] = []) =>
+    sendJson<PaymentSubmission>("PUT", `/api/admin/payments/${id}/approve`, { productIds }),
 
-  reject: (id: number, reason: string) =>
-    sendJson<PaymentSubmission>("PUT", `/api/admin/payments/${id}/reject`, { reason: reason.trim() }),
+  reject: (id: number, reason: string, productIds: number[] = []) =>
+    sendJson<PaymentSubmission>("PUT", `/api/admin/payments/${id}/reject`, { reason: reason.trim(), productIds }),
 };
 
 // ─── Shop orders (checkout address + items, Shiprocket status) ───────────────

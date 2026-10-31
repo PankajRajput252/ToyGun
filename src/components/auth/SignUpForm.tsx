@@ -5,6 +5,7 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { useAuth } from "../../context/AuthContext";
+import { emailVerificationApi } from "../../services/api";
 
 // declare global { interface Window { Razorpay: any; } }
 
@@ -49,6 +50,12 @@ export default function SignUpForm() {
   // const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [subscriptionDef, setSubscriptionDef] = useState<SubscriptionDefinition | null>(null);
   const [isFetchingCharge, setIsFetchingCharge] = useState(false);
+  // Email OTP verification
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
 
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -78,12 +85,64 @@ export default function SignUpForm() {
     fetchCharge();
   }, []);
 
+  // ─── Email OTP ────────────────────────────────────────────────────────────────
+  // No userNodeId exists before registration, so the email is used as the key
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    // Any change to the email invalidates a previous OTP / verification
+    setIsOtpSent(false);
+    setIsEmailVerified(false);
+    setOtp("");
+  };
+
+  const handleSendOtp = async () => {
+    setError(""); setSuccess("");
+    const trimmedEmail = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await emailVerificationApi.sendOtp(trimmedEmail, trimmedEmail);
+      setIsOtpSent(true);
+      setIsEmailVerified(false);
+      setOtp("");
+      setSuccess("OTP sent to your email. Please enter it to verify.");
+    } catch (err) {
+      setError("Failed to send OTP. Please try again.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setError(""); setSuccess("");
+    if (!otp.trim()) { setError("Please enter the OTP"); return; }
+    setVerifyLoading(true);
+    try {
+      const issuedOtp = await emailVerificationApi.getOtpForVerification(email.trim());
+      if (issuedOtp && issuedOtp === otp.trim()) {
+        setIsEmailVerified(true);
+        setSuccess("Email verified successfully.");
+      } else {
+        setIsEmailVerified(false);
+        setError("Invalid OTP. Please try again.");
+      }
+    } catch (err) {
+      setError("Failed to verify OTP. Please try again.");
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
+
   // ─── Validate ─────────────────────────────────────────────────────────────────
   const validateForm = (): string | null => {
     if (!isChecked) return "You must agree to the Terms and Conditions";
     if (password !== confirmPassword) return "Passwords do not match";
     if (!name || !email || !password || !mobile || !country || !nationalId || !nationalIdType)
       return "Please fill in all required fields";
+    if (!isEmailVerified) return "Please verify your email before registering";
     return null;
   };
 
@@ -278,18 +337,54 @@ export default function SignUpForm() {
                 </div>
               </div>
 
-              {/* Mobile + Email */}
+              {/* Mobile */}
+              <div>
+                <Label>Mobile<span className="text-error-500">*</span></Label>
+                <Input type="tel" id="mobile" name="mobile" placeholder="Enter Your Mobile"
+                  value={mobile} onChange={(e) => setMobile(e.target.value)} />
+              </div>
+
+              {/* Email + OTP verification */}
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                  <Label>Mobile<span className="text-error-500">*</span></Label>
-                  <Input type="tel" id="mobile" name="mobile" placeholder="Enter Your Mobile"
-                    value={mobile} onChange={(e) => setMobile(e.target.value)} />
+                  <Label>
+                    Email<span className="text-error-500">*</span>
+                    {isEmailVerified && (
+                      <span className="ml-2 text-xs font-medium text-green-600 dark:text-green-400">✓ Verified</span>
+                    )}
+                  </Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Input type="email" id="email" name="email" placeholder="Enter Your Email"
+                        value={email} onChange={(e) => handleEmailChange(e.target.value)} />
+                    </div>
+                    <button type="button" onClick={handleSendOtp}
+                      disabled={otpLoading || isEmailVerified || !email}
+                      className="px-4 text-sm font-medium text-white transition rounded-lg bg-brand-500
+                                 hover:bg-brand-600 whitespace-nowrap
+                                 disabled:opacity-50 disabled:cursor-not-allowed">
+                      {otpLoading ? "Sending..." : isOtpSent ? "Resend OTP" : "Send OTP"}
+                    </button>
+                  </div>
                 </div>
-                <div>
-                  <Label>Email<span className="text-error-500">*</span></Label>
-                  <Input type="email" id="email" name="email" placeholder="Enter Your Email"
-                    value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
+                {isOtpSent && !isEmailVerified && (
+                  <div>
+                    <Label>Email OTP<span className="text-error-500">*</span></Label>
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <Input type="text" id="otp" name="otp" placeholder="Enter OTP"
+                          value={otp} onChange={(e) => setOtp(e.target.value)} />
+                      </div>
+                      <button type="button" onClick={handleVerifyOtp}
+                        disabled={verifyLoading || !otp}
+                        className="px-4 text-sm font-medium text-white transition rounded-lg bg-green-500
+                                   hover:bg-green-600 whitespace-nowrap
+                                   disabled:opacity-50 disabled:cursor-not-allowed">
+                        {verifyLoading ? "Verifying..." : "Verify"}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Password + Confirm */}
@@ -369,7 +464,7 @@ export default function SignUpForm() {
                       Continue to Sign In
                     </button>
                     <button type="button"
-                      onClick={() => { setSuccess(""); setGeneratedUsername(""); setError(""); }}
+                      onClick={() => { setSuccess(""); setGeneratedUsername(""); setError(""); handleEmailChange(""); }}
                       className="flex items-center justify-center w-full px-4 py-3 text-sm
                                  font-medium text-gray-700 transition rounded-lg bg-gray-100
                                  shadow-theme-xs hover:bg-gray-200 dark:bg-gray-700
@@ -379,7 +474,7 @@ export default function SignUpForm() {
                   </div>
                 ) : (
                   <button type="submit"
-                    disabled={isLoading /* || isPaymentLoading */ || isFetchingCharge}
+                    disabled={isLoading /* || isPaymentLoading */ || isFetchingCharge || !isEmailVerified}
                     className="flex items-center justify-center w-full px-4 py-3 text-sm
                                font-medium text-white transition rounded-lg bg-brand-500
                                shadow-theme-xs hover:bg-brand-600
@@ -387,6 +482,7 @@ export default function SignUpForm() {
                     {/* isPaymentLoading ? "Opening Payment..." : */}
                     {isLoading ? "Creating account..."
                       : isFetchingCharge ? "Loading..."
+                      : !isEmailVerified ? "Verify Email to Sign Up"
                       // : subscriptionDef && subscriptionDef.subscriptionAmount > 0
                       // ? `Pay ₹${subscriptionDef.subscriptionAmount.toLocaleString()} & Sign Up`
                       : "Sign Up"}

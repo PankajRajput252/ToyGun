@@ -58,9 +58,19 @@ export function AuthImage({ path, alt, className }: { path: string; alt: string;
   return <img src={url} alt={alt} className={className} />;
 }
 
+/** Appends query parameters to a path that may already contain a query string. */
+function withQuery(path: string, params: Record<string, string | number | undefined>): string {
+  const query = Object.entries(params)
+    .filter(([, v]) => v !== undefined && v !== null && v !== "")
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+    .join("&");
+  if (!query) return path;
+  return `${path}${path.includes("?") ? "&" : "?"}${query}`;
+}
+
 /** Shows a receipt inline: images as <img>, PDFs in an <iframe>, with an "open in new tab" link. */
-export function ReceiptPreview({ path, fileName }: { path: string; fileName?: string }) {
-  const { url, type, loading, error } = useAuthFile(path);
+export function ReceiptPreview({ path, fileName, productIds }: { path: string; fileName?: string; productIds?: number[] }) {
+  const { url, type, loading, error } = useAuthFile(withQuery(path, { productIds: productIds?.join(",") }));
 
   if (loading) {
     return (

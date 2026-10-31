@@ -490,6 +490,7 @@ export default function CartPage() {
                 onClose={() => setManualOpen(false)}
                 amount={checkoutOrder?.subtotal}
                 orderReference={checkoutOrder?.orderReference}
+                productIds={checkoutOrder ? [...new Set(checkoutOrder.items.map((i) => i.productId))] : undefined}
                 onSubmitted={handleManualSubmitted}
               />
             </div>

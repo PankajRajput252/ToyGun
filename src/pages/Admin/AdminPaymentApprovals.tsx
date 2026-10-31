@@ -10,6 +10,7 @@ import {
   PaymentApiError,
   PaymentStatus,
   PaymentSubmission,
+  adminShopOrderApi,
   errorMessage,
   formatDateTime,
   formatInr,
@@ -225,13 +226,31 @@ function ReviewModal({
   const [error, setError] = useState<string | null>(null);
   const isPending = payment.status === "PENDING";
   const reasonLen = reason.trim().length;
+  // Products the payment was made for — taken from the linked order and sent with the receipt request
+  const [productIds, setProductIds] = useState<number[]>([]);
+  const [productLoading, setProductLoading] = useState(!!payment.orderReference);
+
+  useEffect(() => {
+    if (!payment.orderReference) return;
+    let cancelled = false;
+    adminShopOrderApi
+      .get(payment.orderReference)
+      .then((order) => !cancelled && setProductIds([...new Set(order.items.map((i) => i.productId))]))
+      .catch(() => {}) // receipt still loads without productIds
+      .finally(() => !cancelled && setProductLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [payment.orderReference]);
 
   const act = async (action: "approve" | "reject") => {
     setBusy(action);
     setError(null);
     try {
       const updated =
-        action === "approve" ? await paymentAdminApi.approve(payment.id) : await paymentAdminApi.reject(payment.id, reason);
+        action === "approve"
+          ? await paymentAdminApi.approve(payment.id, productIds)
+          : await paymentAdminApi.reject(payment.id, reason, productIds);
       onReviewed(updated);
     } catch (err) {
       if (err instanceof PaymentApiError && err.status === 409) return onStale();
@@ -265,7 +284,13 @@ function ReviewModal({
             <Item label="Rejection reason" value={<span className="text-red-600">{payment.rejectionReason}</span>} wide />
           )}
         </dl>
-        <ReceiptPreview path={payment.receiptUrl} fileName={payment.receiptFileName} />
+        {productLoading ? (
+          <div className="flex h-64 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <ReceiptPreview path={payment.receiptUrl} fileName={payment.receiptFileName} productIds={productIds} />
+        )}
       </div>
 
       {payment.orderReference && (
@@ -332,7 +357,7 @@ function ReviewModal({
             </button>
             <button
               onClick={() => act("approve")}
-              disabled={!!busy}
+              disabled={!!busy || productLoading}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
             >
               {busy === "approve" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -343,7 +368,7 @@ function ReviewModal({
         {isPending && mode === "reject" && (
           <button
             onClick={() => act("reject")}
-            disabled={!!busy || reasonLen < MIN_REASON}
+            disabled={!!busy || productLoading || reasonLen < MIN_REASON}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
           >
             {busy === "reject" && <Loader2 className="h-4 w-4 animate-spin" />}
