@@ -507,11 +507,11 @@ export const walletDataApi = {
 export const emailVerificationApi = {
   // Send OTP to the given email (no auth token — user is not registered yet)
   sendOtp: (email: string, userNodeId: string): Promise<any> =>
-    apiCall<any>(`/api/users/sendEmailOtp?email=${encodeURIComponent(email)}&userNodeId=${encodeURIComponent(userNodeId)}`, 'POST', undefined, false).then(response => response.data?.[0] || response),
+    apiCall<any>(`/api/v1/auth/sendEmailOtp?email=${encodeURIComponent(email)}&userNodeId=${encodeURIComponent(userNodeId)}`, 'POST', undefined, false).then(response => response.data?.[0] || response),
 
   // Fetch the OTP issued for the given userNodeId (no auth token)
   getOtpForVerification: (userNodeId: string): Promise<string> =>
-    apiCall<any>(`/api/users/getOtpForVerification?userNodeId=${encodeURIComponent(userNodeId)}`, 'GET', undefined, false).then(response => {
+    apiCall<any>(`/api/v1/auth/getOtpForVerification?userNodeId=${encodeURIComponent(userNodeId)}`, 'GET', undefined, false).then(response => {
       const record = response?.data?.[0] ?? response?.data ?? response;
       const otp = typeof record === 'object' && record !== null
         ? record.otp ?? record.oneTimePassword ?? record.id
