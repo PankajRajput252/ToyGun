@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { imageUploadApi, sellProductApi, ProductReq } from "../services/api";
 import { AlertTriangle, Check } from "lucide-react";
+import { SHOOTING_CATEGORIES } from "./shootingCategories";
 
 type ProductForm = {
     title: string;
@@ -17,18 +18,6 @@ type ProductForm = {
     zipCode: string;
     country: string;
 };
-
-type Category = {
-    categoryPkId: number;
-    categoryName: string;
-};
-
-type SubCategory = {
-    subCategoryPkId: number;
-    subCategoryName: string;
-};
-
-const API_URL = "https://api.bandookwale.com";
 
 export default function AdminSellProductPage() {
     const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
@@ -60,12 +49,6 @@ export default function AdminSellProductPage() {
     });
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-    // ─── Category & Subcategory state ─────────────────────────────────────────────
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [isCategoryLoading, setIsCategoryLoading] = useState(false);
-    const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
-    const [isSubCategoryLoading, setIsSubCategoryLoading] = useState(false);
 
     const [form, setForm] = useState<ProductForm>({
         title: "",
@@ -123,61 +106,13 @@ export default function AdminSellProductPage() {
         }
     }, [isEditMode]);
 
-    // ─── Fetch Categories on mount ────────────────────────────────────────────────
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                setIsCategoryLoading(true);
-                const res = await fetch(
-                    `${API_URL}/api/users/getCategory?filterBy=ACTIVE&page=0&size=20&inputPkId=null&inputFkId=null&searchValue=null`
-                );
-                const data = await res.json();
-                const list: Category[] =
-                    Array.isArray(data?.data) ? data.data :
-                        Array.isArray(data?.content) ? data.content :
-                            Array.isArray(data) ? data : [];
-                setCategories(list);
-            } catch (err) {
-                console.error("Failed to fetch categories:", err);
-            } finally {
-                setIsCategoryLoading(false);
-            }
-        };
-        fetchCategories();
-    }, []);
-
-    // ─── Fetch Subcategories when category changes ────────────────────────────────
-    useEffect(() => {
-        if (!form.categoryId) {
-            setSubCategories([]);
-            setForm((prev) => ({ ...prev, subcategoryId: "" }));
-            return;
-        }
-
-        const fetchSubCategories = async () => {
-            try {
-                setIsSubCategoryLoading(true);
-                setSubCategories([]);
-                // Don't reset subcategoryId here so edit mode keeps its value
-                const res = await fetch(
-                    `${API_URL}/api/users/getSubCategory?categoryFkId=${form.categoryId}&SubCategoryPkId=null`
-                );
-                const data = await res.json();
-                const list: SubCategory[] =
-                    Array.isArray(data?.data) ? data.data :
-                        Array.isArray(data?.content) ? data.content :
-                            Array.isArray(data) ? data : [];
-                setSubCategories(list);
-            } catch (err) {
-                console.error("Failed to fetch subcategories:", err);
-                setSubCategories([]);
-            } finally {
-                setIsSubCategoryLoading(false);
-            }
-        };
-
-        fetchSubCategories();
-    }, [form.categoryId]);
+    // ─── Hardcoded categories (see shootingCategories.ts) ─────────────────────────
+    // "Category" is the top-level group; "Subcategory" lists its categories and their sub-items
+    const selectedGroup = SHOOTING_CATEGORIES.find((g) => g.id === Number(form.categoryId));
+    const subCategoryOptions = (selectedGroup?.categories ?? []).flatMap((cat) => [
+        { id: cat.id, label: cat.name },
+        ...(cat.subcategories ?? []).map((sub) => ({ id: sub.id, label: `    ${sub.name}` })),
+    ]);
     const confirmCancel = () => {
         setShowCancelModal(false);
         navigate(-1);
@@ -196,6 +131,8 @@ export default function AdminSellProductPage() {
         setForm({
             ...form,
             [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+            // a new category invalidates the previously picked subcategory
+            ...(name === "categoryId" ? { subcategoryId: "" } : {}),
         });
     };
 
@@ -610,70 +547,50 @@ export default function AdminSellProductPage() {
                                     name="categoryId"
                                     value={form.categoryId}
                                     onChange={handleChange}
-                                    disabled={isCategoryLoading}
                                     className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2
                                            focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <option value="">
-                                        {isCategoryLoading ? "Loading categories..." : "Select Category *"}
-                                    </option>
-                                    {categories.map((cat) => (
-                                        <option key={cat.categoryPkId} value={cat.categoryPkId}>
-                                            {cat.categoryName}
+                                    <option value="">Select Category *</option>
+                                    {SHOOTING_CATEGORIES.map((group) => (
+                                        <option key={group.id} value={group.id}>
+                                            {group.name}
                                         </option>
                                     ))}
                                 </select>
-                                {isCategoryLoading && (
-                                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                        <span className="animate-spin inline-block">⏳</span> Fetching categories...
-                                    </p>
-                                )}
-                                {!isCategoryLoading && categories.length === 0 && (
-                                    <p className="text-xs text-red-400 mt-1">
-                                        Failed to load categories. Please refresh.
-                                    </p>
-                                )}
                             </div>
 
                             {/* Subcategory */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Subcategory
-                                    {isSubCategoryLoading && (
-                                        <span className="ml-2 text-xs text-yellow-500 font-normal">
-                                            ⏳ Loading...
-                                        </span>
-                                    )}
                                 </label>
                                 <select
                                     name="subcategoryId"
                                     value={form.subcategoryId}
                                     onChange={handleChange}
-                                    disabled={!form.categoryId || isSubCategoryLoading}
+                                    disabled={!form.categoryId || subCategoryOptions.length === 0}
                                     className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2
                                            focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="">
                                         {!form.categoryId
                                             ? "Select a category first"
-                                            : isSubCategoryLoading
-                                                ? "Loading subcategories..."
-                                                : subCategories.length === 0
-                                                    ? "No subcategories available"
-                                                    : "Select Subcategory"}
+                                            : subCategoryOptions.length === 0
+                                                ? "No subcategories available"
+                                                : "Select Subcategory"}
                                     </option>
-                                    {subCategories.map((sub) => (
-                                        <option key={sub.subCategoryPkId} value={sub.subCategoryPkId}>
-                                            {sub.subCategoryName}
+                                    {subCategoryOptions.map((opt) => (
+                                        <option key={opt.id} value={opt.id}>
+                                            {opt.label}
                                         </option>
                                     ))}
                                 </select>
                                 {!form.categoryId && (
                                     <p className="text-xs text-gray-400 mt-1">
-                                        Select a category to load subcategories
+                                        Select a category to see subcategories
                                     </p>
                                 )}
-                                {form.categoryId && !isSubCategoryLoading && subCategories.length === 0 && (
+                                {form.categoryId && subCategoryOptions.length === 0 && (
                                     <p className="text-xs text-gray-400 mt-1">
                                         No subcategories for this category
                                     </p>

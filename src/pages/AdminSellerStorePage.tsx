@@ -2,12 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Store, Plus, Package, IndianRupee, Clock, ShieldCheck, Search, ArrowUpDown, UploadCloud, X,
+  LayoutGrid, ChevronDown,
 } from "lucide-react";
 import { sellProductApi } from "../services/api";
 import ProductCard, { type Product } from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { mapProduct, timeAgo } from "./productUtils";
 import storeLogo from "../components/images/storeLogo.png";
+import {
+  SHOOTING_CATEGORY_COLUMNS, selectionIds, selectionLabel, selectionTerms, type CategorySelection,
+} from "./shootingCategories";
+
+const API_URL = "https://api.bandookwale.com";
 
 type SortKey = "newest" | "price-asc" | "price-desc";
 
@@ -43,6 +49,11 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
   const [totalCount, setTotalCount] = useState(0);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortKey>("newest");
+  const [selectedCategory, setSelectedCategory] = useState<CategorySelection | null>(null);
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  // Backend id → name, so products can be matched against the category tree by name
+  const [categoryNames, setCategoryNames] = useState<Record<number, string>>({});
+  const [subCategoryNames, setSubCategoryNames] = useState<Record<number, string>>({});
 
   // ─── Fetch store products ─────────────────────────────────────────────────
   const fetchStoreProducts = async () => {
@@ -79,6 +90,39 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
     fetchStoreProducts();
   }, [sellerId]);
 
+  // ─── Resolve category / subcategory names for the products in this store ──
+  useEffect(() => {
+    fetch(`${API_URL}/api/users/getCategory?filterBy=ACTIVE&page=0&size=100&inputPkId=null&inputFkId=null&searchValue=null`)
+      .then((res) => res.json())
+      .then((data) => {
+        const list: any[] = Array.isArray(data?.data) ? data.data : [];
+        setCategoryNames(Object.fromEntries(list.map((c) => [c.categoryPkId, c.categoryName])));
+      })
+      .catch((err) => console.error("Failed to fetch categories:", err));
+  }, []);
+
+  useEffect(() => {
+    const categoryIds = [...new Set(products.map((p) => p.categoryId).filter((id) => id != null))];
+    if (categoryIds.length === 0) return;
+    Promise.all(
+      categoryIds.map((id) =>
+        fetch(`${API_URL}/api/users/getSubCategory?categoryFkId=${id}&SubCategoryPkId=null`)
+          .then((res) => res.json())
+          .then((data) => (Array.isArray(data?.data) ? data.data : []))
+          .catch(() => [])
+      )
+    ).then((lists) => {
+      setSubCategoryNames(
+        Object.fromEntries(lists.flat().map((s: any) => [s.subCategoryPkId, s.subCategoryName]))
+      );
+    });
+  }, [products]);
+
+  const selectCategory = (selection: CategorySelection | null) => {
+    setSelectedCategory(selection);
+    setIsCategoryMenuOpen(false);
+  };
+
   // ─── Remove deleted product from list instantly ───────────────────────────
   const handleProductDeleted = (deletedId: number) => {
     setProducts((prev) => prev.filter((p) => p.id !== deletedId));
@@ -102,7 +146,7 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
   // ─── Search + sort ────────────────────────────────────────────────────────
   const visibleProducts = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const list = q
+    let list = q
       ? products.filter(
           (p) =>
             p.title?.toLowerCase().includes(q) ||
@@ -111,11 +155,30 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
         )
       : [...products];
 
+    // Match on the hardcoded category IDs first, then on the old backend
+    // category/subcategory name, falling back to the product's text
+    if (selectedCategory) {
+      const ids = new Set(selectionIds(selectedCategory));
+      const terms = selectionTerms(selectedCategory).map((t) => t.toLowerCase());
+      list = list.filter((p) => {
+        // A subcategory pick must match the subcategory; broader picks match either field
+        if (selectedCategory.subcategory ? ids.has(p.subcategoryId!) : ids.has(p.categoryId!) || ids.has(p.subcategoryId!)) {
+          return true;
+        }
+        const names = [
+          p.categoryId != null ? categoryNames[p.categoryId] : "",
+          p.subcategoryId != null ? subCategoryNames[p.subcategoryId] : "",
+        ].map((n) => (n || "").toLowerCase());
+        const text = `${p.title || ""} ${p.description || ""} ${p.brand || ""}`.toLowerCase();
+        return terms.some((t) => names.includes(t) || text.includes(t));
+      });
+    }
+
     if (sortBy === "price-asc") list.sort((a, b) => Number(a.price) - Number(b.price));
     if (sortBy === "price-desc") list.sort((a, b) => Number(b.price) - Number(a.price));
     if (sortBy === "newest") list.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
     return list;
-  }, [products, search, sortBy]);
+  }, [products, search, sortBy, selectedCategory, categoryNames, subCategoryNames]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white">
@@ -198,6 +261,19 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
             </h2>
 
             <div className="flex gap-2">
+              <button
+                onClick={() => setIsCategoryMenuOpen((open) => !open)}
+                aria-expanded={isCategoryMenuOpen}
+                className={`inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sm font-medium border transition flex-shrink-0
+                            ${isCategoryMenuOpen || selectedCategory
+                              ? "bg-gold-500 text-white border-gold-500"
+                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:border-gold-500"
+                            }`}
+              >
+                <LayoutGrid className="w-4 h-4" />
+                <span className="hidden sm:inline">Categories</span>
+                <ChevronDown className={`w-4 h-4 transition ${isCategoryMenuOpen ? "rotate-180" : ""}`} />
+              </button>
               <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -235,6 +311,75 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
           </div>
         )}
 
+        {/* Category mega menu */}
+        {isCategoryMenuOpen && (
+          <div className="mb-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl
+                          px-5 py-6 sm:px-8 max-h-[70vh] overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
+              {SHOOTING_CATEGORY_COLUMNS.map((column, colIndex) => (
+                <div key={colIndex} className="space-y-6">
+                  {column.map((group) => (
+                    <div key={group.name}>
+                      <button
+                        onClick={() => selectCategory({ group: group.name })}
+                        className="text-sm font-bold uppercase tracking-wide text-gray-900 dark:text-white hover:text-gold-500 transition text-left"
+                      >
+                        {group.name}
+                      </button>
+                      <ul className="mt-2 space-y-1">
+                        {group.categories.map((cat) => (
+                          <li key={cat.name}>
+                            <button
+                              onClick={() => selectCategory({ group: group.name, category: cat.name })}
+                              className={`text-sm text-left hover:text-gold-500 transition ${
+                                cat.subcategories
+                                  ? "font-semibold text-gray-600 dark:text-gray-300 mt-1.5"
+                                  : "text-gray-500 dark:text-gray-400"
+                              }`}
+                            >
+                              {cat.name}
+                            </button>
+                            {cat.subcategories && (
+                              <ul className="mt-1 space-y-1">
+                                {cat.subcategories.map((sub) => (
+                                  <li key={sub.id}>
+                                    <button
+                                      onClick={() => selectCategory({ group: group.name, category: cat.name, subcategory: sub.name })}
+                                      className="text-sm text-left text-gray-500 dark:text-gray-400 hover:text-gold-500 transition"
+                                    >
+                                      {sub.name}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Active category filter */}
+        {selectedCategory && (
+          <div className="mb-5 flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 pl-3 pr-1.5 py-1.5 rounded-full text-sm bg-gold-500/15 border border-gold-500/30 text-gold-600 dark:text-gold-300">
+              {selectionLabel(selectedCategory)}
+              <button
+                onClick={() => selectCategory(null)}
+                aria-label="Clear category filter"
+                className="p-0.5 rounded-full hover:bg-gold-500/20"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </span>
+          </div>
+        )}
+
         {/* Loading */}
         {isLoading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -268,9 +413,16 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
         {/* No search results */}
         {!isLoading && products.length > 0 && visibleProducts.length === 0 && (
           <div className="py-16 text-center">
-            <p className="text-gray-500">No products match "{search}"</p>
-            <button onClick={() => setSearch("")} className="mt-3 text-sm text-gold-500 hover:underline">
-              Clear search
+            <p className="text-gray-500">
+              No products match {search && `"${search}"`}
+              {search && selectedCategory && " in "}
+              {selectedCategory && selectionLabel(selectedCategory)}
+            </p>
+            <button
+              onClick={() => { setSearch(""); selectCategory(null); }}
+              className="mt-3 text-sm text-gold-500 hover:underline"
+            >
+              Clear filters
             </button>
           </div>
         )}
@@ -278,7 +430,7 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
         {/* Products Grid — "upload" tile first on your own store */}
         {!isLoading && visibleProducts.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-            {canPost && !search && (
+            {canPost && !search && !selectedCategory && (
               <button
                 onClick={() => navigate(POST_ITEM_PATH)}
                 className="group min-h-[260px] rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700
