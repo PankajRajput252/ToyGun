@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, ArrowLeft, Building2, Loader2, QrCode, ReceiptText, RefreshCw } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Building2, FileText, Loader2, QrCode, ReceiptText, RefreshCw } from "lucide-react";
 import {
   PaymentSubmission,
   errorMessage,
@@ -11,6 +11,7 @@ import {
 import PaymentStatusBadge from "../components/payment/PaymentStatusBadge";
 import { ReceiptPreview } from "../components/payment/AuthFilePreview";
 import ManualPaymentModal from "../components/payment/ManualPaymentModal";
+import InvoiceModal from "../components/payment/InvoiceModal";
 import { useToast } from "../context/ToastContext";
 
 export default function MyPaymentsPage() {
@@ -21,6 +22,7 @@ export default function MyPaymentsPage() {
   const [error, setError] = useState<string | null>(null);
   const [openReceiptId, setOpenReceiptId] = useState<number | null>(null);
   const [resubmitFor, setResubmitFor] = useState<PaymentSubmission | null>(null);
+  const [invoiceFor, setInvoiceFor] = useState<PaymentSubmission | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -135,6 +137,14 @@ export default function MyPaymentsPage() {
                     >
                       {openReceiptId === p.id ? "Hide receipt" : "View receipt"}
                     </button>
+                    {p.status === "APPROVED" && (
+                      <button
+                        onClick={() => setInvoiceFor(p)}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#111827] px-3 py-1.5 text-sm font-semibold text-white hover:bg-gray-800"
+                      >
+                        <FileText className="h-4 w-4" /> View invoice
+                      </button>
+                    )}
                     {p.status === "REJECTED" && (
                       <button
                         onClick={() => setResubmitFor(p)}
@@ -156,6 +166,8 @@ export default function MyPaymentsPage() {
           </ul>
         )}
       </div>
+
+      <InvoiceModal payment={invoiceFor} onClose={() => setInvoiceFor(null)} />
 
       <ManualPaymentModal
         isOpen={resubmitFor !== null}

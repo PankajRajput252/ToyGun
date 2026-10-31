@@ -212,7 +212,7 @@ export default function Home() {
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
                                bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm transition"
                   >
-                    <MessageCircle className="w-4 h-4" />
+                    <Handshake className="w-4 h-4" />
                     Marketplace
                   </button>
                 </div>
