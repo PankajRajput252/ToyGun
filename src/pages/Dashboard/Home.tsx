@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import Footer from "../../components/footer/Footer";
 import CategoryFilterBar from "../CategoryFilterBar";
 import CategoryGrid from "../CategoryGrid";
-import { useNavigate } from "react-router-dom";
 import ProductCard, { type Product } from "../ProductCard";
 import { mapProduct, fetchProductsByCategory } from "../productUtils";
 import ProductCardSkeleton from "../ProductCardSkeleton";
@@ -10,7 +9,7 @@ import { getRecentlyViewed } from "../recentlyViewed";
 import { sellProductApi } from "../../services/api";
 import { useFilter } from "../Filtercontext";
 import {
-  ShoppingCart, MessageCircle, LayoutGrid, PlusCircle, Store, History, Loader2, ShieldCheck,
+  ShoppingCart, MessageCircle, LayoutGrid, Store, History, Loader2, ShieldCheck,
   Search, Handshake, /* Lock, */ Truck,
 } from "lucide-react";
 import HeroCarousel3D from "../HeroCarousel3D";
@@ -43,7 +42,6 @@ const TRUST_POINTS = [
 ];
 
 export default function Home() {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(0);
@@ -210,12 +208,12 @@ export default function Home() {
                     Shop the store
                   </button>
                   <button
-                    onClick={() => navigate("/sellProductPage")}
+                    onClick={() => { setActiveTab("listing"); scrollToProducts(); }}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
                                bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm transition"
                   >
-                    <PlusCircle className="w-4 h-4" />
-                    Sell an item
+                    <MessageCircle className="w-4 h-4" />
+                    Marketplace
                   </button>
                 </div>
               </div>

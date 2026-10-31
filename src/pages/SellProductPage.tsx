@@ -369,9 +369,25 @@ export default function SellProductPage() {
                 <div className="bg-white rounded-xl shadow overflow-hidden">
 
                     {/* Header */}
-                    <div className="flex items-center justify-between px-4 sm:px-6 py-4 bg-gradient-to-r from-black to-yellow-500">
-                        <h2 className="text-lg font-semibold text-white">Post Your Ad</h2>
-                        <button onClick={handleCancel} className="text-white/80 hover:text-white transition">
+                    <div className="relative overflow-hidden flex items-center justify-between px-4 sm:px-6 py-5
+                                    bg-gradient-to-br from-[#0b0f19] via-[#1f2937] to-gold-600 border-b-2 border-gold-400">
+                        {/* soft gold glow on the right */}
+                        <div className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-gold-300/30 blur-3xl" />
+                        <div className="relative flex items-center gap-3">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-gold-300 to-gold-600
+                                             text-white shadow-lg shadow-gold-500/40 ring-1 ring-white/20">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                          d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                </svg>
+                            </span>
+                            <div>
+                                <h2 className="text-lg sm:text-xl font-bold tracking-wide text-white">
+                                    Post Your <span className="text-gold-300">Ad</span>
+                                </h2>
+                            </div>
+                        </div>
+                        <button onClick={handleCancel} className="relative rounded-lg p-1.5 text-white/80 hover:text-white hover:bg-white/10 transition">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                                       d="M6 18L18 6M6 6l12 12" />
