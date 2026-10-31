@@ -35,6 +35,12 @@ type Props = {
 // const WS_URL = "https://api.bandookwale.com/ws"; // ← update to your backend URL
 // const API_URL = "https://api.bandookwale.com";
 
+// conversationId format: {productId}-{sellerId}-{buyerId}
+const parseConvId = (convId: string) => {
+  const parts = convId.split("-");
+  return { sellerId: parts[parts.length - 2], buyerId: parts[parts.length - 1] };
+};
+
 export default function ChatUI({
   conversationId,
   userId,
@@ -53,10 +59,29 @@ export default function ChatUI({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   // Mobile only: toggles between the conversation list and the chat window
   const [showListMobile, setShowListMobile] = useState(false);
+  // Name of the other person in each conversation, learned from their messages
+  const [peerNames, setPeerNames] = useState<Record<string, string>>({});
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<any>(null);
+  const activeConvIdRef = useRef(conversationId);
+
+  // The owner opening chat from their own product lands on a {seller}-{seller} thread with nobody in it
+  const ownConv = parseConvId(conversationId);
+  const isSelfConv = ownConv.sellerId === ownConv.buyerId;
+
+  const rememberPeerName = (convId: string, msgs: Message[]) => {
+    const peerMsg = msgs.find((m) => m.senderId !== userId && m.senderName);
+    if (peerMsg) setPeerNames((prev) => ({ ...prev, [convId]: peerMsg.senderName! }));
+  };
+
+  // Who I'm talking to: the buyer if I own the product, otherwise the seller
+  const getPeer = (convId: string, fallbackSellerName?: string) => {
+    const role = parseConvId(convId).sellerId === userId ? "Buyer" : "Seller";
+    const name = peerNames[convId] || (role === "Seller" ? fallbackSellerName : undefined);
+    return { role, name: name || role };
+  };
 
  const loadHistory = async (convId: string) => {
   if (!convId || convId.includes("undefined")) {
@@ -75,7 +100,9 @@ export default function ChatUI({
 
     const data = await res.json();
     // ← Guard: API might return object instead of array
-    setMessages(Array.isArray(data) ? data : []);
+    const history: Message[] = Array.isArray(data) ? data : [];
+    setMessages(history);
+    rememberPeerName(convId, history);
 
   } catch (err) {
     console.error("Failed to load chat history:", err);
@@ -98,7 +125,14 @@ const loadConversations = async () => {
 
     const data = await res.json();
     // ← Guard: API might return object instead of array
-    setConversations(Array.isArray(data) ? data : []);
+    const list: Conversation[] = Array.isArray(data) ? data : [];
+    setConversations(list);
+
+    // Owner came from their own product — open their first real conversation instead
+    const firstReal = list.find((c) => c.conversationId !== conversationId);
+    if (isSelfConv && activeConvIdRef.current === conversationId && firstReal) {
+      switchConversation(firstReal.conversationId);
+    }
 
   } catch (err) {
     console.error("Failed to load conversations:", err);
@@ -116,6 +150,7 @@ const loadConversations = async () => {
     subscriptionRef.current = client.subscribe(topic, (stompMessage) => {
       const newMessage: Message = JSON.parse(stompMessage.body);
       setMessages((prev) => [...prev, newMessage]);
+      rememberPeerName(convId, [newMessage]);
     });
   };
 
@@ -128,7 +163,7 @@ const loadConversations = async () => {
       onConnect: () => {
         setIsConnected(true);
         console.log("✅ WebSocket connected");
-        subscribeToConversation(client, activeConvId);
+        subscribeToConversation(client, activeConvIdRef.current);
       },
 
       onDisconnect: () => {
@@ -158,6 +193,7 @@ const loadConversations = async () => {
   // ─── Switch conversation ───────────────────────────────────────────────────
   const switchConversation = (convId: string) => {
     setActiveConvId(convId);
+    activeConvIdRef.current = convId;
     loadHistory(convId);
     if (clientRef.current?.connected) {
       subscribeToConversation(clientRef.current, convId);
@@ -203,6 +239,23 @@ const loadConversations = async () => {
   };
 
   // ─── Render ───────────────────────────────────────────────────────────────
+  const activeConv = conversations.find((c) => c.conversationId === activeConvId);
+  const isProductConv = activeConvId === conversationId;
+  const headerTitle = isProductConv ? productTitle : activeConv?.productTitle || productTitle;
+  const headerImage = isProductConv ? productImage : activeConv?.productImage || productImage;
+  const headerPeer = getPeer(activeConvId, isProductConv ? sellerName : activeConv?.sellerName);
+
+  const renderPeer = (peer: { role: string; name: string }) => (
+    <p className="flex items-center gap-2 font-semibold text-sm text-gray-800 dark:text-white min-w-0">
+      <span className="truncate">{peer.name}</span>
+      {peer.name !== peer.role && (
+        <span className="flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-yellow-500/15 text-yellow-600 dark:text-yellow-400">
+          {peer.role}
+        </span>
+      )}
+    </p>
+  );
+
   return (
     <div className="flex h-[calc(100dvh-114px)] lg:h-[calc(100dvh-90px)] overflow-hidden bg-gray-100 dark:bg-gray-900">
 
@@ -217,6 +270,7 @@ const loadConversations = async () => {
         </div>
 
         {/* Current conversation (from product) */}
+        {!isSelfConv && (
         <div
           onClick={() => { switchConversation(conversationId); setShowListMobile(false); }}
           className={`p-4 cursor-pointer border-b dark:border-gray-700 transition
@@ -237,13 +291,12 @@ const loadConversations = async () => {
               <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-600 flex-shrink-0" />
             )}
             <div className="min-w-0">
-              <p className="font-semibold text-sm text-gray-800 dark:text-white truncate">
-                {sellerName}
-              </p>
+              {renderPeer(getPeer(conversationId, sellerName))}
               <p className="text-xs text-gray-400 truncate">{productTitle}</p>
             </div>
           </div>
         </div>
+        )}
 
         {/* Other conversations */}
         {conversations
@@ -258,9 +311,7 @@ const loadConversations = async () => {
                   : "hover:bg-gray-50 dark:hover:bg-gray-700"
                 }`}
             >
-              <p className="font-semibold text-sm text-gray-800 dark:text-white truncate">
-                {conv.sellerName || "Seller"}
-              </p>
+              {renderPeer(getPeer(conv.conversationId, conv.sellerName))}
               <p className="text-xs text-gray-400 truncate">
                 {conv.lastMessage || conv.productTitle || conv.conversationId}
               </p>
@@ -282,17 +333,17 @@ const loadConversations = async () => {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          {productImage && (
+          {headerImage && (
             <img
-              src={productImage}
-              alt={productTitle}
+              src={headerImage}
+              alt={headerTitle}
               className="w-9 h-9 rounded-lg object-cover border flex-shrink-0"
               onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/36"; }}
             />
           )}
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-800 dark:text-white truncate">{sellerName}</p>
-            <p className="text-xs text-gray-400 truncate">Re: {productTitle}</p>
+            {renderPeer(headerPeer)}
+            <p className="text-xs text-gray-400 truncate">Re: {headerTitle}</p>
           </div>
 
           {/* Connection badge */}

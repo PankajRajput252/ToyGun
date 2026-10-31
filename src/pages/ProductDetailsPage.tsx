@@ -364,7 +364,7 @@ function ProductDetails({ item }: { item: Product }) {
         productTitle: item.title,
         productImage: images[0],
         sellerId: item.sellerId,
-        sellerName,
+        sellerName: item.sellerName, // chat falls back to "Seller" rather than showing the node id
         buyerId: user?.nodeId,
         buyerName: user?.name || "Me",
         initialMessage,
@@ -668,16 +668,25 @@ function ProductDetails({ item }: { item: Product }) {
               </div>
             )}
 
-            {/* Share row */}
+            {/* Share row — store items share on WhatsApp; marketplace listings chat with the owner */}
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 flex gap-2">
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366]/25 transition"
-              >
-                <MessageCircle className="w-4 h-4" /> WhatsApp
-              </a>
+              {isStoreProduct ? (
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366]/25 transition"
+                >
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </a>
+              ) : (
+                <button
+                  onClick={() => handleChat()}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold bg-blue-600/15 text-blue-400 hover:bg-blue-600/25 transition"
+                >
+                  <MessageCircle className="w-4 h-4" /> {isOwner ? 'Chat' : 'Chat with seller'}
+                </button>
+              )}
               <button
                 onClick={handleCopyLink}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
