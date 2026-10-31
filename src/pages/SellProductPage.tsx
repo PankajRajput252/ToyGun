@@ -13,6 +13,7 @@ type ProductForm = {
     licenseRequired: boolean;
     price: string;
     isNegotiable: boolean;
+    quantity: string;
     isStoreProduct: boolean;
     location: string;
     city: string;
@@ -37,7 +38,7 @@ const EMPTY_FORM: ProductForm = {
     weaponCategoryFkId: "", weaponTypeFkId: "",
     weaponSubTypeFkId: "", caliberFkId: "",
     licenseRequired: false,
-    price: "", isNegotiable: false, isStoreProduct: false,
+    price: "", isNegotiable: false, quantity: "1", isStoreProduct: false,
     location: "", city: "", state: "", zipCode: "", country: "India",
 };
 
@@ -227,6 +228,10 @@ export default function SellProductPage() {
             showPopup("Missing Required Fields", "Please fill Title, Price and Weapon Category.");
             return;
         }
+        if (!/^[1-9]\d*$/.test(form.quantity)) {
+            showPopup("Invalid Quantity", "Product quantity must be a whole number of at least 1.");
+            return;
+        }
         if (isUploadingImage) {
             showPopup("Images Uploading", "Please wait for all images to finish uploading.");
             return;
@@ -250,6 +255,7 @@ export default function SellProductPage() {
             licenseRequired:    form.licenseRequired,
             price:              Number(form.price),
             isNegotiable:       form.isNegotiable,
+            productQuantity:    Number(form.quantity),
             isStoreProduct:     form.isStoreProduct,
             sellerId:           userNodeId,
             location:           form.location,
@@ -366,16 +372,14 @@ export default function SellProductPage() {
 
             {/* ── Main Page ── */}
             <div className="max-w-4xl mx-auto p-3 sm:p-6 bg-transparent">
-                <div className="bg-white rounded-xl shadow overflow-hidden">
+                <div className="bg-white rounded-xl shadow border-2 border-[#f5b301] overflow-hidden">
 
                     {/* Header */}
                     <div className="relative overflow-hidden flex items-center justify-between px-4 sm:px-6 py-5
-                                    bg-gradient-to-br from-[#0b0f19] via-[#1f2937] to-gold-600 border-b-2 border-gold-400">
-                        {/* soft gold glow on the right */}
-                        <div className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-gold-300/30 blur-3xl" />
+                                    bg-[#111827] border-b-2 border-[#f5b301]">
                         <div className="relative flex items-center gap-3">
                             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-gold-300 to-gold-600
-                                             text-white shadow-lg shadow-gold-500/40 ring-1 ring-white/20">
+                                             text-white shadow-lg shadow-gold-300/40 ring-1 ring-white/20">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                                           d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -383,7 +387,7 @@ export default function SellProductPage() {
                             </span>
                             <div>
                                 <h2 className="text-lg sm:text-xl font-bold tracking-wide text-white">
-                                    Post Your <span className="text-gold-300">Ad</span>
+                                    Post Your Ad
                                 </h2>
                             </div>
                         </div>
@@ -521,6 +525,15 @@ export default function SellProductPage() {
                             <span>Negotiable</span>
                         </label>
 
+                        {/* Quantity */}
+                        <div>
+                            <label htmlFor="quantity" className="font-medium block mb-1">Product Quantity *</label>
+                            <input id="quantity" type="number" name="quantity" min={1} step={1} inputMode="numeric"
+                                   placeholder="Number of items available" value={form.quantity}
+                                   onChange={handleChange}
+                                   className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                        </div>
+
                         {/* Image Upload */}
                         <div className="space-y-3">
                             <label className="font-medium block">Product Images</label>
@@ -593,7 +606,7 @@ export default function SellProductPage() {
                         {/* Submit */}
                         <button onClick={() => setShowConfirmModal(true)}
                                 disabled={isSubmitting || isUploadingImage}
-                                className="w-full py-3 text-white rounded-xl bg-gradient-to-r from-black to-yellow-500
+                                className="w-full py-3 text-white font-semibold rounded-xl bg-[#111827] border-2 border-[#f5b301]
                                            disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition">
                             {isSubmitting ? "Posting..." : "Post Ad"}
                         </button>

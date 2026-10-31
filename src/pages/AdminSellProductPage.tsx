@@ -473,10 +473,10 @@ export default function AdminSellProductPage() {
                     </div>
                 )}
 
-                <div className="bg-white rounded-xl shadow overflow-hidden">
+                <div className="bg-white rounded-xl shadow border-2 border-[#f5b301] overflow-hidden">
 
                     {/* HEADER */}
-                    <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-4 mt-8 bg-gradient-to-r from-black to-yellow-500">
+                    <div className="flex items-center justify-between gap-2 px-4 sm:px-6 py-4  bg-[#111827] border-b-2 border-[#f5b301]">
                         <h2 className="text-base sm:text-lg font-semibold text-white">
                             {isEditMode ? "Edit Store Product" : "Post Store Product"}
                         </h2>
@@ -657,10 +657,9 @@ export default function AdminSellProductPage() {
                         </div>
 
                         {/* LOCATION */}
-                        <div className="space-y-3">
+                        {/* <div className="space-y-3">
                             <label className="font-medium block">Location</label>
 
-                            {/* Address */}
                             <input
                                 name="location"
                                 value={form.location}
@@ -669,7 +668,6 @@ export default function AdminSellProductPage() {
                                 className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             />
 
-                            {/* PIN + City */}
                             <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <input
                                     name="zipCode"
@@ -687,7 +685,6 @@ export default function AdminSellProductPage() {
                                 />
                             </div>
 
-                            {/* State + Country */}
                             <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 <input
                                     name="state"
@@ -704,13 +701,13 @@ export default function AdminSellProductPage() {
                                     className="w-full min-w-0 border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                                 />
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* SUBMIT */}
                         <button
                             onClick={() => setShowConfirmModal(true)}
                             disabled={isSubmitting || isUploadingImage}
-                            className="w-full py-3 text-white rounded-xl bg-gradient-to-r from-black to-yellow-500
+                            className="w-full py-3 text-white font-semibold rounded-xl bg-[#111827] border-2 border-[#f5b301]
                                    disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition"
                         >
                             {isSubmitting
