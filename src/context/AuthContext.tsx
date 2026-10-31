@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { usersApi } from "../services/api";
 
 interface User {
   userPkId?: number;
@@ -90,6 +91,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   console.log("API Base URL:", apiBaseUrl);
 
+  // Pull the latest profile (incl. profile image) from the server and merge it
+  // into the stored user, keeping the existing image if the server omits it
+  const refreshUserFromServer = async (baseUser: User) => {
+    if (!baseUser?.userPkId) return;
+    try {
+      const fetchedUser = await usersApi.getById(baseUser.userPkId);
+      if (!fetchedUser) return;
+      const imageUrl =
+        fetchedUser.profileImageUrl ||
+        fetchedUser.imageUrl ||
+        baseUser.profileImageUrl ||
+        baseUser.imageUrl ||
+        null;
+      const mergedUser = {
+        ...baseUser,
+        ...fetchedUser,
+        profileImageUrl: imageUrl,
+        imageUrl,
+      } as User;
+      setUser(mergedUser);
+      localStorage.setItem("stylocoin_user", JSON.stringify(mergedUser));
+    } catch (error) {
+      console.error("Failed to refresh user profile:", error);
+    }
+  };
+
   // Check if user is already logged in on mount
   useEffect(() => {
     const storedUser = localStorage.getItem("stylocoin_user");
@@ -99,8 +126,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (storedUser) {
       if (keepLoggedIn === "true" || keepLoggedIn === null) {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
         setIsAuthenticated(true);
+        refreshUserFromServer(parsedUser);
       }
     }
 
@@ -166,6 +195,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             "stylocoin_token",
             responseData.token
           );
+
+          // Login payload may not include the profile image; fetch the full profile
+          refreshUserFromServer(responseData.user);
 
           return true;
         } else {
@@ -251,12 +283,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         response.status
       );
 
-      const responseData = await response.json();
+      // Body may be JSON, plain text or empty; keep whatever the API sent
+      const rawBody = await response.text();
+      let responseData: any = {};
+      try {
+        responseData = rawBody ? JSON.parse(rawBody) : {};
+      } catch {
+        responseData = { message: rawBody };
+      }
+      const apiMessage: string | undefined =
+        responseData.message || responseData.status || responseData.error || undefined;
 
       console.log("Registration response data:", responseData);
 
-      if (response.ok) {
-        const generatedUsername = responseData.message;
+      // The API can answer 200 with an error in the body, so also check the body for failure signs
+      const statusText = String(responseData.status ?? responseData.statusCode ?? "").toUpperCase();
+      const bodyFailed =
+        responseData.success === false ||
+        Boolean(responseData.error) ||
+        /FAIL|ERROR|BAD_REQUEST|CONFLICT|^[45]\d\d$/.test(statusText);
+      // A generated username is a single token; text with spaces is a message, not a username
+      const looksLikeUsername =
+        typeof responseData.message === "string" && /^\S+$/.test(responseData.message.trim());
+
+      if (response.ok && !bodyFailed && (looksLikeUsername || !responseData.message)) {
+        const generatedUsername = looksLikeUsername ? responseData.message.trim() : "";
 
         if (generatedUsername) {
           localStorage.setItem(
@@ -271,17 +322,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
         } else {
           return {
-            success: false,
-            message:
-              "Registration completed but no username was generated",
+            success: true,
+            message: apiMessage || `Registration successful (status ${response.status})`,
           };
         }
       } else {
         return {
           success: false,
           message:
-            responseData.message ||
-            "Registration failed. Please try again.",
+            apiMessage ||
+            `Registration failed (status ${response.status}). Please try again.`,
         };
       }
     } catch (error) {

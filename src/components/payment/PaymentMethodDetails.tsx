@@ -1,4 +1,5 @@
 import { Smartphone } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import type { PaymentMethod } from "../../services/paymentApi";
 import CopyField from "./CopyField";
 import { AuthImage } from "./AuthFilePreview";
@@ -25,7 +26,13 @@ export default function PaymentMethodDetails({ method, amount }: { method: Payme
 
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/60">
-      {method.qrImageUrl && (
+      {/* With a UPI ID and a fixed amount, generate the QR so scanning pre-fills the amount;
+          the uploaded QR image is static and can't carry it */}
+      {upiLink && amount ? (
+        <div className="rounded-lg bg-white p-3">
+          <QRCodeSVG value={upiLink} size={200} level="M" />
+        </div>
+      ) : method.qrImageUrl && (
         <AuthImage
           path={method.qrImageUrl}
           alt={`QR code for ${method.displayName}`}
@@ -33,6 +40,11 @@ export default function PaymentMethodDetails({ method, amount }: { method: Payme
         />
       )}
       <p className="text-center text-xs text-gray-500 dark:text-gray-400">Scan with any UPI app (GPay, PhonePe, Paytm, BHIM)</p>
+      {upiLink && amount ? (
+        <p className="text-center text-xs font-medium text-gray-700 dark:text-gray-300">
+          Amount ₹{amount.toFixed(2)} will be filled in automatically
+        </p>
+      ) : null}
       {method.upiId && (
         <div className="w-full">
           <CopyField label="UPI ID" value={method.upiId} mono />

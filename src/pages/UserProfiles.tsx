@@ -125,7 +125,13 @@ export default function UserProfiles() {
             fetchedImageUrl !== currentImageUrl;
 
           if (needsUpdate) {
-            updateUser(fetchedUser);
+            // Merge instead of replace so a response without an image doesn't wipe the existing one
+            updateUser({
+              ...currentUserData,
+              ...fetchedUser,
+              profileImageUrl: fetchedImageUrl || currentImageUrl || null,
+              imageUrl: fetchedImageUrl || currentImageUrl || null,
+            });
           }
         } else {
           // Fallback to localStorage data if API returns no data
