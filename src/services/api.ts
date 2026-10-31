@@ -1598,6 +1598,7 @@ export interface ProductReq {
   subcategoryId: number;
   price: number;
   isNegotiable: boolean;
+  productQuantity?: number;
   sellerId: string
   location: string
   city: string

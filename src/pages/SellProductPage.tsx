@@ -13,6 +13,7 @@ type ProductForm = {
     licenseRequired: boolean;
     price: string;
     isNegotiable: boolean;
+    quantity: string;
     isStoreProduct: boolean;
     location: string;
     city: string;
@@ -37,7 +38,7 @@ const EMPTY_FORM: ProductForm = {
     weaponCategoryFkId: "", weaponTypeFkId: "",
     weaponSubTypeFkId: "", caliberFkId: "",
     licenseRequired: false,
-    price: "", isNegotiable: false, isStoreProduct: false,
+    price: "", isNegotiable: false, quantity: "1", isStoreProduct: false,
     location: "", city: "", state: "", zipCode: "", country: "India",
 };
 
@@ -227,6 +228,10 @@ export default function SellProductPage() {
             showPopup("Missing Required Fields", "Please fill Title, Price and Weapon Category.");
             return;
         }
+        if (!/^[1-9]\d*$/.test(form.quantity)) {
+            showPopup("Invalid Quantity", "Product quantity must be a whole number of at least 1.");
+            return;
+        }
         if (isUploadingImage) {
             showPopup("Images Uploading", "Please wait for all images to finish uploading.");
             return;
@@ -250,6 +255,7 @@ export default function SellProductPage() {
             licenseRequired:    form.licenseRequired,
             price:              Number(form.price),
             isNegotiable:       form.isNegotiable,
+            productQuantity:    Number(form.quantity),
             isStoreProduct:     form.isStoreProduct,
             sellerId:           userNodeId,
             location:           form.location,
@@ -518,6 +524,15 @@ export default function SellProductPage() {
                                    className="w-4 h-4 accent-yellow-500" />
                             <span>Negotiable</span>
                         </label>
+
+                        {/* Quantity */}
+                        <div>
+                            <label htmlFor="quantity" className="font-medium block mb-1">Product Quantity *</label>
+                            <input id="quantity" type="number" name="quantity" min={1} step={1} inputMode="numeric"
+                                   placeholder="Number of items available" value={form.quantity}
+                                   onChange={handleChange}
+                                   className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                        </div>
 
                         {/* Image Upload */}
                         <div className="space-y-3">
