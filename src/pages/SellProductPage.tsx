@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { imageUploadApi, sellProductApi, ProductReq } from "../services/api";
 import { AlertTriangle } from "lucide-react";
+import { WEAPON_CATEGORIES, WEAPON_TYPES, RIFLE_PURPOSES } from "./weaponCategories";
 
 type ProductForm = {
     title: string;
@@ -10,6 +11,7 @@ type ProductForm = {
     weaponTypeFkId: string;
     weaponSubTypeFkId: string;
     caliberFkId: string;
+    riflePurposeFkId: string;
     licenseRequired: boolean;
     price: string;
     isNegotiable: boolean;
@@ -22,21 +24,22 @@ type ProductForm = {
     country: string;
 };
 
-// NOTE: WeaponCategory field names confirmed from actual API response.
-// WeaponType / WeaponSubType / Caliber are ASSUMED to follow the same
-// "*PkId" / "*Name" pattern — please verify against real responses from
-// getWeaponType / getWeaponSubType / getCaliber and adjust if different.
-type WeaponCategory = { weaponCategoryPkId: number; weaponCategoryName: string };
-type WeaponType      = { weaponTypePkId: number;     weaponTypeName: string };
-type WeaponSubType   = { weaponSubTypePkId: number;  weaponSubTypeName: string };
-type Caliber         = { caliberPkId: number;        caliberName: string };
-
-const API_URL = "https://api.bandookwale.com";
+// ── LEGACY: API-driven weapon dropdowns — replaced by hardcoded ./weaponCategories ──
+// // NOTE: WeaponCategory field names confirmed from actual API response.
+// // WeaponType / WeaponSubType / Caliber are ASSUMED to follow the same
+// // "*PkId" / "*Name" pattern — please verify against real responses from
+// // getWeaponType / getWeaponSubType / getCaliber and adjust if different.
+// type WeaponCategory = { weaponCategoryPkId: number; weaponCategoryName: string };
+// type WeaponType      = { weaponTypePkId: number;     weaponTypeName: string };
+// type WeaponSubType   = { weaponSubTypePkId: number;  weaponSubTypeName: string };
+// type Caliber         = { caliberPkId: number;        caliberName: string };
+//
+// const API_URL = "https://api.bandookwale.com";
 
 const EMPTY_FORM: ProductForm = {
     title: "", description: "",
     weaponCategoryFkId: "", weaponTypeFkId: "",
-    weaponSubTypeFkId: "", caliberFkId: "",
+    weaponSubTypeFkId: "", caliberFkId: "", riflePurposeFkId: "",
     licenseRequired: false,
     price: "", isNegotiable: false, quantity: "1", isStoreProduct: false,
     location: "", city: "", state: "", zipCode: "", country: "India",
@@ -63,20 +66,21 @@ export default function SellProductPage() {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showCancelModal,  setShowCancelModal]  = useState(false);
 
-    // ── dropdown data ─────────────────────────────────────────────────────────────
-    const [weaponCategories, setWeaponCategories] = useState<WeaponCategory[]>([]);
-    const [weaponTypes,      setWeaponTypes]      = useState<WeaponType[]>([]);
-    const [weaponSubTypes,   setWeaponSubTypes]   = useState<WeaponSubType[]>([]);
-    const [calibers,         setCalibersState]    = useState<Caliber[]>([]);
-
-    const [loadingCat,    setLoadingCat]    = useState(false);
-    const [loadingType,   setLoadingType]   = useState(false);
-    const [loadingSubType,setLoadingSubType]= useState(false);
-    const [loadingCal,    setLoadingCal]    = useState(false);
+    // ── LEGACY: API-driven dropdown data — replaced by hardcoded ./weaponCategories ──
+    // const [weaponCategories, setWeaponCategories] = useState<WeaponCategory[]>([]);
+    // const [weaponTypes,      setWeaponTypes]      = useState<WeaponType[]>([]);
+    // const [weaponSubTypes,   setWeaponSubTypes]   = useState<WeaponSubType[]>([]);
+    // const [calibers,         setCalibersState]    = useState<Caliber[]>([]);
+    //
+    // const [loadingCat,    setLoadingCat]    = useState(false);
+    // const [loadingType,   setLoadingType]   = useState(false);
+    // const [loadingSubType,setLoadingSubType]= useState(false);
+    // const [loadingCal,    setLoadingCal]    = useState(false);
 
     // ── form ──────────────────────────────────────────────────────────────────────
     const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
 
+    /* ── LEGACY: API fetches for weapon dropdowns ─────────────────────────────────
     // helper to extract array from varied API shapes
     const toArray = <T,>(data: any): T[] =>
         Array.isArray(data?.data)    ? data.data    :
@@ -141,16 +145,39 @@ export default function SellProductPage() {
             finally { setLoadingSubType(false); setLoadingCal(false); }
         })();
     }, [form.weaponTypeFkId]);
+    ── end LEGACY ─────────────────────────────────────────────────────────────── */
+
+    // ── hardcoded weapon dropdown data ────────────────────────────────────────────
+    // Category is independent of type. Calibers come from the sub type when it has
+    // its own list (Pistol / Revolver), otherwise from the type (Shotgun / Rifle).
+    const selectedType    = WEAPON_TYPES.find(t => String(t.id) === form.weaponTypeFkId);
+    const selectedSubType = selectedType?.subTypes.find(s => String(s.id) === form.weaponSubTypeFkId);
+    const caliberDependsOnSubType = !!selectedType?.subTypes.some(s => s.caliberGroups);
+    const caliberGroups   = caliberDependsOnSubType
+        ? selectedSubType?.caliberGroups ?? []
+        : selectedType?.caliberGroups ?? [];
 
     // ── handlers ──────────────────────────────────────────────────────────────────
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
     ) => {
         const { name, value, type } = e.target;
-        setForm(prev => ({
-            ...prev,
-            [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
-        }));
+        setForm(prev => {
+            const next = {
+                ...prev,
+                [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+            };
+            // clear the weapon fields that depend on the one that changed
+            if (name === "weaponTypeFkId") {
+                next.weaponSubTypeFkId = "";
+                next.caliberFkId       = "";
+                next.riflePurposeFkId  = "";
+            }
+            if (name === "weaponSubTypeFkId" && caliberDependsOnSubType) {
+                next.caliberFkId = "";
+            }
+            return next;
+        });
     };
 
     const handleCancel  = () => setShowCancelModal(true);
@@ -252,6 +279,7 @@ export default function SellProductPage() {
             weaponTypeFkId:     form.weaponTypeFkId    ? Number(form.weaponTypeFkId)    : null,
             weaponSubTypeFkId:  form.weaponSubTypeFkId ? Number(form.weaponSubTypeFkId) : null,
             caliberFkId:        form.caliberFkId       ? Number(form.caliberFkId)       : null,
+            riflePurposeFkId:   form.riflePurposeFkId  ? Number(form.riflePurposeFkId)  : null,
             licenseRequired:    form.licenseRequired,
             price:              Number(form.price),
             isNegotiable:       form.isNegotiable,
@@ -412,10 +440,91 @@ export default function SellProductPage() {
                                   onChange={handleChange}
                                   className="w-full border p-2 rounded-lg h-28 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
 
-                        {/* ── Weapon dropdowns (2-column grid) ── */}
+                        {/* ── Weapon dropdowns (2-column grid, hardcoded from ./weaponCategories) ── */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                             {/* Weapon Category */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Weapon Category *
+                                </label>
+                                <Select name="weaponCategoryFkId" value={form.weaponCategoryFkId}
+                                        onChange={handleChange} placeholder="Select Category *">
+                                    {WEAPON_CATEGORIES.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </Select>
+                            </div>
+
+                            {/* Weapon Type */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Weapon Type
+                                </label>
+                                <Select name="weaponTypeFkId" value={form.weaponTypeFkId}
+                                        onChange={handleChange} placeholder="Select Weapon Type">
+                                    {WEAPON_TYPES.map(t => (
+                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                    ))}
+                                </Select>
+                            </div>
+
+                            {/* Weapon Sub Type */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    {selectedType?.hasPurpose ? "Action" : "Weapon Sub Type"}
+                                </label>
+                                <Select name="weaponSubTypeFkId" value={form.weaponSubTypeFkId}
+                                        onChange={handleChange} disabled={!selectedType}
+                                        placeholder={!selectedType ? "Select a type first" : "Select Sub Type"}>
+                                    {selectedType?.subTypes.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </Select>
+                            </div>
+
+                            {/* Caliber / Bore — grouped (Rimfire, Centerfire, Magnum …) */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Caliber / Bore
+                                </label>
+                                <Select name="caliberFkId" value={form.caliberFkId}
+                                        onChange={handleChange} disabled={caliberGroups.length === 0}
+                                        placeholder={
+                                            !selectedType                                 ? "Select a type first"     :
+                                            caliberDependsOnSubType && !selectedSubType   ? "Select a sub type first" :
+                                                                                            "Select Caliber"
+                                        }>
+                                    {caliberGroups.map(g => (
+                                        <optgroup key={g.name} label={g.name}>
+                                            {g.calibers.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </optgroup>
+                                    ))}
+                                </Select>
+                            </div>
+
+                            {/* Rifle Purpose — only for rifles */}
+                            {selectedType?.hasPurpose && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Rifle Purpose
+                                    </label>
+                                    <Select name="riflePurposeFkId" value={form.riflePurposeFkId}
+                                            onChange={handleChange} placeholder="Select Purpose">
+                                        {RIFLE_PURPOSES.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                    </Select>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* ── LEGACY: API-driven weapon dropdowns ──
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                            -- Weapon Category --
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Weapon Category *
@@ -434,7 +543,7 @@ export default function SellProductPage() {
                                 )}
                             </div>
 
-                            {/* Weapon Type */}
+                            -- Weapon Type --
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Weapon Type
@@ -457,7 +566,7 @@ export default function SellProductPage() {
                                 </Select>
                             </div>
 
-                            {/* Weapon Sub Type */}
+                            -- Weapon Sub Type --
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Weapon Sub Type
@@ -480,7 +589,7 @@ export default function SellProductPage() {
                                 </Select>
                             </div>
 
-                            {/* Caliber */}
+                            -- Caliber --
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Caliber
@@ -503,6 +612,7 @@ export default function SellProductPage() {
                                 </Select>
                             </div>
                         </div>
+                        ── end LEGACY ── */}
 
                         {/* License Required */}
                         <label className="flex items-center gap-2 cursor-pointer select-none">
