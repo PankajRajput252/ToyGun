@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { Menu, Loader2 } from "lucide-react";
+// import { useEffect, useState } from "react";
+// import { Menu, Loader2 } from "lucide-react";
+import { Menu } from "lucide-react";
+import { WEAPON_CATEGORIES } from "./weaponCategories";
 
 export interface Category {
   categoryPkId: number;
@@ -11,9 +13,17 @@ interface Props {
   onSelectCategory: (categoryId: number | null, categoryName?: string) => void;
 }
 
-const API_URL = "https://api.bandookwale.com";
+// ── LEGACY: categories from the getCategory API — replaced by hardcoded ./weaponCategories ──
+// const API_URL = "https://api.bandookwale.com";
+
+// Pills come from the hardcoded weapon categories (Non-Prohibited / Prohibited)
+const categories: Category[] = WEAPON_CATEGORIES.map((c) => ({
+  categoryPkId: c.id,
+  categoryName: c.name,
+}));
 
 export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory }: Props) {
+  /* ── LEGACY: API fetch for category pills ─────────────────────────────────────
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,6 +47,7 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
 
     fetchCategories();
   }, []);
+  ── end LEGACY ─────────────────────────────────────────────────────────────── */
 
   return (
     <div className="w-full bg-black/95 backdrop-blur border-b border-gray-800 pt-2">
@@ -57,11 +68,13 @@ export default function CategoryFilterBar({ selectedCategoryId, onSelectCategory
           ALL CATEGORIES
         </button>
 
+        {/* LEGACY loading spinner
         {isLoading && (
           <Loader2 className="w-4 h-4 text-gray-400 animate-spin flex-shrink-0" />
         )}
+        */}
 
-        {/* Dynamic category pills */}
+        {/* Category pills */}
         {categories.map((cat) => (
           <button
             key={cat.categoryPkId}

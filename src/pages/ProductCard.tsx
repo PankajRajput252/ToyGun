@@ -166,7 +166,7 @@ export default function ProductCard({ item, onDeleted }: Props) {
       {/* ── Card ── */}
       <div
         onClick={openDetails}
-        className="group cursor-pointer rounded-2xl overflow-hidden flex flex-col
+        className="group cursor-pointer h-full rounded-2xl overflow-hidden flex flex-col
                    bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800
                    shadow-sm transition-all duration-300
                    hover:-translate-y-1 hover:border-gold-500/70 hover:shadow-xl hover:shadow-gold-500/10"
@@ -297,9 +297,8 @@ export default function ProductCard({ item, onDeleted }: Props) {
           <p className="text-sm font-medium line-clamp-2 min-h-[2.5rem] text-gray-800 dark:text-gray-200">
             {item.title}
           </p>
-          {stockLeft && (
-            <p className="text-[11px] font-medium text-green-600 dark:text-green-400">{stockLeft}</p>
-          )}
+          {/* Line is always rendered so cards with and without a stock count stay the same height */}
+          <p className="text-[11px] font-medium min-h-[1rem] text-green-600 dark:text-green-400">{stockLeft}</p>
 
           <div className="flex justify-between gap-2 text-[11px] mt-auto pt-1 text-gray-500">
             <span className="flex items-center gap-1 min-w-0">

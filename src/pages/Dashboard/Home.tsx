@@ -3,7 +3,7 @@ import Footer from "../../components/footer/Footer";
 import CategoryFilterBar from "../CategoryFilterBar";
 import CategoryGrid from "../CategoryGrid";
 import ProductCard, { type Product } from "../ProductCard";
-import { mapProduct, fetchProductsByCategory } from "../productUtils";
+import { mapProduct, fetchProductsByWeaponCategory } from "../productUtils";
 import ProductCardSkeleton from "../ProductCardSkeleton";
 import { getRecentlyViewed } from "../recentlyViewed";
 import { sellProductApi } from "../../services/api";
@@ -82,10 +82,11 @@ export default function Home() {
   const fetchByCategory = async (categoryId: number) => {
     try {
       setIsLoading(true);
-      // The API only returns one kind per call (isStoreProduct=null errors), so fetch store + listings together
+      // The API only returns one kind per call (isStoreProduct=null errors), so fetch store + listings together.
+      // Pills are hardcoded weapon categories, so filter on weaponCategoryFkId (was: fetchProductsByCategory).
       const [listings, storeItems] = await Promise.all([
-        fetchProductsByCategory(categoryId, 200, false),
-        fetchProductsByCategory(categoryId, 200, true),
+        fetchProductsByWeaponCategory(categoryId, 200, false),
+        fetchProductsByWeaponCategory(categoryId, 200, true),
       ]);
       setAllProducts([...storeItems, ...listings]);
       setHasMore(false); // category view loads everything in one request
@@ -224,12 +225,12 @@ export default function Home() {
           )}
 
           {/* Category Grid */}
-          {showGrid && (
+          {/* {showGrid && (
             <CategoryGrid
               selectedCategoryId={selectedCategoryId}
               onSelectCategory={handleSelectCategory}
             />
-          )}
+          )} */}
           {/* Recently viewed — horizontal swipe row */}
           {showGrid && recentlyViewed.length > 0 && (
             <section className="mx-4 md:mx-8 mt-8">

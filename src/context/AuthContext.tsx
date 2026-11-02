@@ -72,6 +72,75 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Auto sign-out after this long without any user activity. The last-activity time
+// lives in localStorage so it survives reloads and is shared between open tabs.
+const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+const LAST_ACTIVITY_KEY = "stylocoin_last_activity";
+const ACTIVITY_EVENTS = ["mousemove", "mousedown", "keydown", "scroll", "touchstart", "wheel"];
+
+const markActivity = () => localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+
+// A session with no recorded activity (e.g. from before this check existed) counts as expired
+const isSessionIdle = () => {
+  const last = Number(localStorage.getItem(LAST_ACTIVITY_KEY));
+  return !last || Date.now() - last > IDLE_TIMEOUT_MS;
+};
+
+// Sign out when the site's tabs are closed — including on mobile, where swiping Chrome
+// away from recent apps kills it without a reliable pagehide, and Chrome later restores
+// the tab together with its sessionStorage.
+// Each tab keeps a heartbeat in localStorage. A page load continues the session only if
+//  - this same tab checked in a few seconds ago (a reload), or
+//  - another tab of the site is still open and checking in.
+const TAB_ID_KEY = "stylocoin_tab_id";
+const OPEN_TABS_KEY = "stylocoin_open_tabs";
+const TAB_HEARTBEAT_MS = 20 * 1000;
+// Chrome runs timers in background tabs only about once a minute, so allow for that
+const TAB_STALE_MS = 2 * 60 * 1000;
+// A reload writes the heartbeat on pagehide and loads again within a few seconds
+const TAB_RESUME_MS = 15 * 1000;
+
+type TabEntry = { seen: number; closed?: boolean };
+
+const readOpenTabs = (): Record<string, TabEntry> => {
+  try {
+    const tabs = JSON.parse(localStorage.getItem(OPEN_TABS_KEY) || "{}");
+    return tabs && typeof tabs === "object" ? tabs : {};
+  } catch {
+    return {};
+  }
+};
+
+const writeOpenTabs = (tabs: Record<string, TabEntry>) =>
+  localStorage.setItem(OPEN_TABS_KEY, JSON.stringify(tabs));
+
+// Worked out once per page load, before this tab writes its own heartbeat
+const tabId = sessionStorage.getItem(TAB_ID_KEY) || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+sessionStorage.setItem(TAB_ID_KEY, tabId);
+const tabsAtLoad = readOpenTabs();
+const ownEntry = tabsAtLoad[tabId];
+const isReloadedTab = !!ownEntry?.seen && Date.now() - ownEntry.seen < TAB_RESUME_MS;
+const anotherTabOpen = Object.entries(tabsAtLoad).some(
+  ([id, tab]) => id !== tabId && !tab?.closed && !!tab?.seen && Date.now() - tab.seen < TAB_STALE_MS
+);
+// The previous session ended when its tabs were closed or the browser was killed
+const tabsWereClosed = !isReloadedTab && !anotherTabOpen;
+
+const writeTab = (closed = false) => {
+  const now = Date.now();
+  const tabs = readOpenTabs();
+  // drop entries from tabs that were closed or killed a while ago
+  Object.keys(tabs).forEach((id) => {
+    if (!tabs[id]?.seen || now - tabs[id].seen > TAB_STALE_MS) delete tabs[id];
+  });
+  tabs[tabId] = closed ? { seen: now, closed: true } : { seen: now };
+  writeOpenTabs(tabs);
+};
+
+const touchTab = () => writeTab();
+// pagehide fires on close and on reload; a reload is recognised by the fresh timestamp
+const closeTab = () => writeTab(true);
+
 // Helper function to check if user is admin based on roles
 export const isUserAdmin = (user: User | null): boolean => {
   if (!user) return false;
@@ -125,16 +194,75 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     if (storedUser) {
-      if (keepLoggedIn === "true" || keepLoggedIn === null) {
+      if (tabsWereClosed || isSessionIdle()) {
+        // All tabs were closed, or idle for more than 15 minutes — don't restore the session.
+        // Several modules read stylocoin_user once at import time, so reload to reset them.
+        signOut();
+        window.location.reload();
+        return;
+      } else if (keepLoggedIn === "true" || keepLoggedIn === null) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         setIsAuthenticated(true);
+        markActivity();
         refreshUserFromServer(parsedUser);
       }
     }
 
     setIsLoading(false);
   }, []);
+
+  // Keep this tab's heartbeat fresh while it's open, and mark it closed when the page goes away
+  useEffect(() => {
+    touchTab();
+    const intervalId = window.setInterval(touchTab, TAB_HEARTBEAT_MS);
+    // Mobile browsers freeze timers in the background, so also record the moment the
+    // tab is hidden or shown — that's the last heartbeat if Chrome is then killed
+    document.addEventListener("visibilitychange", touchTab);
+    window.addEventListener("pagehide", closeTab);
+    // A page restored from the back/forward cache is open again
+    window.addEventListener("pageshow", touchTab);
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", touchTab);
+      window.removeEventListener("pagehide", closeTab);
+      window.removeEventListener("pageshow", touchTab);
+    };
+  }, []);
+
+  // While signed in, record activity and sign out once the user has been idle for 15 minutes
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    // Activity events fire constantly; writing the timestamp every few seconds is enough
+    let lastWrite = 0;
+    const onActivity = () => {
+      const now = Date.now();
+      if (now - lastWrite > 5000) {
+        lastWrite = now;
+        markActivity();
+      }
+    };
+
+    const checkIdle = () => {
+      if (isSessionIdle()) {
+        signOut();
+        window.location.assign("/signin");
+      }
+    };
+
+    ACTIVITY_EVENTS.forEach((ev) => window.addEventListener(ev, onActivity, { passive: true }));
+    // Timers are throttled in background tabs, so also check as soon as the tab is shown again
+    const onVisible = () => document.visibilityState === "visible" && checkIdle();
+    document.addEventListener("visibilitychange", onVisible);
+    const intervalId = window.setInterval(checkIdle, 30 * 1000);
+
+    return () => {
+      ACTIVITY_EVENTS.forEach((ev) => window.removeEventListener(ev, onActivity));
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearInterval(intervalId);
+    };
+  }, [isAuthenticated]);
 
   const signIn = async (
     username: string,
@@ -195,6 +323,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             "stylocoin_token",
             responseData.token
           );
+
+          // Start the 15-minute idle timer from the moment of login
+          markActivity();
 
           // Login payload may not include the profile image; fetch the full profile
           refreshUserFromServer(responseData.user);
@@ -352,6 +483,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("stylocoin_user");
     localStorage.removeItem("stylocoin_keep_logged_in");
     localStorage.removeItem("stylocoin_token");
+    localStorage.removeItem(LAST_ACTIVITY_KEY);
   };
 
   const updateUser = (updatedUser: User) => {

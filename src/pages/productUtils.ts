@@ -76,6 +76,21 @@ export async function fetchProductsByCategory(
   return extractList(await res.json()).map(mapProduct);
 }
 
+// getProduct has no weapon-category filter (it ignores weaponCategoryFkId), so fetch
+// the page and keep the products whose weaponCategoryFkId matches.
+export async function fetchProductsByWeaponCategory(
+  weaponCategoryId: number,
+  size = 200,
+  isStoreProduct: boolean | null = false
+): Promise<Product[]> {
+  const res = await fetch(
+    `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=${size}&inputPkId=null&inputFkId=null&searchValue=null&isStoreProduct=${isStoreProduct}`
+  );
+  return extractList(await res.json())
+    .filter((item) => item.weaponCategoryFkId === weaponCategoryId)
+    .map(mapProduct);
+}
+
 // Used when a product page is opened from a shared link (no router state).
 export async function fetchProductById(id: number): Promise<Product | null> {
   const res = await fetch(
