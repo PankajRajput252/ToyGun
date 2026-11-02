@@ -88,7 +88,7 @@ export default function TrackOrderPage() {
             <button
               onClick={handleTrack}
               disabled={isLoading}
-              className="px-5 py-2.5 sm:py-0 justify-center bg-gradient-to-r from-black to-yellow-500 text-white
+              className="px-5 py-2.5 sm:py-0 justify-center bg-gold-500 text-white
                          rounded-lg font-medium hover:opacity-90 transition
                          disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >

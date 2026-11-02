@@ -281,7 +281,7 @@ export default function ManageSubscription() {
                 </div>
                 <button
                   onClick={handleAddIncomeType}
-                  className="px-4 py-2 bg-gradient-to-r from-black to-yellow-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 flex items-center justify-center gap-2 whitespace-nowrap"
+                  className="px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 focus:outline-none focus:ring-2 focus:ring-gold-400 flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

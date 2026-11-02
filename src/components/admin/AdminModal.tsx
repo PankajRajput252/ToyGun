@@ -176,7 +176,7 @@ export default function AdminModal({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-gradient-to-r from-black to-yellow-500 rounded-t-lg">
+      <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-gold-500 rounded-t-lg">
         <h2 className="text-lg font-semibold text-white">
           {title}
         </h2>

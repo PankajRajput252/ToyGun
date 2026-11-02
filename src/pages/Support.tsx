@@ -422,7 +422,7 @@ export default function Support() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-black to-yellow-500 text-white font-semibold
+                      className="w-full bg-gold-500 text-white font-semibold
                                  py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50
                                  disabled:cursor-not-allowed"
                     >
@@ -549,7 +549,7 @@ export default function Support() {
       >
         <div className="w-full max-w-[700px] rounded-2xl bg-white overflow-hidden">
 
-          <div className="flex flex-col px-4 sm:px-6 py-5 bg-gradient-to-r from-black to-yellow-500">
+          <div className="flex flex-col px-4 sm:px-6 py-5 bg-gold-500">
             <h4 className="text-xl font-semibold text-white">Edit Support Ticket</h4>
             <p className="text-sm text-gray-100 mt-1">Update the support ticket details.</p>
           </div>

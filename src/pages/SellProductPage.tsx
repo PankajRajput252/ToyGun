@@ -255,10 +255,11 @@ export default function SellProductPage() {
             showPopup("Missing Required Fields", "Please fill Title, Price and Weapon Category.");
             return;
         }
-        if (!/^[1-9]\d*$/.test(form.quantity)) {
-            showPopup("Invalid Quantity", "Product quantity must be a whole number of at least 1.");
-            return;
-        }
+        // Quantity field is hidden and always sent as 1, so no validation needed
+        // if (!/^[1-9]\d*$/.test(form.quantity)) {
+        //     showPopup("Invalid Quantity", "Product quantity must be a whole number of at least 1.");
+        //     return;
+        // }
         if (isUploadingImage) {
             showPopup("Images Uploading", "Please wait for all images to finish uploading.");
             return;
@@ -283,7 +284,8 @@ export default function SellProductPage() {
             licenseRequired:    form.licenseRequired,
             price:              Number(form.price),
             isNegotiable:       form.isNegotiable,
-            productQuantity:    Number(form.quantity),
+            // Quantity field is hidden; always send 1 so out-of-stock logic stays the same
+            productQuantity:    1,
             isStoreProduct:     form.isStoreProduct,
             sellerId:           userNodeId,
             location:           form.location,
@@ -636,13 +638,13 @@ export default function SellProductPage() {
                         </label>
 
                         {/* Quantity */}
-                        <div>
+                        {/* <div>
                             <label htmlFor="quantity" className="font-medium block mb-1">Product Quantity *</label>
                             <input id="quantity" type="number" name="quantity" min={1} step={1} inputMode="numeric"
                                    placeholder="Number of items available" value={form.quantity}
                                    onChange={handleChange}
                                    className="w-full border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" />
-                        </div>
+                        </div> */}
 
                         {/* Image Upload */}
                         <div className="space-y-3">
