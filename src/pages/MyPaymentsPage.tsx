@@ -148,7 +148,7 @@ export default function MyPaymentsPage() {
                     {p.status === "REJECTED" && (
                       <button
                         onClick={() => setResubmitFor(p)}
-                        className="rounded-lg bg-gradient-to-r from-black to-yellow-500 px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90"
+                        className="rounded-lg bg-gold-500 px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90"
                       >
                         Submit again
                       </button>

@@ -163,7 +163,7 @@ export default function OrderDetailPage() {
         <button
           onClick={() => navigate("/")}
           className="w-full py-3 rounded-xl text-white font-semibold
-                     bg-gradient-to-r from-black to-yellow-500
+                     bg-gold-500
                      hover:opacity-90 transition"
         >
           Continue Shopping

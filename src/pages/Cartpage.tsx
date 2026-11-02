@@ -256,7 +256,7 @@ export default function CartPage() {
           </p>
           <button
             onClick={() => navigate("/payments")}
-            className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-black to-yellow-500 hover:opacity-90 transition mb-3"
+            className="w-full py-3 rounded-xl text-white font-semibold bg-gold-500 hover:opacity-90 transition mb-3"
           >
             Track Payment Status
           </button>
@@ -286,7 +286,7 @@ export default function CartPage() {
           <button
             onClick={() => navigate("/orders")}
             className="w-full py-3 rounded-xl text-white font-semibold
-                       bg-gradient-to-r from-black to-yellow-500
+                       bg-gold-500
                        hover:opacity-90 transition mb-3"
           >
             View My Orders
@@ -318,7 +318,7 @@ export default function CartPage() {
           <button
             onClick={() => navigate("/")}
             className="w-full py-3 rounded-xl text-white font-semibold
-                       bg-gradient-to-r from-black to-yellow-500
+                       bg-gold-500
                        hover:opacity-90 transition mb-3"
           >
             Browse Listings
@@ -437,7 +437,7 @@ export default function CartPage() {
                 onClick={handlePlaceOrder}
                 disabled={isOrdering}
                 className="mt-3 w-full py-3 rounded-xl text-white font-semibold
-                           bg-gradient-to-r from-black to-yellow-500
+                           bg-gold-500
                            disabled:opacity-50 disabled:cursor-not-allowed
                            hover:opacity-90 transition"
               >

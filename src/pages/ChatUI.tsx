@@ -384,7 +384,7 @@ const loadConversations = async () => {
                   <div
                     className={`px-4 py-2 rounded-2xl max-w-[80%] md:max-w-xs text-sm shadow-sm break-words
                       ${isMe
-                        ? "bg-gradient-to-r from-black to-yellow-500 text-white rounded-br-none"
+                        ? "bg-gold-500 text-white rounded-br-none"
                         : "bg-white dark:bg-gray-800 text-gray-800 dark:text-white border dark:border-gray-700 rounded-bl-none"
                       }`}
                   >
@@ -423,7 +423,7 @@ const loadConversations = async () => {
           <button
             onClick={sendMessage}
             disabled={!input.trim()}
-            className="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-r from-black to-yellow-500
+            className="w-10 h-10 flex-shrink-0 rounded-full bg-gold-500
                        flex items-center justify-center text-white
                        disabled:opacity-40 disabled:cursor-not-allowed
                        hover:opacity-90 transition"

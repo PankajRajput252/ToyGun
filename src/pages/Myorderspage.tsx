@@ -76,7 +76,7 @@ export default function MyOrdersPage() {
             </p>
             <button
               onClick={() => navigate("/")}
-              className="bg-gradient-to-r from-black to-yellow-500 text-white
+              className="bg-gold-500 text-white
                          px-6 py-3 rounded-xl font-medium hover:opacity-90 transition
                          flex items-center gap-2"
             >
