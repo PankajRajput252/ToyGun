@@ -37,7 +37,11 @@ export default function WishlistPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {wishlistedProducts.map((item) => (
-            <ProductCard key={item.id} item={item} />
+            <ProductCard
+              key={item.id}
+              item={item}
+              onDeleted={(id) => setProducts((prev) => prev.filter((p) => p.id !== id))}
+            />
           ))}
         </div>
       )}

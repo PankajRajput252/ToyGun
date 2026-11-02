@@ -36,6 +36,24 @@ const createFileUploadHeaders = (): HeadersInit => {
   };
 };
 
+const SESSION_EXPIRED_MESSAGE = "Your session has expired. Please sign in again.";
+let redirectingToSignIn = false;
+
+// A 401 means the saved token is missing, expired or rejected by the server. Public
+// endpoints (product listing) still work without a valid token, so the site can look
+// signed in while every protected call fails — clear the dead session and ask the user
+// to sign in again (same keys as AuthContext.signOut).
+export const handleUnauthorized = () => {
+  if (redirectingToSignIn || !localStorage.getItem("stylocoin_user")) return;
+  redirectingToSignIn = true;
+  localStorage.removeItem("stylocoin_user");
+  localStorage.removeItem("stylocoin_keep_logged_in");
+  localStorage.removeItem("stylocoin_token");
+  localStorage.removeItem("stylocoin_last_activity");
+  // give the caller a moment to show its error toast before leaving the page
+  setTimeout(() => window.location.assign("/signin"), 1500);
+};
+
 // Generic API call function
 const apiCall = async <T>(
   endpoint: string,
@@ -61,6 +79,10 @@ const apiCall = async <T>(
       status: response.status,
       errorData,
     });
+    if (response.status === 401 && withAuth) {
+      handleUnauthorized();
+      throw new Error(SESSION_EXPIRED_MESSAGE);
+    }
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
 
@@ -1048,6 +1070,7 @@ export const imageUploadApi = {
       body: formData
     }).then(async (response) => {
       if (!response.ok) {
+        if (response.status === 401) handleUnauthorized();
         let errorMessage = `HTTP error! status: ${response.status}`;
 
         // Handle specific status codes
@@ -1083,6 +1106,7 @@ export const imageUploadApi = {
       body: formData
     }).then(async (response) => {
       if (!response.ok) {
+        if (response.status === 401) handleUnauthorized();
         let errorMessage = `HTTP error! status: ${response.status}`;
 
         // Handle specific status codes
@@ -1395,6 +1419,7 @@ export const depositReceiptUploadApi = {
       body: formData
     }).then(async (response) => {
       if (!response.ok) {
+        if (response.status === 401) handleUnauthorized();
         let errorMessage = `HTTP error! status: ${response.status}`;
 
         // Handle specific status codes

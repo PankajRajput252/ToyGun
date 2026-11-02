@@ -46,7 +46,7 @@ export default function Home() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
-  const [recentlyViewed] = useState<Product[]>(() => getRecentlyViewed<Product>());
+  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>(() => getRecentlyViewed<Product>());
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
@@ -141,6 +141,12 @@ export default function Home() {
       setShowGrid(false);
       fetchByCategory(categoryId);
     }
+  };
+
+  // ─── Drop a deleted product from every list on the page ─────────────────────
+  const handleProductDeleted = (id: number) => {
+    setAllProducts((prev) => prev.filter((p) => p.id !== id));
+    setRecentlyViewed((prev) => prev.filter((p) => p.id !== id));
   };
 
   useEffect(() => {
@@ -241,7 +247,7 @@ export default function Home() {
               <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 snap-x snap-mandatory no-scrollbar">
                 {recentlyViewed.map((item) => (
                   <div key={item.id} className="w-40 sm:w-52 flex-shrink-0 snap-start">
-                    <ProductCard item={item} />
+                    <ProductCard item={item} onDeleted={handleProductDeleted} />
                   </div>
                 ))}
               </div>
@@ -385,7 +391,7 @@ export default function Home() {
             {!isLoading && filteredProducts.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                 {filteredProducts.map((item, index) => (
-                  <ProductCard key={item.id ?? index} item={item} />
+                  <ProductCard key={item.id ?? index} item={item} onDeleted={handleProductDeleted} />
                 ))}
               </div>
             )}

@@ -6,7 +6,7 @@ import {
   Pencil, Trash2, Store, ChevronLeft, ChevronRight, MapPin, Sparkles
 } from "lucide-react";
 import { useWishlist } from "./Wishlistcontext";
-import { addRecentlyViewed } from "./recentlyViewed";
+import { addRecentlyViewed, removeRecentlyViewed } from "./recentlyViewed";
 import { productUrl, isOutOfStock, stockLeftLabel } from "./productUtils";
 import { useToast } from "../context/ToastContext";
 import PLACEHOLDER_IMAGE from "../components/images/BandookwaleLogo.jpeg";
@@ -99,6 +99,7 @@ export default function ProductCard({ item, onDeleted }: Props) {
       setIsDeleting(true);
       await sellProductApi.delete(item.id);
       setShowDeleteModal(false);
+      removeRecentlyViewed(item.id);
       onDeleted?.(item.id);
       showToast("Product deleted");
     } catch (error: any) {

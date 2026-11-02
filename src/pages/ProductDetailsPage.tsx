@@ -217,7 +217,7 @@ function Gallery({ images, title }: { images: string[]; title: string }) {
 }
 
 // ── Horizontal row of product cards ───────────────────────────────────────
-function ProductRow({ title, products, loading }: { title: string; products: Product[]; loading: boolean }) {
+function ProductRow({ title, products, loading, onDeleted }: { title: string; products: Product[]; loading: boolean; onDeleted?: (id: number) => void }) {
   if (!loading && products.length === 0) return null;
   return (
     <section className="mt-10">
@@ -228,7 +228,7 @@ function ProductRow({ title, products, loading }: { title: string; products: Pro
               <div key={i} className="w-40 sm:w-52 flex-shrink-0"><ProductCardSkeleton /></div>
             ))
           : products.map((p) => (
-              <div key={p.id} className="w-40 sm:w-52 flex-shrink-0 snap-start"><ProductCard item={p} /></div>
+              <div key={p.id} className="w-40 sm:w-52 flex-shrink-0 snap-start"><ProductCard item={p} onDeleted={onDeleted} /></div>
             ))}
       </div>
     </section>
@@ -791,8 +791,10 @@ function ProductDetails({ item }: { item: Product }) {
         </div>
       </div>
 
-      <ProductRow title="Similar products" products={similar} loading={similarLoading} />
-      <ProductRow title={`More from ${sellerName}`} products={fromSeller} loading={fromSellerLoading} />
+      <ProductRow title="Similar products" products={similar} loading={similarLoading}
+        onDeleted={(id) => setSimilar((prev) => prev.filter((p) => p.id !== id))} />
+      <ProductRow title={`More from ${sellerName}`} products={fromSeller} loading={fromSellerLoading}
+        onDeleted={(id) => setFromSeller((prev) => prev.filter((p) => p.id !== id))} />
     </div>
   );
 }

@@ -11,6 +11,16 @@ export function getRecentlyViewed<T extends { id?: number }>(): T[] {
   }
 }
 
+// Called after a product is deleted so it doesn't come back in the row
+export function removeRecentlyViewed(id: number) {
+  try {
+    const rest = getRecentlyViewed().filter((p) => p.id !== id);
+    localStorage.setItem(KEY, JSON.stringify(rest));
+  } catch {
+    // Storage blocked — nothing to clean up.
+  }
+}
+
 export function addRecentlyViewed<T extends { id?: number }>(item: T) {
   if (item.id == null) return;
   try {
