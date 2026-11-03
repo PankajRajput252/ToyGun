@@ -15,14 +15,7 @@ import storeImg from "../components/images/storeImg1.jpg"
 import storeNewImg from "../components/images/StoreNewLogo.jpeg"
 import Finallogo from "../components/images/Finallogo.jpeg"
 
-// Popular Indian cities
-const INDIAN_CITIES = [
-  "All India",
-  "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
-  "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Surat",
-  "Lucknow", "Kanpur", "Nagpur", "Indore", "Bhopal",
-  "Visakhapatnam", "Patna", "Vadodara", "Coimbatore", "Ludhiana", "Peddapuram"
-];
+import { INDIAN_CITIES } from "./indianCities";
 
 export default function Header() {
   const { isAuthenticated } = useAuth();
