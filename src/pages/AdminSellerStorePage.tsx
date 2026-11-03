@@ -130,7 +130,11 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
   };
 
   // ─── Stats for the banner ─────────────────────────────────────────────────
-  const stockValue = products.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
+  // Sum of price × quantity; a null/missing quantity means none in stock (see isOutOfStock)
+  const stockValue = products.reduce(
+    (sum, p) => sum + (Number(p.price) || 0) * (Number(p.productQuantity) || 0),
+    0
+  );
   const latestCreatedAt = products
     .map((p) => p.createdAt)
     .filter(Boolean)

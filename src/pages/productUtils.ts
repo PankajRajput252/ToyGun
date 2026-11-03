@@ -42,6 +42,7 @@ export const mapProduct = (item: any): Product => ({
   isStoreProduct: item.isStoreProduct,
   productQuantity: item.productQuantity,
   categoryId: item.categoryId,
+  subcategoryId: item.subcategoryId,
   weaponCategoryFkId: item.weaponCategoryFkId,
   weaponTypeFkId: item.weaponTypeFkId,
   weaponSubTypeFkId: item.weaponSubTypeFkId,
