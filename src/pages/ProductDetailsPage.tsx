@@ -25,6 +25,7 @@ interface Review {
   rating: number;
   comment: string;
   createdAt?: string;
+  createdDateTime?: string | null;
 }
 
 const RELATED_LIMIT = 12;
@@ -434,13 +435,22 @@ function ProductDetails({ item }: { item: Product }) {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const posted = await reviewApi.post({
+      const submitted = {
         productFkId: item.id,
         userFkId: user.nodeId,
         rating: newRating,
         comment: newComment.trim(),
-      });
-      setReviews((prev) => [{ ...posted, userName: user.name || "You" }, ...prev]);
+      };
+      const posted = await reviewApi.post(submitted);
+      // The post response isn't always the review (it can be the bare API wrapper with no
+      // rating → NaN average), so build it from what we sent, then reload the saved list.
+      setReviews((prev) => [
+        { ...submitted, userReviewPkId: posted?.userReviewPkId, userName: user.name || "You", createdAt: new Date().toISOString() },
+        ...prev,
+      ]);
+      reviewApi.getByProduct(item.id)
+        .then((saved) => { if (saved.length) setReviews(saved); })
+        .catch(console.error);
       setNewRating(0);
       setNewComment("");
       showToast("Review submitted — thank you!");
@@ -451,8 +461,9 @@ function ProductDetails({ item }: { item: Product }) {
     }
   };
 
-  const avgRating =
-    reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
+  // Skip any review without a usable rating so one bad row can't turn the average into NaN
+  const ratings = reviews.map((r) => Number(r.rating)).filter((n) => n >= 1 && n <= 5);
+  const avgRating = ratings.length > 0 ? ratings.reduce((sum, n) => sum + n, 0) / ratings.length : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 overflow-x-hidden text-gray-900 dark:text-gray-100">
@@ -510,7 +521,7 @@ function ProductDetails({ item }: { item: Product }) {
           <div className={`${card} p-5`}>
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <h2 className="text-lg font-semibold">Reviews ({reviews.length})</h2>
-              {reviews.length > 0 && (
+              {ratings.length > 0 && (
                 <div className="flex items-center gap-2">
                   <StarRating value={Math.round(avgRating)} readonly size="w-4 h-4" />
                   <span className="text-sm font-medium">{avgRating.toFixed(1)} / 5</span>
@@ -559,8 +570,11 @@ function ProductDetails({ item }: { item: Product }) {
                       <StarRating value={r.rating} readonly size="w-4 h-4" />
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300 ml-10 break-words">{r.comment}</p>
-                    {r.createdAt && (
-                      <p className="text-xs text-gray-400 ml-10 mt-1">{new Date(r.createdAt).toLocaleDateString("en-IN")}</p>
+                    {/* getUserReview sends createdDateTime; createdAt is set on a review just posted */}
+                    {(r.createdDateTime || r.createdAt) && (
+                      <p className="text-xs text-gray-400 ml-10 mt-1">
+                        {new Date((r.createdDateTime || r.createdAt)!).toLocaleDateString("en-IN")}
+                      </p>
                     )}
                   </div>
                 ))}
