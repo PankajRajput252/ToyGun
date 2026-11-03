@@ -819,6 +819,12 @@ export const usersApi = {
     apiCall<UsersResponse>(`/api/users/getUser?page=0&size=25&filterBy=${filterBy}&inputPkId=${userPkId}&inputFkId=null`)
       .then(response => response.data && response.data.length > 0 ? response.data[0] : null),
 
+  // Display name for a nodeId (products only carry sellerId). Public lookup, so no auth —
+  // a failure here must not log the viewer out.
+  getNameByNodeId: (nodeId: string): Promise<string | null> =>
+    apiCall<UsersResponse>(`/api/users/getUser?page=0&size=1&filterBy=ACTIVE&inputPkId=null&inputFkId=${encodeURIComponent(nodeId)}`, 'GET', undefined, false)
+      .then(response => response.data?.find(u => u.nodeId === nodeId)?.name || null),
+
   // Delete user
   delete: (userId: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteUser/${userId}`, 'DELETE'),

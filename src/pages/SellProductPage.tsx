@@ -1,6 +1,8 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { imageUploadApi, sellProductApi, ProductReq } from "../services/api";
+import { fetchRawProductById, fetchProductById } from "./productUtils";
+import { refreshRecentlyViewed } from "./recentlyViewed";
 import { AlertTriangle } from "lucide-react";
 import { WEAPON_CATEGORIES, WEAPON_TYPES, RIFLE_PURPOSES } from "./weaponCategories";
 
@@ -50,6 +52,12 @@ export default function SellProductPage() {
     const userNodeId = user?.nodeId;
     const navigate   = useNavigate();
 
+    // ── edit mode: ProductCard's "Edit item" passes the listing via router state ──
+    const routerLocation = useLocation();
+    const editProductId: number | null = routerLocation.state?.product?.id ?? null;
+    const isEditMode = editProductId != null;
+    const [isLoadingProduct, setIsLoadingProduct] = useState(isEditMode);
+
     // ── popup ────────────────────────────────────────────────────────────────────
     const [popup, setPopup] = useState({ open: false, title: "", message: "" });
     const showPopup = (title: string, message: string) =>
@@ -79,6 +87,48 @@ export default function SellProductPage() {
 
     // ── form ──────────────────────────────────────────────────────────────────────
     const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
+
+    // ── edit mode: load the full listing (the card copy has no weapon fields / image ids) ──
+    useEffect(() => {
+        if (editProductId == null) return;
+        let cancelled = false;
+        const str = (v: any) => (v == null ? "" : String(v));
+        fetchRawProductById(editProductId)
+            .then(p => {
+                if (cancelled) return;
+                if (!p) { showPopup("Not Found", "This ad could not be loaded for editing."); return; }
+                setForm({
+                    title:              p.title || "",
+                    description:        p.description || "",
+                    weaponCategoryFkId: str(p.weaponCategoryFkId),
+                    weaponTypeFkId:     str(p.weaponTypeFkId),
+                    weaponSubTypeFkId:  str(p.weaponSubTypeFkId),
+                    caliberFkId:        str(p.caliberFkId),
+                    riflePurposeFkId:   str(p.riflePurposeFkId),
+                    // sent as licenseRequired, but getProduct returns it as isLicenseRequired
+                    licenseRequired:    !!(p.isLicenseRequired ?? p.licenseRequired),
+                    price:              str(p.price),
+                    isNegotiable:       !!(p.negotiable ?? p.isNegotiable),
+                    quantity:           "1",
+                    isStoreProduct:     !!p.isStoreProduct,
+                    location:           p.location || "",
+                    city:               p.city || "",
+                    state:              p.state || "",
+                    zipCode:            p.zipCode || "",
+                    country:            p.country || "India",
+                });
+                setCoords({ lat: Number(p.latitude) || 0, lng: Number(p.longitude) || 0 });
+                const ids: string[] = (p.productImageList ?? [])
+                    .map((img: any) => img.productImageId)
+                    .filter(Boolean);
+                setProductImageIds(ids);
+                productImageIdsRef.current = ids;
+                setImagePreviews(ids.map(id => `uploaded:${id}`));
+            })
+            .catch(() => { if (!cancelled) showPopup("Error", "Could not load this ad. Please try again."); })
+            .finally(() => { if (!cancelled) setIsLoadingProduct(false); });
+        return () => { cancelled = true; };
+    }, [editProductId]);
 
     /* ── LEGACY: API fetches for weapon dropdowns ─────────────────────────────────
     // helper to extract array from varied API shapes
@@ -308,8 +358,17 @@ export default function SellProductPage() {
 
         try {
             setIsSubmitting(true);
-            await sellProductApi.add(payload);
-            showPopup("Success", "Your ad has been posted successfully!");
+            if (isEditMode) {
+                await sellProductApi.update(editProductId, payload);
+                // keep the "Recently viewed" copy in step with the edit
+                fetchProductById(editProductId)
+                    .then(fresh => { if (fresh) refreshRecentlyViewed([fresh]); })
+                    .catch(console.error);
+                showPopup("Success", "Your ad has been updated successfully!");
+            } else {
+                await sellProductApi.add(payload);
+                showPopup("Success", "Your ad has been posted successfully!");
+            }
             setTimeout(() => navigate(-1), 2000);
         } catch (error: any) {
             showPopup("Error", `Something went wrong: ${error.message || "Please try again."}`);
@@ -388,13 +447,19 @@ export default function SellProductPage() {
                 <div className="fixed inset-0 z-[9998] flex items-center justify-center"
                      style={{ background: "rgba(0,0,0,0.7)" }}>
                     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 w-full max-w-sm mx-4">
-                        <h3 className="text-white text-lg font-semibold">Post Advertisement?</h3>
-                        <p className="text-gray-400 mt-2">Are you sure you want to post this ad?</p>
+                        <h3 className="text-white text-lg font-semibold">
+                            {isEditMode ? "Update Advertisement?" : "Post Advertisement?"}
+                        </h3>
+                        <p className="text-gray-400 mt-2">
+                            Are you sure you want to {isEditMode ? "save changes to" : "post"} this ad?
+                        </p>
                         <div className="flex gap-3 mt-5">
                             <button onClick={() => setShowConfirmModal(false)}
                                     className="flex-1 py-2 rounded-lg bg-gray-700 text-white">Cancel</button>
                             <button onClick={confirmSubmit}
-                                    className="flex-1 py-2 rounded-lg bg-yellow-500 text-white">Yes, Post</button>
+                                    className="flex-1 py-2 rounded-lg bg-yellow-500 text-white">
+                                {isEditMode ? "Yes, Update" : "Yes, Post"}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -417,7 +482,7 @@ export default function SellProductPage() {
                             </span>
                             <div>
                                 <h2 className="text-lg sm:text-xl font-bold tracking-wide text-white">
-                                    Post Your Ad
+                                    {isEditMode ? "Edit Your Ad" : "Post Your Ad"}
                                 </h2>
                             </div>
                         </div>
@@ -717,10 +782,12 @@ export default function SellProductPage() {
 
                         {/* Submit */}
                         <button onClick={() => setShowConfirmModal(true)}
-                                disabled={isSubmitting || isUploadingImage}
+                                disabled={isSubmitting || isUploadingImage || isLoadingProduct}
                                 className="w-full py-3 text-white font-semibold rounded-xl bg-[#111827] border-2 border-[#f5b301]
                                            disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition">
-                            {isSubmitting ? "Posting..." : "Post Ad"}
+                            {isLoadingProduct ? "Loading ad..."
+                                : isSubmitting ? (isEditMode ? "Updating..." : "Posting...")
+                                : isEditMode ? "Update Ad" : "Post Ad"}
                         </button>
                     </div>
                 </div>

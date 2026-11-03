@@ -244,3 +244,25 @@ export const RIFLE_PURPOSES: WeaponOption[] = [
   { id: 9, name: "Match / Target Rifle" },
   { id: 10, name: "Sporting / Hunting Rifle" },
 ];
+
+// Names for the weapon ids saved on a product (0 / missing ids are skipped), for display.
+export function weaponDetails(ids: {
+  weaponCategoryFkId?: number | null;
+  weaponTypeFkId?: number | null;
+  weaponSubTypeFkId?: number | null;
+  caliberFkId?: number | null;
+}) {
+  const type = WEAPON_TYPES.find((t) => t.id === ids.weaponTypeFkId);
+  const subType = type?.subTypes.find((s) => s.id === ids.weaponSubTypeFkId);
+  // caliber ids are unique across the whole taxonomy, so search every list
+  const caliber = WEAPON_TYPES
+    .flatMap((t) => [...(t.caliberGroups ?? []), ...t.subTypes.flatMap((s) => s.caliberGroups ?? [])])
+    .flatMap((g) => g.calibers)
+    .find((c) => c.id === ids.caliberFkId);
+  return {
+    category: WEAPON_CATEGORIES.find((c) => c.id === ids.weaponCategoryFkId)?.name,
+    type: type?.name,
+    subType: subType?.name,
+    caliber: caliber?.name,
+  };
+}

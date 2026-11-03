@@ -34,6 +34,11 @@ export interface Product {
   productQuantity?: number | null;
   categoryId?: number;
   subcategoryId?: number;
+  weaponCategoryFkId?: number;
+  weaponTypeFkId?: number;
+  weaponSubTypeFkId?: number;
+  caliberFkId?: number;
+  isLicenseRequired?: boolean;
   city?: string;
   state?: string;
   zipCode?: string;
@@ -86,7 +91,9 @@ export default function ProductCard({ item, onDeleted }: Props) {
   };
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate("/admin/sellProductPage", { state: { product: item } });
+    // /admin/* is admin-only — sending a normal seller there bounced them back to Home
+    const editPath = item.isStoreProduct ? "/admin/sellProductPage" : "/sellProductPage";
+    navigate(editPath, { state: { product: item } });
   };
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();

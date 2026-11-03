@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { imageUploadApi, sellProductApi, ProductReq } from "../services/api";
 import { AlertTriangle, Check } from "lucide-react";
 import { SHOOTING_CATEGORIES } from "./shootingCategories";
+import { fetchProductById } from "./productUtils";
+import { refreshRecentlyViewed } from "./recentlyViewed";
 
 type ProductForm = {
     title: string;
@@ -251,6 +253,10 @@ export default function AdminSellProductPage() {
             setIsSubmitting(true);
             if (isEditMode && editProductId) {
                 await sellProductApi.update(editProductId, payload);
+                // keep the "Recently viewed" copy in step with the edit
+                fetchProductById(Number(editProductId))
+                    .then((fresh) => { if (fresh) refreshRecentlyViewed([fresh]); })
+                    .catch(console.error);
                 showPopup(
                     "Success",
                     "Product updated successfully!"

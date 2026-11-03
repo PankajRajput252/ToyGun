@@ -5,7 +5,7 @@ import CategoryGrid from "../CategoryGrid";
 import ProductCard, { type Product } from "../ProductCard";
 import { mapProduct, fetchProductsByWeaponCategory } from "../productUtils";
 import ProductCardSkeleton from "../ProductCardSkeleton";
-import { getRecentlyViewed } from "../recentlyViewed";
+import { getRecentlyViewed, refreshRecentlyViewed } from "../recentlyViewed";
 import { sellProductApi } from "../../services/api";
 import { useFilter } from "../Filtercontext";
 import {
@@ -152,6 +152,11 @@ export default function Home() {
   useEffect(() => {
     fetchAllProducts(0);
   }, []);
+
+  // Recently viewed is a saved snapshot — update it with whatever fresh products just loaded
+  useEffect(() => {
+    if (allProducts.length) setRecentlyViewed(refreshRecentlyViewed(allProducts));
+  }, [allProducts]);
 
   const scrollToProducts = () =>
     document.getElementById("products")?.scrollIntoView({ behavior: "smooth", block: "start" });

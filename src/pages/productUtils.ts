@@ -42,6 +42,11 @@ export const mapProduct = (item: any): Product => ({
   isStoreProduct: item.isStoreProduct,
   productQuantity: item.productQuantity,
   categoryId: item.categoryId,
+  weaponCategoryFkId: item.weaponCategoryFkId,
+  weaponTypeFkId: item.weaponTypeFkId,
+  weaponSubTypeFkId: item.weaponSubTypeFkId,
+  caliberFkId: item.caliberFkId,
+  isLicenseRequired: item.isLicenseRequired,
 });
 
 // A product can't be bought or chatted about when its quantity is null or 0.
@@ -91,12 +96,17 @@ export async function fetchProductsByWeaponCategory(
     .map(mapProduct);
 }
 
-// Used when a product page is opened from a shared link (no router state).
-export async function fetchProductById(id: number): Promise<Product | null> {
+// Raw getProduct item — has the weapon fields and image ids that Product drops (used by edit).
+export async function fetchRawProductById(id: number): Promise<any | null> {
   const res = await fetch(
     `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=1&inputPkId=${id}&inputFkId=null&searchValue=null`
   );
-  const match = extractList(await res.json()).find((p) => p.productPkId === id);
+  return extractList(await res.json()).find((p) => p.productPkId === id) ?? null;
+}
+
+// Used when a product page is opened from a shared link (no router state).
+export async function fetchProductById(id: number): Promise<Product | null> {
+  const match = await fetchRawProductById(id);
   return match ? mapProduct(match) : null;
 }
 

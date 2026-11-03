@@ -7,11 +7,12 @@ import {
 } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { useWishlist } from "./Wishlistcontext";
-import { viewApi, reviewApi, sellProductApi } from "../services/api";
+import { viewApi, reviewApi, sellProductApi, usersApi } from "../services/api";
 import { useToast } from "../context/ToastContext";
 import ProductCard, { type Product, PLACEHOLDER_IMAGE } from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { addRecentlyViewed } from "./recentlyViewed";
+import { weaponDetails } from "./weaponCategories";
 import { mapProduct, fetchProductsByCategory, fetchProductById, productUrl, isOutOfStock, stockLeftLabel } from "./productUtils";
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -299,6 +300,7 @@ function ProductDetails({ item }: { item: Product }) {
 
   const images: string[] = item.images?.length > 0 ? item.images : [PLACEHOLDER_IMAGE];
   const isStoreProduct = item.isStoreProduct === true;
+  const weapon = weaponDetails(item);
   const isOwner = !!user?.nodeId && user.nodeId === item.sellerId;
   const outOfStock = isOutOfStock(item);
   const stockLeft = stockLeftLabel(item);
@@ -306,7 +308,17 @@ function ProductDetails({ item }: { item: Product }) {
   const alreadyInCart = cartItems.some((c) => c.id === cartId);
   const favorited = item.id != null ? isFavorited(item.id) : false;
   const favLoading = item.id != null ? isFavLoading(item.id) : false;
-  const sellerName = item.sellerName || item.sellerId || "Seller";
+  // mapProduct falls back to the node id for sellerName, so treat that as "no name" and look it up
+  const knownSellerName = item.sellerName && item.sellerName !== item.sellerId ? item.sellerName : null;
+  const [sellerName, setSellerName] = useState(knownSellerName || "Seller");
+  useEffect(() => {
+    if (knownSellerName || !item.sellerId) return;
+    let cancelled = false;
+    usersApi.getNameByNodeId(item.sellerId)
+      .then((name) => { if (!cancelled && name) setSellerName(name); })
+      .catch(console.error);
+    return () => { cancelled = true; };
+  }, [item.sellerId, knownSellerName]);
 
   // ── On mount: record view, load views, reviews, related products ───────
   useEffect(() => {
@@ -369,7 +381,7 @@ function ProductDetails({ item }: { item: Product }) {
         productTitle: item.title,
         productImage: images[0],
         sellerId: item.sellerId,
-        sellerName: item.sellerName, // chat falls back to "Seller" rather than showing the node id
+        sellerName, // looked-up name; "Seller" until it loads, never the node id
         buyerId: user?.nodeId,
         buyerName: user?.name || "Me",
         initialMessage,
@@ -460,10 +472,19 @@ function ProductDetails({ item }: { item: Product }) {
           <div className={`${card} p-5`}>
             <h2 className="text-lg font-semibold mb-3">Details</h2>
             <dl className="divide-y divide-gray-200 dark:divide-gray-800 text-sm">
-              <div className="flex justify-between py-2.5">
-                <dt className="text-gray-500">Brand</dt>
-                <dd className="font-medium">{item.brand || "N/A"}</dd>
-              </div>
+              {/* Rows only appear when the listing has that value — the sell form has no brand field yet */}
+              {[
+                ["Brand", item.brand],
+                ["Category", weapon.category],
+                ["Weapon type", [weapon.type, weapon.subType].filter(Boolean).join(" · ")],
+                ["Caliber / Gauge", weapon.caliber],
+                ["Licence required", item.isLicenseRequired == null ? null : item.isLicenseRequired ? "Yes" : "No"],
+              ].filter(([, value]) => value).map(([label, value]) => (
+                <div key={label} className="flex justify-between gap-4 py-2.5">
+                  <dt className="text-gray-500 shrink-0">{label}</dt>
+                  <dd className="font-medium text-right">{value}</dd>
+                </div>
+              ))}
               <div className="flex justify-between py-2.5">
                 <dt className="text-gray-500">Type</dt>
                 <dd className="font-medium">{isStoreProduct ? "Store product" : "Marketplace listing"}</dd>
