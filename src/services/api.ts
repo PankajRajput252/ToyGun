@@ -534,7 +534,8 @@ export const emailVerificationApi = {
   // Fetch the OTP issued for the given userNodeId (no auth token)
   getOtpForVerification: (userNodeId: string): Promise<string> =>
     apiCall<any>(`/api/v1/auth/getOtpForVerification?userNodeId=${encodeURIComponent(userNodeId)}`, 'GET', undefined, false).then(response => {
-      const record = response?.data?.[0] ?? response?.data ?? response;
+      // The OTP record comes back under `response` ({ status, response: { otp, expiryTime, ... } })
+      const record = response?.response ?? response?.data?.[0] ?? response?.data ?? response;
       const otp = typeof record === 'object' && record !== null
         ? record.otp ?? record.oneTimePassword ?? record.id
         : record;
