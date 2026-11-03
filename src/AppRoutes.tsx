@@ -64,6 +64,7 @@ const MyPaymentsPage = lazy(() => import("./pages/MyPaymentsPage"));
 const AdminPaymentMethods = lazy(() => import("./pages/Admin/AdminPaymentMethods"));
 const AdminPaymentApprovals = lazy(() => import("./pages/Admin/AdminPaymentApprovals"));
 const AdminShipments = lazy(() => import("./pages/Admin/AdminShipments"));
+const AdminUserListings = lazy(() => import("./pages/Admin/AdminUserListings"));
 
 
 // Shown while a page's code downloads (pages load on demand to keep the first visit fast)
@@ -182,6 +183,7 @@ export default function AppRoutes() {
             <Route path="payment-methods" element={<AdminPaymentMethods />} />
             <Route path="payments" element={<AdminPaymentApprovals />} />
             <Route path="shipments" element={<AdminShipments />} />
+            <Route path="listings" element={<AdminUserListings />} />
           </Route>
         </Route>
 

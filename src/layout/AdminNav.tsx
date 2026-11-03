@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ChevronDown, LayoutDashboard, Users, UserCheck, UserX, ShieldCheck,
-  BadgeIndianRupee, PackagePlus, CheckCircle2, Landmark, Truck, type LucideIcon,
+  BadgeIndianRupee, PackagePlus, ListChecks, CheckCircle2, Landmark, Truck, type LucideIcon,
 } from "lucide-react";
 
 // Admin header navigation: links + dropdown menus, shared by desktop and mobile.
@@ -35,6 +35,7 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/admin/subscription", label: "Subscription", description: "Plans and user subscriptions", icon: BadgeIndianRupee },
       { to: "/admin/store", label: "Add Store Items", description: "List products in the store", icon: PackagePlus },
+      { to: "/admin/listings", label: "User Listings", description: "Products posted by users; remove bad ones", icon: ListChecks },
     ],
   },
   {
