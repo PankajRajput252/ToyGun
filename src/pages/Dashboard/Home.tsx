@@ -3,9 +3,9 @@ import Footer from "../../components/footer/Footer";
 import CategoryFilterBar from "../CategoryFilterBar";
 import CategoryGrid from "../CategoryGrid";
 import ProductCard, { type Product } from "../ProductCard";
-import { mapProduct, fetchProductsByWeaponCategory } from "../productUtils";
+import { mapProduct, fetchProductsByWeaponCategory, lookupProductById } from "../productUtils";
 import ProductCardSkeleton from "../ProductCardSkeleton";
-import { getRecentlyViewed, refreshRecentlyViewed } from "../recentlyViewed";
+import { getRecentlyViewed, refreshRecentlyViewed, removeRecentlyViewed, clearRecentlyViewed } from "../recentlyViewed";
 import { sellProductApi } from "../../services/api";
 import { useFilter } from "../Filtercontext";
 import {
@@ -46,7 +46,9 @@ export default function Home() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
-  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>(() => getRecentlyViewed<Product>());
+  // Starts empty: saved items are shown only after the backend confirms they still exist
+  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
+  const [recentChecked, setRecentChecked] = useState(false);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
@@ -63,6 +65,11 @@ export default function Home() {
       isFirstPage ? setIsLoading(true) : setIsLoadingMore(true);
       const response = await sellProductApi.getAll(pageToLoad, PAGE_SIZE, "ACTIVE", null, false);
       const mapped = response.content.map(mapProduct);
+      // The backend has no products at all, so nothing saved in Recently viewed can still exist
+      if (isFirstPage && mapped.length === 0 && !response.totalElements) {
+        clearRecentlyViewed();
+        setRecentlyViewed([]);
+      }
       setAllProducts((prev) => (isFirstPage ? mapped : [...prev, ...mapped]));
       setPage(pageToLoad);
       const loadedSoFar = pageToLoad * PAGE_SIZE + mapped.length;
@@ -153,10 +160,34 @@ export default function Home() {
     fetchAllProducts(0);
   }, []);
 
-  // Recently viewed is a saved snapshot — update it with whatever fresh products just loaded
+  // Recently viewed lives in localStorage, so it can hold products the current backend doesn't have
+  // (deleted, deactivated, or saved while the site pointed at another backend). Look each one up and
+  // drop the missing ones. A failed request keeps the item — only a confirmed "not found" removes it.
   useEffect(() => {
-    if (allProducts.length) setRecentlyViewed(refreshRecentlyViewed(allProducts));
-  }, [allProducts]);
+    const saved = getRecentlyViewed<Product>().filter((p) => p.id != null);
+    if (!saved.length) { setRecentChecked(true); return; }
+    let cancelled = false;
+
+    Promise.all(
+      saved.map((p) =>
+        lookupProductById(p.id!, p.isStoreProduct === true)
+          .then((fresh) => ({ id: p.id!, fresh, ok: true }))
+          .catch(() => ({ id: p.id!, fresh: null as Product | null, ok: false }))
+      )
+    ).then((results) => {
+      if (cancelled) return;
+      results.forEach((r) => { if (r.ok && !r.fresh) removeRecentlyViewed(r.id); });
+      const fresh = results.flatMap((r) => (r.fresh ? [r.fresh] : []));
+      setRecentlyViewed(refreshRecentlyViewed(fresh));
+      setRecentChecked(true);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // After the check, keep the row in step with whatever fresh products just loaded
+  useEffect(() => {
+    if (recentChecked && allProducts.length) setRecentlyViewed(refreshRecentlyViewed(allProducts));
+  }, [allProducts, recentChecked]);
 
   const scrollToProducts = () =>
     document.getElementById("products")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -252,7 +283,7 @@ export default function Home() {
               <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 snap-x snap-mandatory no-scrollbar">
                 {recentlyViewed.map((item) => (
                   <div key={item.id} className="w-40 sm:w-52 flex-shrink-0 snap-start">
-                    <ProductCard item={item} onDeleted={handleProductDeleted} />
+                    <ProductCard item={item} readOnly />
                   </div>
                 ))}
               </div>

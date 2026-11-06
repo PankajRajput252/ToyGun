@@ -59,6 +59,7 @@ const AdminSellProductPage = lazy(() => import("./pages/AdminSellProductPage"));
 // Premium page no longer used
 // const PremiumPage = lazy(() => import("./pages/Premiumpage"));
 const TrackOrderPage = lazy(() => import("./pages/Trackorderpage"));
+const LaunchPage = lazy(() => import("./pages/LaunchPage"));
 // Manual payments (bank transfer / UPI + receipt)
 const MyPaymentsPage = lazy(() => import("./pages/MyPaymentsPage"));
 const AdminPaymentMethods = lazy(() => import("./pages/Admin/AdminPaymentMethods"));
@@ -89,6 +90,7 @@ export default function AppRoutes() {
   const hideHeaderRoutes = [
     "/signin",
     "/signup",
+    "/launch",
   ];
 
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
@@ -109,6 +111,9 @@ export default function AppRoutes() {
 
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+
+        {/* Secret one-time launch ceremony page (not linked anywhere) */}
+        <Route path="/launch" element={<LaunchPage />} />
 
         {/* Old links/bookmarks used a /bandookwale prefix — send them to the root-based URL */}
         <Route path="/bandookwale/*" element={<LegacyPrefixRedirect />} />

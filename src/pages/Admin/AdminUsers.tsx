@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
 import UserManagementTable from '../../components/admin/UserManagementTable';
 import TransactionApprovalModal from '../../components/admin/TransactionApprovalModal';
+import { API_BASE_URL } from "../../services/apiBase";
 //  import { User, WalletData, usersApi, walletDataApi } from '../../services/api';
 import { usersApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -115,7 +116,7 @@ export default function AdminUsers() {
         setUsers([]); // <- Important
       }
 
-      const walletUrl = `https://api.bandookwale.com/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
+      const walletUrl = `${API_BASE_URL}/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
       const walletResponse = await fetch(walletUrl);
       const walletDdata = await walletResponse.json();
 

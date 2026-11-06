@@ -21,6 +21,15 @@ export function removeRecentlyViewed(id: number) {
   }
 }
 
+// Called when the backend has no products at all — nothing saved can still exist
+export function clearRecentlyViewed() {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // Storage blocked — nothing to clear.
+  }
+}
+
 // Swap stored copies for fresh ones (e.g. after an edit) without changing the order.
 // Returns the updated list so callers can put it straight into state.
 export function refreshRecentlyViewed<T extends { id?: number }>(fresh: T[]): T[] {

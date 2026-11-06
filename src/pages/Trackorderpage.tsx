@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Package, Search, Truck, CheckCircle, ArrowLeft } from "lucide-react";
 
-const API_URL = "https://api.bandookwale.com";
+import { API_BASE_URL as API_URL } from "../services/apiBase";
 
 interface TrackingResult {
   status?: string;

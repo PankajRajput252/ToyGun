@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { usersApi } from "../services/api";
+import { API_BASE_URL } from "../services/apiBase";
 
 interface User {
   userPkId?: number;
@@ -154,9 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // API Base URL
-  const apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL ||
-    "http://localhost:8080";
+  const apiBaseUrl = API_BASE_URL;
 
   console.log("API Base URL:", apiBaseUrl);
 

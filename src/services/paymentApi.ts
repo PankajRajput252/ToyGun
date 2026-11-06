@@ -3,8 +3,7 @@
 
 import { getAuthToken } from "./api";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.trim() || "https://api.bandookwale.com";
+import { API_BASE_URL } from "./apiBase";
 
 // ─── Types (mirror the backend DTOs) ──────────────────────────────────────────
 

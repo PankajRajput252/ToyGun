@@ -51,9 +51,11 @@ export interface Product {
 type Props = {
   item: Product;
   onDeleted?: (id: number) => void;
+  // Hide owner edit/delete controls (e.g. the "Recently viewed" row is for browsing only)
+  readOnly?: boolean;
 };
 
-export default function ProductCard({ item, onDeleted }: Props) {
+export default function ProductCard({ item, onDeleted, readOnly = false }: Props) {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const { toggleFavorite, isFavorited, isLoading, isInitialized } = useWishlist();
@@ -231,7 +233,7 @@ export default function ProductCard({ item, onDeleted }: Props) {
           {/* Owner controls / wishlist */}
           <div className="absolute top-2.5 right-2.5 flex gap-1.5" onClick={(e) => e.stopPropagation()}>
             {isOwner ? (
-              <>
+              !readOnly && <>
                 <button
                   onClick={handleEdit}
                   title="Edit"
@@ -319,12 +321,12 @@ export default function ProductCard({ item, onDeleted }: Props) {
           {/* CTA — owners edit their own item instead of buying it */}
           {isOwner ? (
             <button
-              onClick={handleEdit}
+              onClick={readOnly ? (e) => { e.stopPropagation(); openDetails(); } : handleEdit}
               className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-[11px] sm:text-xs font-semibold
                          transition-colors whitespace-nowrap bg-gold-500/10 border border-gold-500/40 text-gold-400
                          hover:bg-gold-500 hover:text-white"
             >
-              <Pencil className="w-3.5 h-3.5" /> Edit item
+              {readOnly ? "View item" : <><Pencil className="w-3.5 h-3.5" /> Edit item</>}
             </button>
           ) : outOfStock ? (
             <button

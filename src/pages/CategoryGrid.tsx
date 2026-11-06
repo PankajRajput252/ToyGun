@@ -20,7 +20,7 @@ interface Props {
   onSelectCategory: (categoryId: number | null, categoryName?: string) => void;
 }
 
-const API_URL = "https://api.bandookwale.com";
+import { API_BASE_URL as API_URL } from "../services/apiBase";
 
 const getImageForCategory = (name: string): string => {
   const n = name.toLowerCase();

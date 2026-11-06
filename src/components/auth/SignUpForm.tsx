@@ -29,7 +29,7 @@ interface SubscriptionDefinition {
   subscriptionAmount: number;
 }
 
-const API_URL = "https://api.bandookwale.com";
+import { API_BASE_URL as API_URL } from "../../services/apiBase";
 // const RAZORPAY_KEY = "rzp_test_Sk36cjHZNLcY5o"; // ← your key
 
 export default function SignUpForm() {

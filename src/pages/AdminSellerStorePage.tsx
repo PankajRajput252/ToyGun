@@ -13,7 +13,7 @@ import {
   SHOOTING_CATEGORY_COLUMNS, selectionIds, selectionLabel, selectionTerms, type CategorySelection,
 } from "./shootingCategories";
 
-const API_URL = "https://api.bandookwale.com";
+import { API_BASE_URL as API_URL } from "../services/apiBase";
 
 type SortKey = "newest" | "price-asc" | "price-desc";
 

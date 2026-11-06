@@ -3,6 +3,7 @@ import { rentContainer, RentContainerData } from "../services/api";
 import Button from "../components/ui/button/Button";
 import ComponentCard from "../components/common/ComponentCard";
 import { Table, TableBody, TableCell, TableHeader, TableRow, } from "../components/ui/table";
+import { API_BASE_URL } from "../services/apiBase";
 
 /* ============================
    Types
@@ -74,7 +75,7 @@ export default function RentContainer() {
   ============================ */
   useEffect(() => {
     fetch(
-      "https://api.bandookwale.com/api/container/getInvestment?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=CONT66855610",
+      `${API_BASE_URL}/api/container/getInvestment?page=1&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=CONT66855610`,
       {
         headers: {
           Authorization: `Bearer YOUR_TOKEN_HERE`,

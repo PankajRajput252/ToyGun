@@ -7,10 +7,7 @@
 //     ? import.meta.env.VITE_API_BASE_URL
 //     : (import.meta.env.PROD ? '' : 'http://localhost:8080');
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.trim() ||
-  // "https://Minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com";
-  "https://api.bandookwale.com";
+import { API_BASE_URL } from "./apiBase";
 
 
 // Get auth token from localStorage
@@ -523,6 +520,21 @@ export const walletDataApi = {
   addOtp: (email: string, userNodeId?: string | null): Promise<UsersResponse> =>
     apiCall<any>(`/api/users/sendEmailOtp?email=${email}&userNodeId=${userNodeId}`, 'POST').then(response => response.data?.[0] || response),
 
+};
+
+// One-time website launch (public, used by the /launch page)
+export interface LaunchStatus {
+  launched: boolean;
+  launchedAt: string | null;
+  /** true when someone else had already launched the site before this click */
+  alreadyLaunched: boolean;
+}
+
+export const siteLaunchApi = {
+  getStatus: (): Promise<LaunchStatus> =>
+    apiCall<LaunchStatus>(`/api/v1/auth/launchStatus`, 'GET', undefined, false),
+  launch: (): Promise<LaunchStatus> =>
+    apiCall<LaunchStatus>(`/api/v1/auth/launchWebsite`, 'POST', undefined, false),
 };
 
 // Email verification API (used during sign-up, before a userNodeId exists)
@@ -1682,8 +1694,8 @@ export const sellProductApi = {
 };
 
 
-export const WS_URL = "https://api.bandookwale.com/ws"; // ← update to your backend URL
-export const API_URL = "https://api.bandookwale.com";
+export const WS_URL = `${API_BASE_URL}/ws`;
+export const API_URL = API_BASE_URL;
 
 export type Favorite = {
   favoritesPkId: number;

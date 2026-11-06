@@ -1,7 +1,7 @@
 import type { Product } from "./ProductCard";
 import PLACEHOLDER_IMAGE from "../components/images/BandookwaleLogo.jpeg";
 
-const API_URL = "https://api.bandookwale.com";
+import { API_BASE_URL as API_URL } from "../services/apiBase";
 
 // "5m ago", "3h ago", "2d ago" — easier to scan than a full date
 export const timeAgo = (iso?: string): string => {
@@ -108,6 +108,18 @@ export async function fetchRawProductById(id: number): Promise<any | null> {
 // Used when a product page is opened from a shared link (no router state).
 export async function fetchProductById(id: number): Promise<Product | null> {
   const match = await fetchRawProductById(id);
+  return match ? mapProduct(match) : null;
+}
+
+// Like fetchProductById, but throws when the request itself fails, so callers can tell
+// "backend says this product doesn't exist" (null) apart from "couldn't reach the backend" (throws).
+// Pass the product's own isStoreProduct: without it the backend answers 500 instead of an empty list.
+export async function lookupProductById(id: number, isStoreProduct: boolean): Promise<Product | null> {
+  const res = await fetch(
+    `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=1&inputPkId=${id}&inputFkId=null&searchValue=null&isStoreProduct=${isStoreProduct}`
+  );
+  if (!res.ok) throw new Error(`getProduct ${id} failed: HTTP ${res.status}`);
+  const match = extractList(await res.json()).find((p) => p.productPkId === id);
   return match ? mapProduct(match) : null;
 }
 
