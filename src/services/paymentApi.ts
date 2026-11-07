@@ -136,10 +136,15 @@ async function request(path: string, init: RequestInit = {}): Promise<Response> 
   return res;
 }
 
-const getJson = async <T>(path: string, init?: RequestInit): Promise<T> =>
+export const getJson = async <T>(path: string, init?: RequestInit): Promise<T> =>
   (await request(path, init)).json() as Promise<T>;
 
-const sendJson = <T>(method: string, path: string, body?: unknown) =>
+/** For calls that answer 204 No Content (e.g. DELETE). */
+export const sendNoContent = async (method: string, path: string): Promise<void> => {
+  await request(path, { method });
+};
+
+export const sendJson = <T>(method: string, path: string, body?: unknown) =>
   getJson<T>(path, {
     method,
     headers: body === undefined ? undefined : { "Content-Type": "application/json" },
@@ -257,12 +262,22 @@ export interface ShopOrder {
   orderReference: string;
   userId: string | null; // admin view only
   status: OrderStatus;
+  /** Sum of item lines at the charged unit prices (automatic sale discounts already applied). */
   subtotal: number;
+  /** Voucher applied at checkout; null/absent when none. */
+  voucherCode?: string | null;
+  /** Amount taken off by the voucher; 0/absent when none. */
+  voucherDiscount?: number | null;
+  /** Amount the buyer must pay = subtotal − voucherDiscount. Absent on older backends — use orderPayable(). */
+  total?: number | null;
   items: {
     productId: number;
     productName: string;
     units: number;
+    /** Charged unit price (after any sale discount). */
     unitPrice: number;
+    /** List price before a sale discount; absent/equal to unitPrice when no sale applied. */
+    originalUnitPrice?: number | null;
     licenceRequired: boolean;
     storeProduct: boolean;
   }[];
@@ -287,8 +302,16 @@ export interface ShopOrder {
 
 export const shopOrderApi = {
   /** Creates the order on the server; prices come from the products table. */
-  create: (items: { productId: number; quantity: number }[], shipping: ShippingAddressInput) =>
-    sendJson<ShopOrder>("POST", "/api/shop-orders", { items, shipping }),
+  create: (
+    items: { productId: number; quantity: number }[],
+    shipping: ShippingAddressInput,
+    voucherCode?: string | null
+  ) =>
+    sendJson<ShopOrder>("POST", "/api/shop-orders", {
+      items,
+      shipping,
+      ...(voucherCode ? { voucherCode } : {}),
+    }),
   myOrders: () => getJson<ShopOrder[]>("/api/shop-orders"),
   get: (orderReference: string) => getJson<ShopOrder>(`/api/shop-orders/${encodeURIComponent(orderReference)}`),
 };
@@ -307,6 +330,10 @@ export const adminShopOrderApi = {
   ship: (orderReference: string) =>
     sendJson<ShopOrder>("POST", `/api/admin/shop-orders/${encodeURIComponent(orderReference)}/ship`),
 };
+
+/** What the buyer pays for an order: total after the voucher (falls back to subtotal on older backends). */
+export const orderPayable = (o: Pick<ShopOrder, "subtotal" | "total">): number =>
+  o.total ?? o.subtotal;
 
 export const PHONE_PATTERN = /^(\+?91[\s-]?|0)?[6-9]\d{9}$/;
 export const PINCODE_PATTERN = /^[1-9]\d{5}$/;

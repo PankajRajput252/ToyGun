@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Package, ArrowLeft, ShoppingCart, ExternalLink, MapPin } from "lucide-react";
-import { ShopOrder, formatDateTime, formatInr, shopOrderApi } from "../services/paymentApi";
+import { ShopOrder, formatDateTime, formatInr, orderPayable, shopOrderApi } from "../services/paymentApi";
 import ShippingStatusBadge from "../components/payment/ShippingStatusBadge";
 import { useCart } from "./Cartcontext";
 import { Order } from "./Cartcontext";
@@ -185,7 +185,7 @@ function ServerOrderCard({ order }: { order: ShopOrder }) {
         <p className="text-sm text-gray-600 dark:text-gray-400 truncate flex-1 min-w-0">
           {order.items.map((i) => `${i.productName}${i.units > 1 ? ` × ${i.units}` : ""}`).join(", ")}
         </p>
-        <p className="text-sm font-bold text-gray-800 dark:text-white ml-4 flex-shrink-0">{formatInr(order.subtotal)}</p>
+        <p className="text-sm font-bold text-gray-800 dark:text-white ml-4 flex-shrink-0">{formatInr(orderPayable(order))}</p>
       </div>
 
       <p className="flex items-start gap-1.5 text-xs text-gray-500 dark:text-gray-400">

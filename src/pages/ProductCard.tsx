@@ -10,6 +10,7 @@ import { addRecentlyViewed, removeRecentlyViewed } from "./recentlyViewed";
 import { productUrl, isOutOfStock, stockLeftLabel } from "./productUtils";
 import { useToast } from "../context/ToastContext";
 import PLACEHOLDER_IMAGE from "../components/images/BandookwaleLogo.jpeg";
+import PriceTag from "../components/promo/PriceTag";
 
 export { PLACEHOLDER_IMAGE };
 
@@ -39,6 +40,10 @@ export interface Product {
   weaponSubTypeFkId?: number;
   caliberFkId?: number;
   isLicenseRequired?: boolean;
+  /** Price after the best live sale discount; null/undefined when no sale applies. */
+  salePrice?: number | null;
+  /** e.g. "20% OFF" — sent by the backend alongside salePrice. */
+  discountLabel?: string | null;
   city?: string;
   state?: string;
   zipCode?: string;
@@ -301,9 +306,7 @@ export default function ProductCard({ item, onDeleted, readOnly = false }: Props
 
         {/* BODY */}
         <div className="p-3 flex flex-col gap-1 flex-1">
-          <p className="text-lg sm:text-xl font-bold break-words leading-tight text-gold-600 dark:text-gold-400">
-            ₹ {Number(item.price).toLocaleString("en-IN")}
-          </p>
+          <PriceTag item={item} />
           <p className="text-sm font-medium line-clamp-2 min-h-[2.5rem] text-gray-800 dark:text-gray-200">
             {item.title}
           </p>

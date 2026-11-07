@@ -30,6 +30,8 @@ interface Props {
   items: { productId: number; quantity: number }[];
   /** Cart total shown for reference; the server's total is what gets charged. */
   cartTotal: number;
+  /** Voucher applied in the cart; the server re-checks it when creating the order. */
+  voucherCode?: string | null;
   onCreated: (order: ShopOrder) => void;
 }
 
@@ -56,7 +58,7 @@ function emptyAddress(): ShippingAddressInput {
 }
 
 /** Step 1 of bank/UPI checkout: collect the delivery address and create the order on the server. */
-export default function CheckoutAddressModal({ isOpen, onClose, items, cartTotal, onCreated }: Props) {
+export default function CheckoutAddressModal({ isOpen, onClose, items, cartTotal, voucherCode, onCreated }: Props) {
   const [address, setAddress] = useState<ShippingAddressInput>(initialAddress);
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -93,7 +95,7 @@ export default function CheckoutAddressModal({ isOpen, onClose, items, cartTotal
 
     setSaving(true);
     try {
-      const order = await shopOrderApi.create(items, address);
+      const order = await shopOrderApi.create(items, address, voucherCode);
       localStorage.setItem(LAST_ADDRESS_KEY, JSON.stringify(address));
       onCreated(order);
     } catch (err) {

@@ -13,7 +13,8 @@ import ProductCard, { type Product, PLACEHOLDER_IMAGE } from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { addRecentlyViewed } from "./recentlyViewed";
 import { weaponDetails } from "./weaponCategories";
-import { mapProduct, fetchProductsByCategory, fetchProductById, productUrl, isOutOfStock, stockLeftLabel } from "./productUtils";
+import { mapProduct, fetchProductsByCategory, fetchProductById, productUrl, isOutOfStock, stockLeftLabel, effectivePrice } from "./productUtils";
+import PriceTag from "../components/promo/PriceTag";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 interface Review {
@@ -364,7 +365,8 @@ function ProductDetails({ item }: { item: Product }) {
     addToCart({
       id: cartId,
       title: item.title,
-      price: Number(item.price),
+      price: effectivePrice(item),
+      originalPrice: Number(item.price),
       image: images[0],
       location: item.location,
     });
@@ -403,7 +405,7 @@ function ProductDetails({ item }: { item: Product }) {
   };
 
   const shareUrl = `${window.location.origin}${productUrl(item.id)}`;
-  const shareText = `${item.title} — ₹${Number(item.price).toLocaleString("en-IN")} on Bandookwale`;
+  const shareText = `${item.title} — ₹${effectivePrice(item).toLocaleString("en-IN")} on Bandookwale`;
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -609,9 +611,7 @@ function ProductDetails({ item }: { item: Product }) {
             </div>
 
             <div className="flex justify-between items-start gap-3">
-              <p className="text-2xl sm:text-3xl font-bold text-gold-600 dark:text-gold-400 break-all">
-                ₹ {Number(item.price).toLocaleString("en-IN")}
-              </p>
+              <PriceTag item={item} size="lg" />
               <div className="flex gap-1 flex-shrink-0">
                 <button
                   onClick={handleShare}

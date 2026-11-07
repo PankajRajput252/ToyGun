@@ -5,7 +5,10 @@ import { createContext, useContext, useState, ReactNode } from "react";
 export interface CartItem {
   id: string;
   title: string;
+  /** Unit price the buyer pays (sale price when a discount is live). */
   price: number;
+  /** List price before a sale discount; shown struck through in the cart. */
+  originalPrice?: number;
   image: string;
   location: string;
   quantity: number;

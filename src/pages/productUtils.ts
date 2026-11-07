@@ -48,7 +48,17 @@ export const mapProduct = (item: any): Product => ({
   weaponSubTypeFkId: item.weaponSubTypeFkId,
   caliberFkId: item.caliberFkId,
   isLicenseRequired: item.isLicenseRequired,
+  salePrice: item.salePrice ?? null,
+  discountLabel: item.discountLabel ?? null,
 });
+
+// ─── Sale discounts (set by admin; the backend sends salePrice when one is live) ──
+export const hasSale = (p: Pick<Product, "price" | "salePrice">): boolean =>
+  p.salePrice != null && Number(p.salePrice) < Number(p.price);
+
+/** The price the buyer pays for one unit right now. */
+export const effectivePrice = (p: Pick<Product, "price" | "salePrice">): number =>
+  hasSale(p) ? Number(p.salePrice) : Number(p.price);
 
 // A product can't be bought or chatted about when its quantity is null or 0.
 // undefined means the API didn't send the field at all, so it isn't blocked.

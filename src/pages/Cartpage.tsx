@@ -6,7 +6,9 @@ import { Order } from "./Cartcontext";
 import ManualPaymentModal from "../components/payment/ManualPaymentModal";
 import CheckoutAddressModal from "../components/payment/CheckoutAddressModal";
 import type { PaymentSubmission, ShopOrder } from "../services/paymentApi";
-import { formatInr } from "../services/paymentApi";
+import { formatInr, orderPayable } from "../services/paymentApi";
+import type { VoucherQuote } from "../services/promoApi";
+import CartVoucherBox from "../components/promo/CartVoucherBox";
 
 // ─── Razorpay type declaration ────────────────────────────────────────────────
 // declare global {
@@ -45,10 +47,17 @@ export default function CartPage() {
   const [checkoutOrder, setCheckoutOrder] = useState<ShopOrder | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [manualPayment, setManualPayment] = useState<PaymentSubmission | null>(null);
+  const [voucher, setVoucher] = useState<VoucherQuote | null>(null);
 
   // Cart ids are backend product ids (productPkId) for items added from a product page
   const orderLines = cartItems.map((i) => ({ productId: Number(i.id), quantity: i.quantity }));
   const allLinesOrderable = orderLines.every((l) => Number.isInteger(l.productId) && l.productId > 0);
+
+  // Totals shown in the summary. The server re-prices everything when the order is created.
+  const listTotal = cartItems.reduce((sum, i) => sum + (i.originalPrice ?? i.price) * i.quantity, 0);
+  const saleSavings = Math.max(0, listTotal - totalPrice);
+  const voucherDiscount = voucher?.discountAmount ?? 0;
+  const payableTotal = voucher ? voucher.total : totalPrice;
 
   const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
   const buyerId = user?.nodeId;
@@ -228,12 +237,13 @@ export default function CartPage() {
       // razorpayOrderId: null,
       // razorpayPaymentId: null,
       items: [...cartItems],
-      totalAmount: checkoutOrder.subtotal,
+      totalAmount: orderPayable(checkoutOrder),
       status: "PENDING", // becomes PAID once the admin approves the payment
       createdAt: new Date().toISOString(),
     };
     addOrder(newOrder);
     clearCart();
+    setVoucher(null);
     setManualOpen(false);
     setManualPayment(payment);
   };
@@ -388,6 +398,11 @@ export default function CartPage() {
                   <p className="text-sm text-gray-500 mt-1 truncate">{item.location}</p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white mt-2">
                     ₹ {(item.price * item.quantity).toLocaleString()}
+                    {item.originalPrice != null && item.originalPrice > item.price && (
+                      <span className="ml-2 text-sm font-normal text-gray-400 line-through">
+                        ₹ {(item.originalPrice * item.quantity).toLocaleString()}
+                      </span>
+                    )}
                   </p>
                   {item.quantity > 1 && (
                     <p className="text-xs text-gray-400">
@@ -415,18 +430,44 @@ export default function CartPage() {
               <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex justify-between">
                   <span>Items ({totalItems})</span>
-                  <span>₹ {totalPrice.toLocaleString()}</span>
+                  <span>{formatInr(listTotal)}</span>
                 </div>
+                {saleSavings > 0 && (
+                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                    <span>Sale discount</span>
+                    <span>− {formatInr(saleSavings)}</span>
+                  </div>
+                )}
+                {voucher && voucherDiscount > 0 && (
+                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                    <span>Voucher ({voucher.code})</span>
+                    <span>− {formatInr(voucherDiscount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Delivery</span>
                   <span className="text-green-500 font-medium">Free</span>
                 </div>
               </div>
 
+              <div className="mt-4">
+                <CartVoucherBox
+                  items={orderLines}
+                  applied={voucher}
+                  onChange={setVoucher}
+                  disabled={!allLinesOrderable || addressOpen || manualOpen}
+                />
+              </div>
+
               <div className="border-t dark:border-gray-700 mt-4 pt-4 flex justify-between font-bold text-gray-900 dark:text-white">
                 <span>Total</span>
-                <span>₹ {totalPrice.toLocaleString()}</span>
+                <span>{formatInr(payableTotal)}</span>
               </div>
+              {saleSavings + voucherDiscount > 0 && (
+                <p className="mt-1 text-right text-xs font-medium text-green-600 dark:text-green-400">
+                  You save {formatInr(saleSavings + voucherDiscount)}
+                </p>
+              )}
 
               {/* Razorpay note + Pay with Razorpay button — disabled
               <p className="text-xs text-gray-400 mt-3 text-center">
@@ -470,7 +511,10 @@ export default function CartPage() {
               )}
 
               <button
-                onClick={clearCart}
+                onClick={() => {
+                  clearCart();
+                  setVoucher(null);
+                }}
                 className="mt-3 w-full py-2 rounded-xl text-red-500 border border-red-300
                            hover:bg-red-50 transition text-sm font-medium"
               >
@@ -481,14 +525,15 @@ export default function CartPage() {
                 isOpen={addressOpen}
                 onClose={() => setAddressOpen(false)}
                 items={orderLines}
-                cartTotal={totalPrice}
+                cartTotal={payableTotal}
+                voucherCode={voucher?.code ?? null}
                 onCreated={handleOrderCreated}
               />
 
               <ManualPaymentModal
                 isOpen={manualOpen}
                 onClose={() => setManualOpen(false)}
-                amount={checkoutOrder?.subtotal}
+                amount={checkoutOrder ? orderPayable(checkoutOrder) : undefined}
                 orderReference={checkoutOrder?.orderReference}
                 productIds={checkoutOrder ? [...new Set(checkoutOrder.items.map((i) => i.productId))] : undefined}
                 onSubmitted={handleManualSubmitted}

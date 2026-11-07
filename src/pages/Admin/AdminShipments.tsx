@@ -11,6 +11,7 @@ import {
   errorMessage,
   formatDateTime,
   formatInr,
+  orderPayable,
 } from "../../services/paymentApi";
 
 type Tab = { key: string; label: string; shippingStatus?: ShippingStatus };
@@ -116,7 +117,7 @@ export default function AdminShipments() {
                       <td className="px-4 py-3 font-mono text-gray-900 dark:text-white">{o.orderReference}</td>
                       <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{o.shippingAddress.fullName}</td>
                       <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{o.shippingAddress.city} {o.shippingAddress.pincode}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{formatInr(o.subtotal)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{formatInr(orderPayable(o))}</td>
                       <td className="px-4 py-3"><ShippingStatusBadge status={o.shipping.status} /></td>
                       <td className="px-4 py-3 font-mono text-gray-700 dark:text-gray-300">{o.shipping.awbCode ?? "—"}</td>
                       <td className="px-4 py-3 text-right">

@@ -4,6 +4,8 @@ export function mapApiToProduct(p: any): Product {
     id: p.productPkId,
     title: p.productName,
     price: p.price,
+    salePrice: p.salePrice ?? null,
+    discountLabel: p.discountLabel ?? null,
     location: p.location,
     date: p.createdDateTime,
 

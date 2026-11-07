@@ -8,6 +8,7 @@ import {
   errorMessage,
   formatDateTime,
   formatInr,
+  orderPayable,
 } from "../../services/paymentApi";
 
 /**
@@ -115,9 +116,21 @@ export default function OrderShippingPanel({
             <span className="whitespace-nowrap text-gray-600 dark:text-gray-400">{formatInr(i.unitPrice * i.units)}</span>
           </li>
         ))}
+        {!!order.voucherDiscount && order.voucherDiscount > 0 && (
+          <>
+            <li className="flex justify-between py-1.5 text-gray-600 dark:text-gray-400">
+              <span>Subtotal</span>
+              <span>{formatInr(order.subtotal)}</span>
+            </li>
+            <li className="flex justify-between py-1.5 text-green-600 dark:text-green-400">
+              <span>Voucher {order.voucherCode}</span>
+              <span>− {formatInr(order.voucherDiscount)}</span>
+            </li>
+          </>
+        )}
         <li className="flex justify-between py-1.5 font-semibold text-gray-900 dark:text-white">
           <span>Total</span>
-          <span>{formatInr(order.subtotal)}</span>
+          <span>{formatInr(orderPayable(order))}</span>
         </li>
       </ul>
 
