@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { EyeIcon, EyeCloseIcon, TrashBinIcon, PencilIcon } from "../icons";
+import { TrashBinIcon, PencilIcon } from "../icons";
 import { supportTicketApi, SupportTicket as ApiSupportTicket } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Modal } from "../components/ui/modal";
@@ -11,8 +11,6 @@ interface FormData {
   category: string;
   priority: string;
   message: string;
-  transactionPassword: string;
-  oneTimePassword: string;
 }
 
 export default function Support() {
@@ -21,13 +19,8 @@ export default function Support() {
     category: "",
     priority: "Normal/Minor impact",
     message: "",
-    transactionPassword: "",
-    oneTimePassword: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOtpSent, setIsOtpSent] = useState(false);
-  const [otpLoading, setOtpLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [supportTickets, setSupportTickets] = useState<ApiSupportTicket[]>([]);
@@ -64,19 +57,6 @@ export default function Support() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSendOTP = async () => {
-    setOtpLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setIsOtpSent(true);
-      setSuccess("OTP sent successfully to your registered email/mobile");
-    } catch (err) {
-      setError("Failed to send OTP. Please try again.");
-    } finally {
-      setOtpLoading(false);
-    }
   };
 
   const mapCategoryToApi = (category: string): string => {
@@ -130,8 +110,6 @@ export default function Support() {
     try {
       if (!formData.category) throw new Error("Please select a category");
       if (!formData.message.trim()) throw new Error("Please enter your message");
-      if (!formData.transactionPassword) throw new Error("Please enter your transaction password");
-      if (!formData.oneTimePassword) throw new Error("Please enter the OTP");
       if (!user?.nodeId) throw new Error("User node ID not found. Please login again.");
 
       const ticketData = {
@@ -142,8 +120,6 @@ export default function Support() {
         message: formData.message.trim(),
         status: "OPEN",
         updatedAtDateTime: null,
-        transactionPassword: formData.transactionPassword,
-        otp: formData.oneTimePassword,
       };
 
       await supportTicketApi.add(ticketData);
@@ -153,10 +129,7 @@ export default function Support() {
         category: "",
         priority: "Normal/Minor impact",
         message: "",
-        transactionPassword: "",
-        oneTimePassword: "",
       });
-      setIsOtpSent(false);
       await fetchSupportTickets();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred. Please try again.");

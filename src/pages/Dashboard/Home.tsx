@@ -1,18 +1,19 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import Footer from "../../components/footer/Footer";
 import CategoryFilterBar from "../CategoryFilterBar";
 import CategoryGrid from "../CategoryGrid";
-import ProductCard, { type Product } from "../ProductCard";
-import { mapProduct, fetchProductsByWeaponCategory, lookupProductById } from "../productUtils";
+import ProductCard, { type Product, PLACEHOLDER_IMAGE } from "../ProductCard";
+import { mapProduct, fetchProductsByWeaponCategory, lookupProductById, productUrl, effectivePrice } from "../productUtils";
 import ProductCardSkeleton from "../ProductCardSkeleton";
-import { getRecentlyViewed, refreshRecentlyViewed, removeRecentlyViewed, clearRecentlyViewed } from "../recentlyViewed";
+import { getRecentlyViewed, refreshRecentlyViewed, removeRecentlyViewed, clearRecentlyViewed, addRecentlyViewed } from "../recentlyViewed";
 import { sellProductApi } from "../../services/api";
 import { useFilter } from "../Filtercontext";
 import {
   ShoppingCart, MessageCircle, LayoutGrid, Store, History, Loader2, ShieldCheck,
   Search, Handshake, /* Lock, */ Truck,
 } from "lucide-react";
-import HeroCarousel3D from "../HeroCarousel3D";
+import HeroCarousel3D, { type HeroSlide } from "../HeroCarousel3D";
 import heroImg1 from "../../components/images/hero/scroll_1.jpg";
 import heroImg2 from "../../components/images/hero/scroll_2.jpg";
 import heroImg3 from "../../components/images/hero/scroll_3.jpg";
@@ -25,8 +26,11 @@ type Tab = "all" | "store" | "listing";
 
 const PAGE_SIZE = 24;
 
-// Web-sized copies of the scroll_N originals (see components/images/hero)
-const HERO_IMAGES = [heroImg1, heroImg6, heroImg2, heroImg7, heroImg3];
+// Web-sized copies of the scroll_N originals (see components/images/hero).
+// Shown until store products load, or if the store has none with photos.
+const HERO_IMAGES: HeroSlide[] = [heroImg1, heroImg6, heroImg2, heroImg7, heroImg3].map((image) => ({ image }));
+/** Store products fetched for the hero carousel. */
+const HERO_STORE_LIMIT = 50;
 
 const HOW_IT_WORKS = [
   { icon: Search, title: "Find it", text: "Browse categories or search for exactly what you want, near you." },
@@ -42,6 +46,8 @@ const TRUST_POINTS = [
 ];
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [storeSlides, setStoreSlides] = useState<HeroSlide[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(0);
@@ -54,6 +60,34 @@ export default function Home() {
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
   const [showGrid, setShowGrid] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("all");
+
+  // ── Hero carousel: the store's products, each opening its product page ──────
+  useEffect(() => {
+    let cancelled = false;
+    sellProductApi
+      .getAll(0, HERO_STORE_LIMIT, "ACTIVE", null, true)
+      .then((res) => {
+        if (cancelled) return;
+        const products = res.content.map(mapProduct).filter(
+          (p) => p.id != null && p.images[0] && p.images[0] !== PLACEHOLDER_IMAGE
+        );
+        setStoreSlides(
+          products.map((p) => ({
+            image: p.images[0],
+            title: p.title,
+            subtitle: `₹ ${effectivePrice(p).toLocaleString("en-IN")}`,
+            onOpen: () => {
+              addRecentlyViewed(p);
+              navigate(productUrl(p.id), { state: p }); // same as tapping a product card
+            },
+          }))
+        );
+      })
+      .catch((err) => console.error("Hero store products failed to load:", err));
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate]);
 
   // ── Pull search & city from shared context (set by Navbar) ──────────────────
   const { searchQuery, selectedCity } = useFilter();
@@ -261,7 +295,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <HeroCarousel3D images={HERO_IMAGES} />
+              <HeroCarousel3D slides={storeSlides.length ? storeSlides : HERO_IMAGES} />
               </div>
             </section>
           )}

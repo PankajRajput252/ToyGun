@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import UserDropdown from "../components/header/UserDropdown";
+import ChatButton from "../components/header/ChatButton";
 // import navbarLogo from "../components/images/navbar-Log-1.png";
 import { isUserAdmin } from "../context/AuthContext";
 import { useAuth } from "../context/AuthContext";
@@ -122,6 +123,9 @@ const AppHeader: React.FC = () => {
                 placeholder="Search..."
                 className="hidden lg:block px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+
+              {/* CHATS (buyers message the store) */}
+              <ChatButton className="mx-1" />
 
               {/* SUPPORT */}
               <SupportSidebar />

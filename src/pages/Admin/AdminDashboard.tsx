@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
+import WebsiteVisitorsCard from '../../components/admin/WebsiteVisitorsCard';
 import { User, usersApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -273,6 +274,9 @@ export default function AdminDashboard() {
             onClick={() => go('/admin/users')}
           />
         </div>
+
+        {/* ── Website visitors ── */}
+        <WebsiteVisitorsCard />
 
         {/* ── Bottom Charts Row ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

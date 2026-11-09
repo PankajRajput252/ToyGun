@@ -1,40 +1,52 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import ChatUI from "./ChatUI";
+import { useAuth } from "../context/AuthContext";
 
 export default function ChatPage() {
   const { state } = useLocation();
-  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const { user } = useAuth();
+  const openConvId = params.get("c") || undefined;
 
-  if (!state) {
+  // Opened from a product page ("Chat with seller" / "Make an offer")
+  if (state?.productId && state?.buyerId) {
+    const { productId, sellerId, buyerId, productTitle, productImage, sellerName } = state;
+
+    // conversationId format: {productId}-{sellerId}-{buyerId}
+    const conversationId = `${productId}-${sellerId}-${buyerId}`;
+
     return (
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="text-center">
-          <p className="text-gray-500">No chat data found.</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="mt-4 text-yellow-600 hover:underline text-sm"
-          >
-            ← Go Back
-          </button>
-        </div>
+      <ChatUI
+        key={conversationId}
+        conversationId={conversationId}
+        userId={buyerId}
+        userName={state.buyerName}
+        productTitle={productTitle}
+        productImage={productImage}
+        sellerName={sellerName}
+        initialMessage={state.initialMessage}
+      />
+    );
+  }
+
+  // Inbox: opened from the header chat icon or a new-message notification (?c=conversationId)
+  const stored = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+    } catch {
+      return {};
+    }
+  })();
+  const userId: string | undefined = user?.nodeId ?? stored?.nodeId;
+  const userName: string = user?.name || stored?.name || "Me";
+
+  if (!userId) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] px-4">
+        <p className="text-gray-500">Sign in to see your chats.</p>
       </div>
     );
   }
 
-  const { productId, sellerId, buyerId, productTitle, productImage, sellerName } = state;
-
-  // conversationId format: {productId}-{sellerId}-{buyerId}
-  const conversationId = `${productId}-${sellerId}-${buyerId}`;
-
-  return (
-    <ChatUI
-      conversationId={conversationId}
-      userId={buyerId}
-      userName={state.buyerName}
-      productTitle={productTitle}
-      productImage={productImage}
-      sellerName={sellerName}
-      initialMessage={state.initialMessage}
-    />
-  );
+  return <ChatUI key="inbox" conversationId="" preferredConvId={openConvId} userId={userId} userName={userName} />;
 }

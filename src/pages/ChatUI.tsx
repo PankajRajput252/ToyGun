@@ -3,6 +3,7 @@ import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
 import { Send, Wifi, WifiOff, MessageSquare, ArrowLeft } from "lucide-react";
 import  { WS_URL, API_URL} from "../services/api";
+import { useChatNotifications } from "../context/ChatNotificationContext";
 
 
 type Message = {
@@ -15,11 +16,14 @@ type Message = {
 
 type Conversation = {
   conversationId: string;
-  productTitle: string;
-  productImage: string;
-  sellerName: string;
+  productTitle?: string;
+  productImage?: string;
+  sellerName?: string;
+  /** Name of the other person, as the backend learned it from their messages. */
+  peerName?: string;
   lastMessage?: string;
   lastTimestamp?: string;
+  lastSenderId?: string;
 };
 
 type Props = {
@@ -30,6 +34,8 @@ type Props = {
   productImage?: string;
   sellerName?: string;
   initialMessage?: string; // pre-fills the input, e.g. "Make an offer" from the product page
+  /** Inbox mode (conversationId ""): open this conversation, e.g. from a notification. */
+  preferredConvId?: string;
 };
 
 // const WS_URL = "https://api.bandookwale.com/ws"; // ← update to your backend URL
@@ -49,27 +55,31 @@ export default function ChatUI({
   productImage = "",
   sellerName = "Seller",
   initialMessage = "",
+  preferredConvId,
 }: Props) {
+  const { unreadByConversation, setActiveConversation, onIncoming, requestBrowserNotifications } = useChatNotifications();
+  const isInbox = !conversationId;
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(initialMessage);
   const [stompClient, setStompClient] = useState<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConvId, setActiveConvId] = useState(conversationId);
+  const [activeConvId, setActiveConvId] = useState(conversationId || preferredConvId || "");
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   // Mobile only: toggles between the conversation list and the chat window
-  const [showListMobile, setShowListMobile] = useState(false);
+  const [showListMobile, setShowListMobile] = useState(isInbox && !preferredConvId);
   // Name of the other person in each conversation, learned from their messages
   const [peerNames, setPeerNames] = useState<Record<string, string>>({});
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const clientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<any>(null);
-  const activeConvIdRef = useRef(conversationId);
+  const activeConvIdRef = useRef(conversationId || preferredConvId || "");
 
   // The owner opening chat from their own product lands on a {seller}-{seller} thread with nobody in it
   const ownConv = parseConvId(conversationId);
-  const isSelfConv = ownConv.sellerId === ownConv.buyerId;
+  // Inbox mode behaves the same: there is no product conversation to show, so open a real one
+  const isSelfConv = isInbox || ownConv.sellerId === ownConv.buyerId;
 
   const rememberPeerName = (convId: string, msgs: Message[]) => {
     const peerMsg = msgs.find((m) => m.senderId !== userId && m.senderName);
@@ -127,10 +137,15 @@ const loadConversations = async () => {
     // ← Guard: API might return object instead of array
     const list: Conversation[] = Array.isArray(data) ? data : [];
     setConversations(list);
+    const names: Record<string, string> = {};
+    list.forEach((c) => { if (c.peerName) names[c.conversationId] = c.peerName; });
+    setPeerNames((prev) => ({ ...names, ...prev }));
 
-    // Owner came from their own product — open their first real conversation instead
+    // Owner came from their own product, or the inbox opened with nothing selected — open the latest real conversation
     const firstReal = list.find((c) => c.conversationId !== conversationId);
-    if (isSelfConv && activeConvIdRef.current === conversationId && firstReal) {
+    if (isSelfConv && !activeConvIdRef.current && firstReal) {
+      switchConversation(firstReal.conversationId);
+    } else if (isSelfConv && activeConvIdRef.current === conversationId && firstReal) {
       switchConversation(firstReal.conversationId);
     }
 
@@ -146,6 +161,7 @@ const loadConversations = async () => {
       subscriptionRef.current.unsubscribe();
     }
 
+    if (!convId) return;
     const topic = `/topic/chat/${convId}`;
     subscriptionRef.current = client.subscribe(topic, (stompMessage) => {
       const newMessage: Message = JSON.parse(stompMessage.body);
@@ -200,6 +216,47 @@ const loadConversations = async () => {
     }
   };
 
+  // ─── Notifications: tell the app which conversation is on screen (not counted / notified) ──
+  useEffect(() => {
+    setActiveConversation(activeConvId || null);
+  }, [activeConvId, setActiveConversation]);
+  useEffect(() => () => setActiveConversation(null), [setActiveConversation]);
+
+  // Opening another conversation from a notification while already on this page
+  useEffect(() => {
+    if (preferredConvId && preferredConvId !== activeConvIdRef.current) {
+      switchConversation(preferredConvId);
+      setShowListMobile(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferredConvId]);
+
+  // Keep the sidebar live: newest conversation first, new chats appear without a reload
+  useEffect(
+    () =>
+      onIncoming((msg) => {
+        if (msg.senderName) setPeerNames((prev) => ({ ...prev, [msg.conversationId]: msg.senderName! }));
+        setConversations((prev) => {
+          const existing = prev.find((c) => c.conversationId === msg.conversationId);
+          if (!existing) {
+            loadConversations();
+            return prev;
+          }
+          const updated: Conversation = {
+            ...existing,
+            lastMessage: msg.content,
+            lastTimestamp: msg.timestamp,
+            lastSenderId: msg.senderId,
+            productTitle: existing.productTitle || msg.productTitle,
+            productImage: existing.productImage || msg.productImage,
+          };
+          return [updated, ...prev.filter((c) => c.conversationId !== msg.conversationId)];
+        });
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onIncoming]
+  );
+
   // ─── Auto scroll to bottom ────────────────────────────────────────────────
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -207,14 +264,20 @@ const loadConversations = async () => {
 
   // ─── Send message ─────────────────────────────────────────────────────────
   const sendMessage = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !activeConvId) return;
+    requestBrowserNotifications(); // ask once, on a click, so replies can notify when the tab is in the background
 
-    const msg: Message = {
+    const conv = conversations.find((c) => c.conversationId === activeConvId);
+    const onProductConv = !isInbox && activeConvId === conversationId;
+    const msg: Message & { productTitle?: string; productImage?: string } = {
       senderId: userId,
       senderName: userName,
       content: input.trim(),
       timestamp: new Date().toISOString(),
       type: "CHAT",
+      // lets the other person's inbox / notification show which product this is about
+      productTitle: onProductConv ? productTitle : conv?.productTitle,
+      productImage: onProductConv ? productImage : conv?.productImage,
     };
 
     if (clientRef.current?.connected) {
@@ -240,7 +303,7 @@ const loadConversations = async () => {
 
   // ─── Render ───────────────────────────────────────────────────────────────
   const activeConv = conversations.find((c) => c.conversationId === activeConvId);
-  const isProductConv = activeConvId === conversationId;
+  const isProductConv = !isInbox && activeConvId === conversationId;
   const headerTitle = isProductConv ? productTitle : activeConv?.productTitle || productTitle;
   const headerImage = isProductConv ? productImage : activeConv?.productImage || productImage;
   const headerPeer = getPeer(activeConvId, isProductConv ? sellerName : activeConv?.sellerName);
@@ -298,28 +361,75 @@ const loadConversations = async () => {
         </div>
         )}
 
-        {/* Other conversations */}
+        {/* Other conversations (newest first, unread highlighted) */}
         {conversations
           .filter((c) => c.conversationId !== conversationId)
-          .map((conv) => (
-            <div
-              key={conv.conversationId}
-              onClick={() => { switchConversation(conv.conversationId); setShowListMobile(false); }}
-              className={`p-4 cursor-pointer border-b dark:border-gray-700 transition
-                ${activeConvId === conv.conversationId
-                  ? "bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-l-yellow-500"
-                  : "hover:bg-gray-50 dark:hover:bg-gray-700"
-                }`}
-            >
-              {renderPeer(getPeer(conv.conversationId, conv.sellerName))}
-              <p className="text-xs text-gray-400 truncate">
-                {conv.lastMessage || conv.productTitle || conv.conversationId}
-              </p>
-            </div>
-          ))}
+          .map((conv) => {
+            const unread = activeConvId === conv.conversationId ? 0 : unreadByConversation[conv.conversationId] ?? 0;
+            const fromMe = conv.lastSenderId === userId;
+            return (
+              <div
+                key={conv.conversationId}
+                onClick={() => { switchConversation(conv.conversationId); setShowListMobile(false); }}
+                className={`p-4 cursor-pointer border-b dark:border-gray-700 transition
+                  ${activeConvId === conv.conversationId
+                    ? "bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-l-yellow-500"
+                    : "hover:bg-gray-50 dark:hover:bg-gray-700"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  {conv.productImage ? (
+                    <img
+                      src={conv.productImage}
+                      alt=""
+                      className="w-10 h-10 rounded-lg object-cover border flex-shrink-0"
+                      onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-600 flex-shrink-0 flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      {renderPeer(getPeer(conv.conversationId, conv.sellerName))}
+                      {conv.lastTimestamp && (
+                        <span className={`flex-shrink-0 text-[10px] ${unread ? "text-yellow-500 font-semibold" : "text-gray-400"}`}>
+                          {new Date(conv.lastTimestamp).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      )}
+                    </div>
+                    {conv.productTitle && <p className="text-[11px] text-gray-400 truncate">{conv.productTitle}</p>}
+                    <div className="flex items-center justify-between gap-2">
+                      <p className={`text-xs truncate ${unread ? "font-semibold text-gray-800 dark:text-white" : "text-gray-400"}`}>
+                        {fromMe ? "You: " : ""}{conv.lastMessage}
+                      </p>
+                      {unread > 0 && (
+                        <span className="flex-shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                          {unread > 99 ? "99+" : unread}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+        {isInbox && conversations.length === 0 && (
+          <p className="p-6 text-center text-sm text-gray-400">
+            No chats yet. Open a product and tap "Chat" to message the seller.
+          </p>
+        )}
       </div>
 
       {/* CHAT WINDOW */}
+      {!activeConvId ? (
+        <div className={`${showListMobile ? "hidden" : "flex"} md:flex flex-1 flex-col items-center justify-center p-6 text-center`}>
+          <MessageSquare className="w-12 h-12 text-gray-300 mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Select a chat to start messaging</p>
+        </div>
+      ) : (
       <div className={`${showListMobile ? "hidden" : "flex"} md:flex flex-col flex-1 min-w-0`}>
 
         {/* Chat Header */}
@@ -432,6 +542,7 @@ const loadConversations = async () => {
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 }

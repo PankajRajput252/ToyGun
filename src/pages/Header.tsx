@@ -3,6 +3,7 @@ import { Heart, User, Search, MapPin, ChevronDown, Plus, X, Menu } from "lucide-
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import UserDropdown from "../components/header/UserDropdown";
+import ChatButton from "../components/header/ChatButton";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "./Cartcontext";
 import { FaStore } from "react-icons/fa";
@@ -221,6 +222,9 @@ export default function Header() {
             />
             <span className="font-semibold mt-1">Wishlist</span>
           </div>
+
+          {/* Chats (unread badge) */}
+          {isAuthenticated && <ChatButton />}
 
           {/* Cart */}
           <button
