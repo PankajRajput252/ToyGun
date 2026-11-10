@@ -80,9 +80,10 @@ export default function AdminUsers() {
     fetchData();
   }, [statusFilter, roleFilter]);
 
-  const fetchData = async () => {
+  // silent = refresh in place (no full-page loader), so the table keeps its page/search state
+  const fetchData = async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) setIsLoading(true);
       // Active/inactive filtering is done by the API via filterBy
       const apiStatusFilter = statusFilter === "inactive" ? "INACTIVE" : "ACTIVE";
       // const [usersResponse, walletResponse] = await Promise.all([
@@ -93,7 +94,11 @@ export default function AdminUsers() {
       let size = 100;
 
       // Same API the Admin Dashboard uses for its user counts
-      const data = await usersApi.getAll(page, size, apiStatusFilter, user?.nodeId || null);
+      let data = await usersApi.getAll(page, size, apiStatusFilter, user?.nodeId || null);
+      // `count` is the real total; refetch when it exceeds the first page so no users are cut off
+      if ((data?.count ?? 0) > (data?.data?.length ?? 0)) {
+        data = await usersApi.getAll(page, data.count, apiStatusFilter, user?.nodeId || null);
+      }
 
       if (data?.data?.length > 0) {
         const userData = data.data as unknown as User[];
@@ -218,7 +223,7 @@ export default function AdminUsers() {
         <UserManagementTable
           users={users}
           loading={isLoading}
-          loadUsers={fetchData}
+          loadUsers={() => fetchData(true)}
           onTransactionApproval={handleTransactionApproval}
         />
 

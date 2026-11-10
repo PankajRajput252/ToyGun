@@ -127,6 +127,7 @@ function StatCard({
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -135,10 +136,17 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const [usersResponse] = await Promise.all([
-        usersApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null)
-      ]);
+      const nodeId = user?.nodeId || null;
+      let usersResponse = await usersApi.getAll(0, 100, 'ACTIVE', nodeId);
+      const total = usersResponse?.count ?? 0;
+      // The API is paginated: `count` is the real total, `data` is only one page.
+      // Refetch everything when there are more users than the first page holds,
+      // so totals and the active/role breakdowns cover all users.
+      if (total > (usersResponse?.data?.length ?? 0)) {
+        usersResponse = await usersApi.getAll(0, total, 'ACTIVE', nodeId);
+      }
       setUsers(usersResponse?.data || []);
+      setTotalCount(Math.max(total, usersResponse?.data?.length ?? 0));
     } catch (error) {
       console.error('Error fetching data:', error);
       setUsers([
@@ -162,7 +170,7 @@ export default function AdminDashboard() {
   const inactiveUsers = users.filter(u => !u.enabled).length;
   const adminUsers   = users.filter(u => u.roles?.some(r => r.name === 'ADMIN_USER')).length;
   const normalUsers  = users.filter(u => u.roles?.some(r => r.name === 'NORMAL_USER')).length;
-  const totalUsers   = users.length;
+  const totalUsers   = totalCount || users.length;
 
   const go = (path: string) => navigate(path);
 
