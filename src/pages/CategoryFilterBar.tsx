@@ -85,37 +85,6 @@ export default function CategoryFilterBar({ mode, selected, onSelect }: Props) {
   }, [menuOpen]);
   useEffect(() => setMenuOpen(false), [mode]);
 
-  // ── Hover to open (mouse only — touch keeps tap-to-toggle) ──
-  // A short close delay lets the pointer travel from the button down to the menu.
-  const closeTimer = useRef<number | null>(null);
-  const openedByHover = useRef(false);
-  const cancelClose = () => {
-    if (closeTimer.current !== null) window.clearTimeout(closeTimer.current);
-    closeTimer.current = null;
-  };
-  const hoverOpen = (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse") return;
-    cancelClose();
-    if (!menuOpen) openedByHover.current = true;
-    setMenuOpen(true);
-  };
-  const hoverClose = (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse") return;
-    cancelClose();
-    closeTimer.current = window.setTimeout(() => setMenuOpen(false), 200);
-  };
-  useEffect(() => cancelClose, []);
-  const handleButtonClick = () => {
-    // The hover already opened it — a click right after shouldn't snap it shut
-    if (openedByHover.current) {
-      openedByHover.current = false;
-      setMenuOpen(true);
-      return;
-    }
-    setMenuOpen((o) => !o);
-  };
-  useEffect(() => { if (!menuOpen) openedByHover.current = false; }, [menuOpen]);
-
   const pick = (filter: CategoryFilter | null) => {
     onSelect(filter);
     setMenuOpen(false);
@@ -148,11 +117,8 @@ export default function CategoryFilterBar({ mode, selected, onSelect }: Props) {
 
         {/* All Categories — opens the full category / subcategory menu */}
         <button
-          onClick={handleButtonClick}
-          onPointerEnter={hoverOpen}
-          onPointerLeave={hoverClose}
+          onClick={() => setMenuOpen((o) => !o)}
           aria-expanded={menuOpen}
-          aria-haspopup="true"
           className={`flex items-center gap-2 px-4 lg:px-5 py-2 rounded-full whitespace-nowrap
                       transition font-medium text-sm flex-shrink-0
                       ${selected === null || menuOpen ? accent.solid : "bg-gray-800 text-gray-200 hover:bg-gray-700"}`}
@@ -189,11 +155,7 @@ export default function CategoryFilterBar({ mode, selected, onSelect }: Props) {
 
       {/* ── Full category menu ── */}
       {menuOpen && (
-        <div
-          onPointerEnter={hoverOpen}
-          onPointerLeave={hoverClose}
-          className="absolute left-0 right-0 top-full bg-gray-950 border-b border-gray-800 shadow-2xl max-h-[70vh] overflow-y-auto"
-        >
+        <div className="absolute left-0 right-0 top-full bg-gray-950 border-b border-gray-800 shadow-2xl max-h-[70vh] overflow-y-auto">
           <div className="px-4 sm:px-6 lg:px-8 py-5">
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-gray-400">
