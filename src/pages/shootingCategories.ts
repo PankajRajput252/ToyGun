@@ -165,12 +165,22 @@ export const SHOOTING_CATEGORIES: ShootingCategoryGroup[] = [
       },
     ],
   },
+  {
+    id: 10000,
+    name: "Holster",
+    categories: [
+      { id: 10010, name: "Handgun" },
+      { id: 10020, name: "Rifle" },
+      { id: 10030, name: "Shotgun" },
+      { id: 10040, name: "Pistol" },
+    ],
+  },
 ];
 
 // Laid out as four columns, like the shop's mega menu
 export const SHOOTING_CATEGORY_COLUMNS: ShootingCategoryGroup[][] = [
   SHOOTING_CATEGORIES.filter((g) => ["Air Guns", "Firearms", "Clay Targets Machine"].includes(g.name)),
-  SHOOTING_CATEGORIES.filter((g) => ["Ammo", "Spares Parts"].includes(g.name)),
+  SHOOTING_CATEGORIES.filter((g) => ["Ammo", "Spares Parts", "Holster"].includes(g.name)),
   SHOOTING_CATEGORIES.filter((g) => ["Gun Accessories", "Gun Care"].includes(g.name)),
   SHOOTING_CATEGORIES.filter((g) => ["Shooting Accessories", "Sights"].includes(g.name)),
 ];

@@ -5,6 +5,7 @@ import {
   LayoutGrid, ChevronDown,
 } from "lucide-react";
 import { sellProductApi } from "../services/api";
+import { isUserAdmin } from "../context/AuthContext";
 import ProductCard, { type Product } from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { mapProduct, timeAgo } from "./productUtils";
@@ -39,6 +40,7 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
 
   const sellerId = sellerIdFromUrl || loggedInUserId;
   const isOwnStore = sellerId === loggedInUserId;
+  const isAdmin = isUserAdmin(user);
   const canPost = isOwnStore && allowPosting;
   const sellerName = isOwnStore
     ? user?.name || user?.fullName || "My Store"
@@ -143,7 +145,10 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
 
   const stats = [
     { icon: Package, label: "Products", value: totalCount.toLocaleString("en-IN") },
-    { icon: IndianRupee, label: "Stock value", value: `₹${stockValue.toLocaleString("en-IN")}` },
+    // Stock value is business-sensitive: only ADMIN_USER sees it
+    ...(isAdmin
+      ? [{ icon: IndianRupee, label: "Stock value", value: `₹${stockValue.toLocaleString("en-IN")}` }]
+      : []),
     { icon: Clock, label: "Last added", value: latestCreatedAt ? timeAgo(latestCreatedAt) : "—" },
   ];
 
@@ -234,7 +239,7 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
             </div>
 
             {/* Stats */}
-            <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
+            <div className={`mt-6 grid ${stats.length === 3 ? "grid-cols-3" : "grid-cols-2"} gap-2 sm:gap-3`}>
               {stats.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="rounded-2xl px-3 py-3 sm:px-4 sm:py-4 bg-white/5 border border-white/10 backdrop-blur-sm min-w-0">
                   <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-400">
