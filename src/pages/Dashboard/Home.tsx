@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../components/footer/Footer";
-import CategoryFilterBar from "../CategoryFilterBar";
+import CategoryFilterBar, { type CategoryFilter, type ShopMode } from "../CategoryFilterBar";
 import CategoryGrid from "../CategoryGrid";
 import ProductCard, { type Product, PLACEHOLDER_IMAGE } from "../ProductCard";
-import { mapProduct, fetchProductsByWeaponCategory, lookupProductById, productUrl, effectivePrice } from "../productUtils";
+import { mapProduct, lookupProductById, productUrl, effectivePrice } from "../productUtils";
 import ProductCardSkeleton from "../ProductCardSkeleton";
 import { getRecentlyViewed, refreshRecentlyViewed, removeRecentlyViewed, clearRecentlyViewed, addRecentlyViewed } from "../recentlyViewed";
 import { sellProductApi } from "../../services/api";
 import { useFilter } from "../Filtercontext";
 import {
-  ShoppingCart, MessageCircle, LayoutGrid, Store, History, Loader2, ShieldCheck,
-  Search, Handshake, /* Lock, */ Truck,
+  ShoppingCart, MessageCircle, Store, History, Loader2, ShieldCheck,
+  Search, Handshake, /* Lock, */ Truck, Check,
 } from "lucide-react";
 import HeroCarousel3D, { type HeroSlide } from "../HeroCarousel3D";
 import heroImg1 from "../../components/images/hero/scroll_1.jpg";
@@ -22,9 +22,41 @@ import heroImg7 from "../../components/images/hero/scroll_7.jpg";
 
 export type { Product };
 
-type Tab = "all" | "store" | "listing";
+// Store and Marketplace are never mixed; the landing page opens on the Store
 
 const PAGE_SIZE = 24;
+
+// The two ways to buy, described in plain words so new users can tell them apart.
+// Class strings are written out in full so Tailwind keeps them.
+const SHOP_MODES: Record<ShopMode, {
+  title: string; tagline: string; points: string[]; howToBuy: string; icon: typeof ShoppingCart;
+  iconBox: string; activeCard: string; countPill: string; accentText: string; banner: string;
+}> = {
+  store: {
+    title: "Bandookwale Store",
+    tagline: "New products at a fixed price",
+    points: ["Add to cart & pay online", "Delivered to your door"],
+    howToBuy: "Fixed price — add to cart, check out, and we deliver it.",
+    icon: ShoppingCart,
+    iconBox: "bg-gold-500 text-white",
+    activeCard: "border-gold-500 bg-gold-500/10 shadow-lg shadow-gold-500/10",
+    countPill: "bg-gold-500/15 text-gold-700 dark:text-gold-300",
+    accentText: "text-gold-500",
+    banner: "text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
+  },
+  listing: {
+    title: "Marketplace",
+    tagline: "Items posted by individual sellers",
+    points: ["Chat with the seller & negotiate", "Meet & inspect before you pay"],
+    howToBuy: "Posted by individual sellers — chat to agree a price, then meet to buy.",
+    icon: MessageCircle,
+    iconBox: "bg-blue-500 text-white",
+    activeCard: "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/10",
+    countPill: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
+    accentText: "text-blue-500",
+    banner: "text-blue-800 dark:text-blue-200 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800",
+  },
+};
 
 // Web-sized copies of the scroll_N originals (see components/images/hero).
 // Shown until store products load, or if the store has none with photos.
@@ -56,10 +88,10 @@ export default function Home() {
   const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([]);
   const [recentChecked, setRecentChecked] = useState(false);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
-  const [showGrid, setShowGrid] = useState(true);
-  const [activeTab, setActiveTab] = useState<Tab>("all");
+  const [activeTab, setActiveTab] = useState<ShopMode>("store");
+  // Category picked in the bar — always from the active section's own tree
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter | null>(null);
+  const showGrid = categoryFilter === null;
 
   // ── Hero carousel: the store's products, each opening its product page ──────
   useEffect(() => {
@@ -114,40 +146,18 @@ export default function Home() {
       );
     } catch (error) {
       console.error("Error fetching products:", error);
+      // Stop the auto-fill below from retrying a failing page forever
+      if (!isFirstPage) setHasMore(false);
     } finally {
       isFirstPage ? setIsLoading(false) : setIsLoadingMore(false);
     }
   };
 
-  // ─── Fetch products by CATEGORY ─────────────────────────────────────────────
-  const fetchByCategory = async (categoryId: number) => {
-    try {
-      setIsLoading(true);
-      // The API only returns one kind per call (isStoreProduct=null errors), so fetch store + listings together.
-      // Pills are hardcoded weapon categories, so filter on weaponCategoryFkId (was: fetchProductsByCategory).
-      const [listings, storeItems] = await Promise.all([
-        fetchProductsByWeaponCategory(categoryId, 200, false),
-        fetchProductsByWeaponCategory(categoryId, 200, true),
-      ]);
-      setAllProducts([...storeItems, ...listings]);
-      setHasMore(false); // category view loads everything in one request
-    } catch (error) {
-      console.error("Error fetching category products:", error);
-      setAllProducts([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ─── Apply tab + search + city filters on top of allProducts ────────────────
-  const filteredProducts = useMemo(() => {
+  // ─── Apply search + city filters on top of allProducts ──────────────────────
+  const searchedProducts = useMemo(() => {
     let list = allProducts;
 
-    // 1. Tab filter
-    if (activeTab === "store")   list = list.filter((p) => p.isStoreProduct === true);
-    if (activeTab === "listing") list = list.filter((p) => p.isStoreProduct !== true);
-
-    // 2. Search filter — match title, brand, or description (case-insensitive)
+    // 1. Search filter — match title, brand, or description (case-insensitive)
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
       list = list.filter(
@@ -158,31 +168,44 @@ export default function Home() {
       );
     }
 
-    // 3. City filter — match location field (case-insensitive)
+    // 2. City filter — match location field (case-insensitive)
     if (selectedCity) {
       const city = selectedCity.toLowerCase();
       list = list.filter((p) => p.location?.toLowerCase().includes(city));
     }
 
     return list;
-  }, [allProducts, activeTab, searchQuery, selectedCity]);
+  }, [allProducts, searchQuery, selectedCity]);
 
-  // ─── Tab counts (after tab filter only, so badge reflects what's in that tab) ─
-  const storeCount   = allProducts.filter((p) => p.isStoreProduct === true).length;
-  const listingCount = allProducts.filter((p) => p.isStoreProduct !== true).length;
+  // ─── Split into the two ways of buying ──────────────────────────────────────
+  const storeProducts  = useMemo(() => searchedProducts.filter((p) => p.isStoreProduct === true), [searchedProducts]);
+  const marketProducts = useMemo(() => searchedProducts.filter((p) => p.isStoreProduct !== true), [searchedProducts]);
+  // Category filtering happens here on the loaded products; the auto-fill below keeps
+  // loading pages until the picked category has a full page or the backend runs out
+  const filteredProducts = useMemo(() => {
+    const list = activeTab === "store" ? storeProducts : marketProducts;
+    return categoryFilter ? list.filter(categoryFilter.match) : list;
+  }, [activeTab, storeProducts, marketProducts, categoryFilter]);
+
+  // Counts follow search/city so each card says how many matches it holds
+  const storeCount   = storeProducts.length;
+  const listingCount = marketProducts.length;
+
+  // How many products the selected section shows; "Load more" raises it by a page
+  const [visibleLimit, setVisibleLimit] = useState(PAGE_SIZE);
+  useEffect(() => { setVisibleLimit(PAGE_SIZE); }, [activeTab, categoryFilter]);
+
+  // The API has no "marketplace only" query (isStoreProduct=false returns both kinds), so a
+  // page of 24 can hold only a few items of the section being viewed. Keep fetching pages
+  // until that section is filled — or the backend runs out — instead of showing a half row.
+  useEffect(() => {
+    if (isLoading || isLoadingMore || !hasMore) return;
+    if (filteredProducts.length < visibleLimit) fetchAllProducts(page + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isLoadingMore, hasMore, filteredProducts.length, visibleLimit, page]);
 
   // ─── Handle category selection ───────────────────────────────────────────────
-  const handleSelectCategory = (categoryId: number | null, categoryName?: string) => {
-    setSelectedCategoryId(categoryId);
-    setSelectedCategoryName(categoryName || "");
-    if (categoryId === null) {
-      setShowGrid(true);
-      fetchAllProducts(0);
-    } else {
-      setShowGrid(false);
-      fetchByCategory(categoryId);
-    }
-  };
+  const handleSelectCategory = (filter: CategoryFilter | null) => setCategoryFilter(filter);
 
   // ─── Drop a deleted product from every list on the page ─────────────────────
   const handleProductDeleted = (id: number) => {
@@ -226,16 +249,22 @@ export default function Home() {
   const scrollToProducts = () =>
     document.getElementById("products")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  // ─── Tab config ─────────────────────────────────────────────────────────────
-  const tabs: { key: Tab; label: string; icon: React.ReactNode; count: number }[] = [
-    { key: "all",     label: "All",      icon: <LayoutGrid className="w-3.5 h-3.5" />,     count: allProducts.length },
-    { key: "listing", label: "Listings", icon: <MessageCircle className="w-3.5 h-3.5" />,  count: listingCount },
-    { key: "store",   label: "Store",    icon: <ShoppingCart className="w-3.5 h-3.5" />,   count: storeCount },
-  ];
+  // Switch between the Store and the Marketplace
+  const selectMode = (kind: ShopMode, scroll = false) => {
+    // Each section has its own category tree, so a category picked in one doesn't carry over
+    if (kind !== activeTab) setCategoryFilter(null);
+    setActiveTab(kind);
+    if (scroll) scrollToProducts();
+  };
+  const modeCount = (kind: ShopMode) => (kind === "store" ? storeCount : listingCount);
+  const otherMode: ShopMode = activeTab === "store" ? "listing" : "store";
+
+  // Recently viewed follows the selected section, so the landing page shows no Marketplace items
+  const recentInMode = recentlyViewed.filter((p) => (p.isStoreProduct === true) === (activeTab === "store"));
 
   // ─── Active filter summary label ────────────────────────────────────────────
   const filterLabel = [
-    selectedCategoryName,
+    categoryFilter?.label ?? "",
     selectedCity ? `📍 ${selectedCity}` : "",
     searchQuery   ? `🔍 "${searchQuery}"` : "",
   ]
@@ -248,8 +277,9 @@ export default function Home() {
 
       {/* Category Filter Bar */}
       <CategoryFilterBar
-        selectedCategoryId={selectedCategoryId}
-        onSelectCategory={handleSelectCategory}
+        mode={activeTab}
+        selected={categoryFilter}
+        onSelect={handleSelectCategory}
       />
 
       <main>
@@ -277,7 +307,7 @@ export default function Home() {
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button
-                    onClick={() => { setActiveTab("store"); scrollToProducts(); }}
+                    onClick={() => selectMode("store", true)}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
                                bg-gold-500 text-white hover:bg-gold-400 shadow-lg shadow-gold-500/25 transition"
                   >
@@ -285,7 +315,7 @@ export default function Home() {
                     Shop the store
                   </button>
                   <button
-                    onClick={() => { setActiveTab("listing"); scrollToProducts(); }}
+                    onClick={() => selectMode("listing", true)}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
                                bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm transition"
                   >
@@ -308,96 +338,105 @@ export default function Home() {
             />
           )} */}
           {/* Recently viewed — horizontal swipe row */}
-          {showGrid && recentlyViewed.length > 0 && (
+          {/* {showGrid && recentInMode.length > 0 && (
             <section className="mx-4 md:mx-8 mt-8">
               <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
                 <History className="w-5 h-5 text-gold-500" />
                 Recently viewed
               </h2>
               <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 snap-x snap-mandatory no-scrollbar">
-                {recentlyViewed.map((item) => (
+                {recentInMode.map((item) => (
                   <div key={item.id} className="w-40 sm:w-52 flex-shrink-0 snap-start">
                     <ProductCard item={item} readOnly />
                   </div>
                 ))}
               </div>
             </section>
-          )}
+          )} */}
 
           {/* Products Section */}
           <div id="products" className="mx-4 md:mx-8 my-8 scroll-mt-24">
-            {/* ── TABS + HEADING ROW ── */}
-            <div className="mt-8 md:mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-
-              {/* Section heading */}
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                {filterLabel}
-                <span className="ml-2 text-sm font-normal text-gray-400">
-                  ({filteredProducts.length})
-                </span>
-              </h2>
-
-              {/* Tabs */}
-              <div className="flex items-center self-start sm:self-auto max-w-full overflow-x-auto bg-white dark:bg-gray-800 border
-                              border-gray-200 dark:border-gray-700 rounded-xl p-1 gap-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center flex-shrink-0 whitespace-nowrap gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-sm
-                                font-medium transition-all duration-200
-                                ${activeTab === tab.key
-                                  ? tab.key === "store"
-                                    ? "bg-gold-500 text-white shadow-sm"
-                                    : tab.key === "listing"
-                                    ? "bg-blue-500 text-white shadow-sm"
-                                    : "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 shadow-sm"
-                                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                }`}
-                  >
-                    {tab.icon}
-                    {tab.label}
-                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full
-                      ${activeTab === tab.key
-                        ? tab.key === "all"
-                          ? "bg-gray-900/10 text-gray-900 dark:bg-gray-900/10 dark:text-gray-900"
-                          : "bg-white/20 text-white"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-                      }`}>
-                      {tab.count}
-                    </span>
-                  </button>
-                ))}
+            {/* ── HEADING ROW ── */}
+            <div className="mt-8 md:mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  {`${SHOP_MODES[activeTab].title}${filterLabel !== "All Products" ? ` · ${filterLabel}` : ""}`}
+                  <span className="ml-2 text-sm font-normal text-gray-400">
+                    ({filteredProducts.length})
+                  </span>
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                  There are two ways to buy here — choose one below.
+                </p>
               </div>
 
-              {/* Back to all categories */}
-              {selectedCategoryId && (
-                <button
-                  onClick={() => handleSelectCategory(null)}
-                  className="text-sm text-blue-600 hover:underline flex items-center gap-1 self-start"
-                >
-                  ← All Categories
-                </button>
-              )}
+              <div className="flex items-center gap-3">
+                {/* Back to all categories */}
+                {categoryFilter && (
+                  <button
+                    onClick={() => handleSelectCategory(null)}
+                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    ← All Categories
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Active tab description */}
-            {activeTab === "store" && (
-              <div className="mb-4 flex items-center gap-2 text-xs text-yellow-700
-                              bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200
-                              dark:border-yellow-800 px-3 py-2 rounded-lg w-fit max-w-full">
-                <ShoppingCart className="w-3.5 h-3.5" />
-                Store products — Add to cart and checkout{/* pay via Razorpay */}
-              </div>
-            )}
-            {activeTab === "listing" && (
-              <div className="mb-4 flex items-center gap-2 text-xs text-blue-700
-                              bg-blue-50 dark:bg-blue-900/20 border border-blue-200
-                              dark:border-blue-800 px-3 py-2 rounded-lg w-fit max-w-full">
-                <MessageCircle className="w-3.5 h-3.5" />
-                Marketplace listings — Chat with seller to negotiate
-              </div>
-            )}
+            {/* ── Two ways to buy: big, self-explaining choice cards ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+              {(["store", "listing"] as const).map((kind) => {
+                const mode = SHOP_MODES[kind];
+                const Icon = mode.icon;
+                const active = activeTab === kind;
+                return (
+                  <button
+                    key={kind}
+                    onClick={() => selectMode(kind)}
+                    aria-pressed={active}
+                    className={`relative text-left rounded-2xl border-2 p-3 sm:p-4 transition-all duration-200
+                                ${active
+                                  ? mode.activeCard
+                                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 hover:border-gray-300 dark:hover:border-gray-500"}
+                                ${!active ? "opacity-70 hover:opacity-100" : ""}`}
+                  >
+                    {active && (
+                      <span className={`absolute top-2.5 right-2.5 inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${mode.iconBox}`}>
+                        <Check className="w-3 h-3" /> Showing
+                      </span>
+                    )}
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${mode.iconBox}`}>
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </div>
+                      <div className="min-w-0 flex-1 pr-16">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">{mode.title}</span>
+                          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${mode.countPill}`}>
+                            {modeCount(kind)} items
+                          </span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">{mode.tagline}</p>
+                        <ul className="hidden sm:flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-600 dark:text-gray-300">
+                          {mode.points.map((pt) => (
+                            <li key={pt} className="flex items-center gap-1">
+                              <Check className={`w-3.5 h-3.5 ${mode.accentText}`} />
+                              {pt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* How buying works in the selected section */}
+            <div className={`mb-4 flex items-center gap-2 text-xs sm:text-sm px-3 py-2 rounded-lg w-fit max-w-full border ${SHOP_MODES[activeTab].banner}`}>
+              {activeTab === "store" ? <ShoppingCart className="w-4 h-4 flex-shrink-0" /> : <MessageCircle className="w-4 h-4 flex-shrink-0" />}
+              {SHOP_MODES[activeTab].howToBuy}
+            </div>
 
             {/* Loading — skeleton cards in the same grid shape */}
             {isLoading && (
@@ -412,39 +451,39 @@ export default function Home() {
             {!isLoading && filteredProducts.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <p className="text-4xl mb-3">
-                  {searchQuery ? "🔍" : selectedCity ? "📍" : activeTab === "store" ? "🛒" : activeTab === "listing" ? "💬" : "📭"}
+                  {searchQuery ? "🔍" : selectedCity ? "📍" : activeTab === "store" ? "🛒" : "💬"}
                 </p>
                 <p className="text-gray-500 text-base font-medium">
                   {searchQuery
-                    ? `No results for "${searchQuery}"`
+                    ? `No results for "${searchQuery}" in the ${SHOP_MODES[activeTab].title}`
                     : selectedCity
-                    ? `No products in ${selectedCity}`
+                    ? `No ${SHOP_MODES[activeTab].title} items in ${selectedCity}`
+                    : categoryFilter
+                    ? `No ${SHOP_MODES[activeTab].title} items in "${categoryFilter.label}"`
                     : activeTab === "store"
-                    ? "No store products found"
-                    : activeTab === "listing"
-                    ? "No marketplace listings found"
-                    : `No products found${selectedCategoryName ? ` in "${selectedCategoryName}"` : ""}`}
+                    ? "Nothing in the Bandookwale Store yet"
+                    : "No Marketplace items yet"}
                 </p>
                 <p className="text-gray-400 text-sm mt-1">
-                  {searchQuery || selectedCity
-                    ? "Try adjusting your search or location filter"
-                    : activeTab !== "all"
-                    ? 'Try switching to the "All" tab'
-                    : selectedCategoryId
+                  {categoryFilter
                     ? "Try a different category"
+                    : modeCount(otherMode) > 0
+                    ? `The ${SHOP_MODES[otherMode].title} has ${modeCount(otherMode)} matching item${modeCount(otherMode) === 1 ? "" : "s"}`
+                    : searchQuery || selectedCity
+                    ? "Try adjusting your search or location filter"
                     : ""}
                 </p>
                 <div className="flex gap-2 mt-4 flex-wrap justify-center">
-                  {activeTab !== "all" && (
+                  {!categoryFilter && modeCount(otherMode) > 0 && (
                     <button
-                      onClick={() => setActiveTab("all")}
+                      onClick={() => selectMode(otherMode)}
                       className="text-sm text-yellow-600 border border-yellow-400
                                  px-4 py-2 rounded-lg hover:bg-yellow-50 transition"
                     >
-                      View all products
+                      Go to {SHOP_MODES[otherMode].title}
                     </button>
                   )}
-                  {selectedCategoryId && (
+                  {categoryFilter && (
                     <button
                       onClick={() => handleSelectCategory(null)}
                       className="text-sm text-blue-600 border border-blue-300
@@ -457,20 +496,21 @@ export default function Home() {
               </div>
             )}
 
-            {/* Products Grid */}
+            {/* Products of the selected section only */}
             {!isLoading && filteredProducts.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-                {filteredProducts.map((item, index) => (
+                {filteredProducts.slice(0, visibleLimit).map((item, index) => (
                   <ProductCard key={item.id ?? index} item={item} onDeleted={handleProductDeleted} />
                 ))}
               </div>
             )}
 
-            {/* Load more */}
-            {!isLoading && hasMore && !selectedCategoryId && (
+            {/* Load more — only while this section really has more to show */}
+            {!isLoading &&
+              (filteredProducts.length > visibleLimit || hasMore) && (
               <div className="flex justify-center mt-8">
                 <button
-                  onClick={() => fetchAllProducts(page + 1)}
+                  onClick={() => setVisibleLimit((n) => n + PAGE_SIZE)}
                   disabled={isLoadingMore}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold
                              border border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-white
