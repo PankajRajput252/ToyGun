@@ -360,19 +360,35 @@ function ProductDetails({ item }: { item: Product }) {
   }, [item.id]);
 
   // ── Actions ────────────────────────────────────────────────────────────
-  const handleAddToCart = () => {
-    if (outOfStock) return showToast("This product is out of stock", "error");
-    addToCart({
-      id: cartId,
-      title: item.title,
-      price: effectivePrice(item),
-      originalPrice: Number(item.price),
-      image: images[0],
-      location: item.location,
-    });
-    setAddedToCart(true);
-    showToast("Added to cart 🛒");
-    setTimeout(() => setAddedToCart(false), 2000);
+  const [addingToCart, setAddingToCart] = useState(false);
+  /** Returns true when the item was added. */
+  const handleAddToCart = async (): Promise<boolean> => {
+    if (outOfStock) {
+      showToast("This product is out of stock", "error");
+      return false;
+    }
+    if (addingToCart) return false;
+    setAddingToCart(true);
+    try {
+      // Saved to the server cart when logged in (POST /api/cart/items)
+      await addToCart({
+        id: cartId,
+        title: item.title,
+        price: effectivePrice(item),
+        originalPrice: Number(item.price),
+        image: images[0],
+        location: item.location,
+      });
+      setAddedToCart(true);
+      showToast("Added to cart 🛒");
+      setTimeout(() => setAddedToCart(false), 2000);
+      return true;
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Couldn't add to cart. Please try again.", "error");
+      return false;
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   const handleChat = (initialMessage?: string) => {
@@ -654,13 +670,18 @@ function ProductDetails({ item }: { item: Product }) {
             {isStoreProduct && !isOwner && !outOfStock && (
               <div className="mt-5 space-y-2">
                 <button
-                  onClick={() => { if (!alreadyInCart) handleAddToCart(); navigate("/cart"); }}
+                  onClick={async () => {
+                    // Wait for the server to save it, so the cart page shows it straight away
+                    if (alreadyInCart || (await handleAddToCart())) navigate("/cart");
+                  }}
+                  disabled={addingToCart}
                   className="w-full py-3 rounded-xl font-semibold bg-gold-500 text-white hover:bg-gold-400 shadow-lg shadow-gold-500/20 transition"
                 >
                   Buy now
                 </button>
                 <button
-                  onClick={alreadyInCart ? () => navigate("/cart") : handleAddToCart}
+                  onClick={alreadyInCart ? () => navigate("/cart") : () => { handleAddToCart(); }}
+                  disabled={addingToCart}
                   className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border-2 transition
                     ${alreadyInCart
                       ? "border-green-500 text-green-500 hover:bg-green-500/10"

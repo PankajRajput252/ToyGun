@@ -411,7 +411,11 @@ export default function CartPage() {
                   )}
                 </div>
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() =>
+                    removeFromCart(item.id).catch((err) =>
+                      setCheckoutError(err instanceof Error ? err.message : "Couldn't remove the item. Please try again.")
+                    )
+                  }
                   className="text-red-400 hover:text-red-600 transition flex-shrink-0 self-start"
                 >
                   <Trash2 className="w-5 h-5" />
