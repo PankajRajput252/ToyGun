@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { usersApi } from "../services/api";
 import { API_BASE_URL } from "../services/apiBase";
+import { disableWebPush } from "../services/webPush";
 
 interface User {
   userPkId?: number;
@@ -476,6 +477,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = () => {
+    // Stop this browser getting the signed-out user's chat pushes (needs the token, so before it's removed)
+    disableWebPush(localStorage.getItem("stylocoin_token"));
     setUser(null);
     setIsAuthenticated(false);
 

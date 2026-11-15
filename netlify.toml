@@ -24,6 +24,13 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
+# Service worker must never be served from cache, so notification fixes reach users right away
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Service-Worker-Allowed = "/"
+
 [[headers]]
   for = "/api/*"
   [headers.values]

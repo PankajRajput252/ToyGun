@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   ChevronDown, LayoutDashboard, Users, UserCheck, UserX, ShieldCheck,
-  BadgeIndianRupee, PackagePlus, ListChecks, CheckCircle2, Landmark, Truck, Percent, Ticket, type LucideIcon,
+  BadgeIndianRupee, PackagePlus, ListChecks, CheckCircle2, Landmark, Truck, Percent, Ticket, Video, type LucideIcon,
 } from "lucide-react";
 
 // Admin header navigation: links + dropdown menus, shared by desktop and mobile.
@@ -51,6 +51,12 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/admin/discounts", label: "Discounts", description: "Automatic sales on products or the whole store", icon: Percent },
       { to: "/admin/vouchers", label: "Vouchers", description: "Coupon codes buyers enter at checkout", icon: Ticket },
+    ],
+  },
+  {
+    label: "Services",
+    items: [
+      { to: "/admin/consultations", label: "Consultations", description: "Topics, time slots, bookings & Meet links", icon: Video },
     ],
   },
 ];

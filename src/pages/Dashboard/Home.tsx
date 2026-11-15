@@ -11,8 +11,9 @@ import { sellProductApi } from "../../services/api";
 import { useFilter } from "../Filtercontext";
 import {
   ShoppingCart, MessageCircle, Store, History, Loader2, ShieldCheck,
-  Search, Handshake, /* Lock, */ Truck, Check,
+  Search, Handshake, /* Lock, */ Truck, Check, Video,
 } from "lucide-react";
+import ConsultationPanel, { OPEN_CONSULTATION_KEY } from "../Consultation/ConsultationPanel";
 import HeroCarousel3D, { type HeroSlide } from "../HeroCarousel3D";
 import heroImg1 from "../../components/images/hero/scroll_1.jpg";
 import heroImg2 from "../../components/images/hero/scroll_2.jpg";
@@ -58,6 +59,33 @@ const SHOP_MODES: Record<ShopMode, {
   },
 };
 
+// Third card: talk to an expert instead of buying. Shows the booking panel instead of products.
+const CONSULTATION_CARD = {
+  title: "Consultation",
+  tagline: "Talk to an expert on Google Meet",
+  points: ["Business, guns, accessories & more", "Pick a time — link sent by email"],
+  icon: Video,
+  iconBox: "bg-emerald-500 text-white",
+  activeCard: "border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/10",
+  countPill: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  accentText: "text-emerald-500",
+};
+
+/** Opens on the Consultation card for ?view=consultation (links in emails) or after signing in to book. */
+function startsOnConsultation() {
+  if (typeof window === "undefined") return false;
+  if (new URLSearchParams(window.location.search).get("view") === "consultation") return true;
+  try {
+    if (sessionStorage.getItem(OPEN_CONSULTATION_KEY)) {
+      sessionStorage.removeItem(OPEN_CONSULTATION_KEY);
+      return true;
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  return false;
+}
+
 // Web-sized copies of the scroll_N originals (see components/images/hero).
 // Shown until store products load, or if the store has none with photos.
 const HERO_IMAGES: HeroSlide[] = [heroImg1, heroImg6, heroImg2, heroImg7, heroImg3].map((image) => ({ image }));
@@ -89,6 +117,8 @@ export default function Home() {
   const [recentChecked, setRecentChecked] = useState(false);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [activeTab, setActiveTab] = useState<ShopMode>("store");
+  // The Consultation card replaces the product list with the booking panel
+  const [consulting, setConsulting] = useState(startsOnConsultation);
   // Category picked in the bar — always from the active section's own tree
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter | null>(null);
   const showGrid = categoryFilter === null;
@@ -205,7 +235,10 @@ export default function Home() {
   }, [isLoading, isLoadingMore, hasMore, filteredProducts.length, visibleLimit, page]);
 
   // ─── Handle category selection ───────────────────────────────────────────────
-  const handleSelectCategory = (filter: CategoryFilter | null) => setCategoryFilter(filter);
+  const handleSelectCategory = (filter: CategoryFilter | null) => {
+    setCategoryFilter(filter);
+    if (filter) setConsulting(false); // categories belong to the product sections
+  };
 
   // ─── Drop a deleted product from every list on the page ─────────────────────
   const handleProductDeleted = (id: number) => {
@@ -254,8 +287,20 @@ export default function Home() {
     // Each section has its own category tree, so a category picked in one doesn't carry over
     if (kind !== activeTab) setCategoryFilter(null);
     setActiveTab(kind);
+    setConsulting(false);
     if (scroll) scrollToProducts();
   };
+  const openConsultation = (scroll = false) => {
+    setCategoryFilter(null);
+    setConsulting(true);
+    if (scroll) scrollToProducts();
+  };
+
+  // Arriving from an email link (?view=consultation): bring the panel into view
+  useEffect(() => {
+    if (consulting) setTimeout(scrollToProducts, 300);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const modeCount = (kind: ShopMode) => (kind === "store" ? storeCount : listingCount);
   const otherMode: ShopMode = activeTab === "store" ? "listing" : "store";
 
@@ -322,6 +367,14 @@ export default function Home() {
                     <Handshake className="w-4 h-4" />
                     Marketplace
                   </button>
+                  <button
+                    onClick={() => openConsultation(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold
+                               bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm transition"
+                  >
+                    <Video className="w-4 h-4" />
+                    Book a consultation
+                  </button>
                 </div>
               </div>
 
@@ -360,19 +413,25 @@ export default function Home() {
             <div className="mt-8 md:mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-wrap items-center justify-between gap-3 mb-4">
               <div>
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                  {`${SHOP_MODES[activeTab].title}${filterLabel !== "All Products" ? ` · ${filterLabel}` : ""}`}
-                  <span className="ml-2 text-sm font-normal text-gray-400">
-                    ({filteredProducts.length})
-                  </span>
+                  {consulting ? (
+                    "Book a consultation"
+                  ) : (
+                    <>
+                      {`${SHOP_MODES[activeTab].title}${filterLabel !== "All Products" ? ` · ${filterLabel}` : ""}`}
+                      <span className="ml-2 text-sm font-normal text-gray-400">
+                        ({filteredProducts.length})
+                      </span>
+                    </>
+                  )}
                 </h2>
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                  There are two ways to buy here — choose one below.
+                  Buy from the store or the marketplace, or book a call with an expert — choose one below.
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
                 {/* Back to all categories */}
-                {categoryFilter && (
+                {categoryFilter && !consulting && (
                   <button
                     onClick={() => handleSelectCategory(null)}
                     className="text-sm text-blue-600 hover:underline flex items-center gap-1"
@@ -383,16 +442,16 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── Two ways to buy: big, self-explaining choice cards ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-              {(["store", "listing"] as const).map((kind) => {
-                const mode = SHOP_MODES[kind];
+            {/* ── Two ways to buy + consultation: big, self-explaining choice cards ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+              {(["store", "listing", "consultation"] as const).map((kind) => {
+                const mode = kind === "consultation" ? CONSULTATION_CARD : SHOP_MODES[kind];
                 const Icon = mode.icon;
-                const active = activeTab === kind;
+                const active = kind === "consultation" ? consulting : !consulting && activeTab === kind;
                 return (
                   <button
                     key={kind}
-                    onClick={() => selectMode(kind)}
+                    onClick={() => (kind === "consultation" ? openConsultation() : selectMode(kind))}
                     aria-pressed={active}
                     className={`relative text-left rounded-2xl border-2 p-3 sm:p-4 transition-all duration-200
                                 ${active
@@ -413,7 +472,7 @@ export default function Home() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">{mode.title}</span>
                           <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${mode.countPill}`}>
-                            {modeCount(kind)} items
+                            {kind === "consultation" ? "Book a slot" : `${modeCount(kind)} items`}
                           </span>
                         </div>
                         <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">{mode.tagline}</p>
@@ -432,6 +491,10 @@ export default function Home() {
               })}
             </div>
 
+            {consulting ? (
+              <ConsultationPanel />
+            ) : (
+            <>
             {/* How buying works in the selected section */}
             <div className={`mb-4 flex items-center gap-2 text-xs sm:text-sm px-3 py-2 rounded-lg w-fit max-w-full border ${SHOP_MODES[activeTab].banner}`}>
               {activeTab === "store" ? <ShoppingCart className="w-4 h-4 flex-shrink-0" /> : <MessageCircle className="w-4 h-4 flex-shrink-0" />}
@@ -523,6 +586,8 @@ export default function Home() {
                   )}
                 </button>
               </div>
+            )}
+            </>
             )}
           </div>
 

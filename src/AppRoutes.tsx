@@ -68,6 +68,7 @@ const AdminShipments = lazy(() => import("./pages/Admin/AdminShipments"));
 const AdminUserListings = lazy(() => import("./pages/Admin/AdminUserListings"));
 const AdminDiscounts = lazy(() => import("./pages/Admin/AdminDiscounts"));
 const AdminVouchers = lazy(() => import("./pages/Admin/AdminVouchers"));
+const AdminConsultations = lazy(() => import("./pages/Admin/AdminConsultations"));
 
 
 // Shown while a page's code downloads (pages load on demand to keep the first visit fast)
@@ -193,6 +194,7 @@ export default function AppRoutes() {
             <Route path="listings" element={<AdminUserListings />} />
             <Route path="discounts" element={<AdminDiscounts />} />
             <Route path="vouchers" element={<AdminVouchers />} />
+            <Route path="consultations" element={<AdminConsultations />} />
           </Route>
         </Route>
 
