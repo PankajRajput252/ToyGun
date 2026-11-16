@@ -25,6 +25,10 @@ interface Props {
   orderReference?: string;
   /** Products in the order. If omitted, they are looked up from orderReference on submit. */
   productIds?: number[];
+  /** Consultation booking this payment is for (instead of an order). */
+  consultationBookingId?: number;
+  /** Replaces the default "we'll confirm your order" line. */
+  description?: string;
   onSubmitted: (payment: PaymentSubmission) => void;
 }
 
@@ -35,7 +39,9 @@ const inputCls =
   "focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/30 " +
   "dark:border-gray-700 dark:bg-gray-900 dark:text-white";
 
-export default function ManualPaymentModal({ isOpen, onClose, amount, orderReference, productIds, onSubmitted }: Props) {
+export default function ManualPaymentModal({
+  isOpen, onClose, amount, orderReference, productIds, consultationBookingId, description, onSubmitted,
+}: Props) {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [loadingMethods, setLoadingMethods] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -103,7 +109,7 @@ export default function ManualPaymentModal({ isOpen, onClose, amount, orderRefer
     try {
       const ids =
         productIds ??
-        (orderReference
+        (orderReference && !consultationBookingId
           ? [...new Set((await shopOrderApi.get(orderReference)).items.map((i) => i.productId))]
           : undefined);
       const payment = await paymentUserApi.submitPayment({
@@ -113,6 +119,7 @@ export default function ManualPaymentModal({ isOpen, onClose, amount, orderRefer
         paymentDate,
         remarks,
         orderReference,
+        consultationBookingId,
         productIds: ids,
         receipt,
       });
@@ -137,7 +144,7 @@ export default function ManualPaymentModal({ isOpen, onClose, amount, orderRefer
       <form onSubmit={handleSubmit} noValidate>
         <h2 className="pr-10 text-xl font-bold text-gray-900 dark:text-white">Pay by bank transfer or UPI</h2>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Pay using one of the options below, then upload your receipt. We'll confirm your order once the payment is verified.
+          {description ?? "Pay using one of the options below, then upload your receipt. We'll confirm your order once the payment is verified."}
         </p>
 
         {amount !== undefined && (

@@ -11,6 +11,8 @@ export interface ConsultationTopic {
   description: string | null;
   active: boolean;
   sortOrder: number;
+  /** Fee in rupees set by admin; null = free. */
+  price: number | null;
 }
 
 export interface TopicInput {
@@ -18,6 +20,8 @@ export interface TopicInput {
   description: string | null;
   active: boolean;
   sortOrder: number;
+  /** null or 0 = free */
+  price: number | null;
 }
 
 export interface ConsultationSlot {
@@ -34,7 +38,8 @@ export interface AdminSlot extends ConsultationSlot {
   topicName: string | null;
 }
 
-export type BookingStatus = "CONFIRMED" | "CANCELLED";
+/** PENDING_PAYMENT: paid topic, slot held until the admin approves the user's payment. */
+export type BookingStatus = "PENDING_PAYMENT" | "CONFIRMED" | "CANCELLED";
 
 export interface ConsultationBooking {
   id: number;
@@ -54,6 +59,16 @@ export interface ConsultationBooking {
   cancelledAt: string | null;
   cancelledBy: "USER" | "ADMIN" | null;
   cancelReason: string | null;
+  /** Fee for this booking; null = free. */
+  amount: number | null;
+  /** PENDING_PAYMENT only: the slot is released if no payment is submitted by then. */
+  paymentDueAt: string | null;
+  /** Latest payment for this booking, or null if none submitted yet. */
+  paymentStatus: "PENDING" | "APPROVED" | "REJECTED" | null;
+  paymentId: number | null;
+  paymentRejectionReason: string | null;
+  /** How many more times the user may reschedule (one reschedule per booking). */
+  reschedulesLeft: number;
 }
 
 export interface BookInput {
@@ -89,6 +104,8 @@ export const consultationApi = {
   book: (body: BookInput) => sendJson<ConsultationBooking>("POST", "/api/consultations/bookings", body),
   mine: () => getJson<ConsultationBooking[]>("/api/consultations/bookings/mine"),
   cancel: (id: number) => sendJson<ConsultationBooking>("POST", `/api/consultations/bookings/${id}/cancel`),
+  reschedule: (id: number, slotId: number) =>
+    sendJson<ConsultationBooking>("POST", `/api/consultations/bookings/${id}/reschedule`, { slotId }),
 };
 
 // ─── Admin API ────────────────────────────────────────────────────────────────

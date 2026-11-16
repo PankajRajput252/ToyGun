@@ -140,7 +140,7 @@ export default function AdminPaymentApprovals() {
                       <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{formatInr(p.amount)}</td>
                       <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{p.paymentMethodName}</td>
                       <td className="px-4 py-3 font-mono text-gray-900 dark:text-gray-100">{p.transactionReference}</td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{p.orderReference ?? "—"}</td>
+                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{paymentFor(p)}</td>
                       <td className="px-4 py-3"><PaymentStatusBadge status={p.status} /></td>
                       <td className="px-4 py-3 text-right">
                         <button
@@ -274,7 +274,10 @@ function ReviewModal({
           <Item label="Method" value={payment.paymentMethodName} />
           <Item label="UTR / reference" value={<span className="font-mono">{payment.transactionReference}</span>} />
           <Item label="Paid on" value={payment.paymentDate} />
-          <Item label="Order" value={payment.orderReference ?? "—"} />
+          <Item label={payment.consultationBookingId ? "For" : "Order"} value={paymentFor(payment)} />
+          {payment.consultationBookingId && payment.status === "PENDING" && (
+            <Item label="On approval" value="The consultation is confirmed and the user gets the Google Meet link by email" wide />
+          )}
           <Item label="Submitted" value={formatDateTime(payment.submittedAt)} />
           {payment.remarks && <Item label="Customer note" value={payment.remarks} wide />}
           {payment.reviewedAt && (
@@ -387,4 +390,10 @@ function Item({ label, value, wide = false }: { label: string; value: React.Reac
       <dd className="break-words text-gray-900 dark:text-gray-100">{value}</dd>
     </div>
   );
+}
+
+/** What a payment is for: a shop order or a consultation booking. */
+function paymentFor(p: PaymentSubmission) {
+  if (p.consultationBookingId) return `Consultation #${p.consultationBookingId}`;
+  return p.orderReference ?? "—";
 }

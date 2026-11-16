@@ -1,16 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  CalendarCheck, CalendarDays, CheckCircle2, Clock, Loader2, LogIn, Mail, MessageSquareText, Video, X,
+  AlertTriangle, CalendarCheck, CalendarClock, CalendarDays, CheckCircle2, Clock, Hourglass, Loader2, LogIn, Mail,
+  MessageSquareText, QrCode, Video, X,
 } from "lucide-react";
+import { Modal } from "../../components/ui/modal";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
-import { PaymentApiError, errorMessage } from "../../services/paymentApi";
+import { PaymentApiError, errorMessage, formatInr } from "../../services/paymentApi";
+import ManualPaymentModal from "../../components/payment/ManualPaymentModal";
 import {
   ConsultationBooking, ConsultationSlot, ConsultationTopic, consultationApi, dayKey, formatTime, formatWhen,
 } from "../../services/consultationApi";
 
 // Book a consultation: pick a topic, a day and a time; we email a Google Meet link.
+// Paid topics (price set by admin): booking holds the slot, the user pays by QR / bank transfer and uploads the
+// receipt; once an admin approves the payment the booking is confirmed and the Meet link is emailed.
 
 /** Home opens the Consultation card when it finds this (set before sending a guest to sign in). */
 export const OPEN_CONSULTATION_KEY = "bw-open-consultation";
@@ -47,6 +52,10 @@ export default function ConsultationPanel() {
   const [confirmed, setConfirmed] = useState<ConsultationBooking | null>(null);
 
   const [mine, setMine] = useState<ConsultationBooking[]>([]);
+  /** Booking whose payment form is open. */
+  const [payFor, setPayFor] = useState<ConsultationBooking | null>(null);
+  /** Booking whose cancel / reschedule popup is open. */
+  const [manage, setManage] = useState<ConsultationBooking | null>(null);
 
   const loadSlots = useCallback(async () => {
     const s = await consultationApi.slots(30);
@@ -101,7 +110,8 @@ export default function ConsultationPanel() {
   const daySlots = days.find((d) => d.key === day)?.slots ?? [];
   const slot = slots.find((s) => s.id === slotId) ?? null;
   const topic = topics.find((t) => t.id === topicId) ?? null;
-  const upcoming = mine.filter((b) => b.status === "CONFIRMED" && new Date(b.endsAt) > new Date());
+  const upcoming = mine.filter((b) => b.status !== "CANCELLED" && new Date(b.endsAt) > new Date());
+  const anyPaid = topics.some((t) => isPaid(t.price));
 
   const book = async () => {
     if (!topic || !slot) return;
@@ -125,6 +135,7 @@ export default function ConsultationPanel() {
     try {
       const b = await consultationApi.book({ slotId: slot.id, topicId: topic.id, phone: cleanPhone || undefined, notes: notes.trim() || undefined });
       setConfirmed(b);
+      if (b.status === "PENDING_PAYMENT") setPayFor(b);
       setSlotId(null);
       setNotes("");
       loadMine();
@@ -149,8 +160,26 @@ export default function ConsultationPanel() {
       if (confirmed?.id === b.id) setConfirmed(null);
       loadMine();
       loadSlots().catch(() => {});
+      return true;
     } catch (err) {
       showToast(errorMessage(err), "error");
+      return false;
+    }
+  };
+
+  const rescheduleBooking = async (b: ConsultationBooking, newSlotId: number) => {
+    try {
+      const moved = await consultationApi.reschedule(b.id, newSlotId);
+      showToast(`Rescheduled to ${formatWhen(moved)}. We've emailed you the details.`);
+      if (confirmed?.id === b.id) setConfirmed(moved);
+      loadMine();
+      loadSlots().catch(() => {});
+      return true;
+    } catch (err) {
+      showToast(errorMessage(err), "error");
+      // The time may have just been taken: refresh the list
+      loadSlots().catch(() => {});
+      return false;
     }
   };
 
@@ -169,7 +198,7 @@ export default function ConsultationPanel() {
     <div id="consultation" className="grid gap-6 lg:grid-cols-3 scroll-mt-24">
       <div className="lg:col-span-2 space-y-6">
         {confirmed ? (
-          <Confirmation booking={confirmed} onDone={() => setConfirmed(null)} />
+          <Confirmation booking={confirmed} onPay={() => setPayFor(confirmed)} onDone={() => setConfirmed(null)} />
         ) : topics.length === 0 ? (
           <EmptyCard icon={MessageSquareText} title="Consultations are opening soon" text="Our experts will be available to book here shortly." />
         ) : (
@@ -195,6 +224,11 @@ export default function ConsultationPanel() {
                         <span className="font-semibold text-sm text-gray-900 dark:text-white">{t.name}</span>
                         {on && <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-emerald-500" />}
                       </span>
+                      {anyPaid && (
+                        <span className="mt-1 block text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                          {isPaid(t.price) ? formatInr(t.price!) : "Free"}
+                        </span>
+                      )}
                       {t.description && <span className="mt-0.5 block text-xs text-gray-500 dark:text-gray-400">{t.description}</span>}
                     </button>
                   );
@@ -297,6 +331,12 @@ export default function ConsultationPanel() {
                   {topic && slot ? (
                     <>
                       <b className="text-gray-900 dark:text-white">{topic.name}</b> · {formatWhen(slot)}
+                      {isPaid(topic.price) && (
+                        <>
+                          {" · "}
+                          <b className="text-gray-900 dark:text-white">{formatInr(topic.price!)}</b>
+                        </>
+                      )}
                     </>
                   ) : (
                     "Choose a topic and a time to continue."
@@ -309,7 +349,13 @@ export default function ConsultationPanel() {
                              hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {booking ? <Loader2 className="h-4 w-4 animate-spin" /> : isAuthenticated ? <CalendarCheck className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
-                  {booking ? "Booking…" : isAuthenticated ? "Confirm booking" : "Sign in to book"}
+                  {booking
+                    ? "Booking…"
+                    : !isAuthenticated
+                      ? "Sign in to book"
+                      : topic && isPaid(topic.price)
+                        ? `Book & pay ${formatInr(topic.price!)}`
+                        : "Confirm booking"}
                 </button>
               </div>
               {bookError && <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-300">{bookError}</p>}
@@ -330,7 +376,11 @@ export default function ConsultationPanel() {
             ) : (
               <ul className="space-y-3">
                 {upcoming.map((b) => (
-                  <UpcomingItem key={b.id} booking={b} onCancel={() => cancelBooking(b)} />
+                  <UpcomingItem key={b.id} booking={b} onPay={() => setPayFor(b)} onManage={() => {
+                      setManage(b);
+                      loadSlots().catch(() => {});
+                    }}
+                  />
                 ))}
               </ul>
             )}
@@ -341,7 +391,8 @@ export default function ConsultationPanel() {
           <ol className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
             {[
               [CalendarCheck, "Pick a topic and a free time"],
-              [Mail, "We email you the confirmation with a Google Meet link"],
+              ...(anyPaid ? [[QrCode, "Pay the fee by UPI QR or bank transfer and upload the receipt"]] : []),
+              [Mail, anyPaid ? "Once your payment is verified, we email you a Google Meet link" : "We email you the confirmation with a Google Meet link"],
               [Video, "Join the call at your time — no app needed in a browser"],
             ].map(([Icon, text], i) => {
               const I = Icon as typeof Mail;
@@ -355,11 +406,82 @@ export default function ConsultationPanel() {
           </ol>
         </section>
       </aside>
+
+      {manage && (
+        <CancelOrRescheduleModal
+          booking={manage}
+          slots={slots.filter((s) => s.id !== manage.slotId)}
+          onClose={() => setManage(null)}
+          onReschedule={(newSlotId) => rescheduleBooking(manage, newSlotId)}
+          onCancel={() => cancelBooking(manage)}
+        />
+      )}
+
+      {payFor && payFor.amount != null && (
+        <ManualPaymentModal
+          isOpen
+          amount={payFor.amount}
+          consultationBookingId={payFor.id}
+          description={`Pay for your ${payFor.topicName} consultation (${formatWhen(payFor)}), then upload your receipt. We'll email your Google Meet link once the payment is verified.`}
+          onClose={() => setPayFor(null)}
+          onSubmitted={() => {
+            const done: ConsultationBooking = { ...payFor, paymentStatus: "PENDING", paymentDueAt: null, paymentRejectionReason: null };
+            if (confirmed?.id === payFor.id) setConfirmed(done);
+            setPayFor(null);
+            showToast("Payment submitted. We'll confirm your consultation once it's verified.");
+            loadMine();
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function Confirmation({ booking, onDone }: { booking: ConsultationBooking; onDone: () => void }) {
+const isPaid = (price: number | null | undefined) => price != null && price > 0;
+
+/** "Pay by 4:30 pm" for a held booking. */
+const payByText = (b: ConsultationBooking) => (b.paymentDueAt ? `Pay by ${formatTime(b.paymentDueAt)} to keep this time` : null);
+
+function Confirmation({ booking, onPay, onDone }: { booking: ConsultationBooking; onPay: () => void; onDone: () => void }) {
+  if (booking.status === "PENDING_PAYMENT") {
+    const underReview = booking.paymentStatus === "PENDING";
+    return (
+      <section className="rounded-2xl border-2 border-amber-400 bg-amber-400/10 p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <Hourglass className="h-8 w-8 flex-shrink-0 text-amber-500" />
+          <div className="min-w-0">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+              {underReview ? "Payment submitted — waiting for verification" : "Your time is held — complete the payment"}
+            </h3>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+              <b>{booking.topicName}</b> · {formatWhen(booking)} · <b>{formatInr(booking.amount ?? 0)}</b>
+            </p>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+              {underReview
+                ? <>Once we verify your payment, we'll email the Google Meet link to <b>{booking.userEmail}</b>.</>
+                : payByText(booking) ?? "Pay to confirm this consultation."}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {!underReview && (
+                <button
+                  onClick={onPay}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                >
+                  <QrCode className="h-4 w-4" /> Pay {formatInr(booking.amount ?? 0)}
+                </button>
+              )}
+              <button
+                onClick={onDone}
+                className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-white/50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-white/5"
+              >
+                {underReview ? "Book another" : "Back"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 p-5 sm:p-6">
       <div className="flex items-start gap-3">
@@ -398,17 +520,42 @@ function Confirmation({ booking, onDone }: { booking: ConsultationBooking; onDon
   );
 }
 
-function UpcomingItem({ booking, onCancel }: { booking: ConsultationBooking; onCancel: () => Promise<void> | void }) {
-  const [confirming, setConfirming] = useState(false);
-  const [busy, setBusy] = useState(false);
+function UpcomingItem({ booking, onPay, onManage }: {
+  booking: ConsultationBooking; onPay: () => void; onManage: () => void;
+}) {
+  const awaitingPayment = booking.status === "PENDING_PAYMENT";
+  const underReview = awaitingPayment && booking.paymentStatus === "PENDING";
   return (
     <li className="rounded-xl border border-gray-200 p-3 dark:border-gray-700">
       <p className="text-sm font-semibold text-gray-900 dark:text-white">{booking.topicName}</p>
       <p className="mt-0.5 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
         <Clock className="h-3.5 w-3.5" /> {formatWhen(booking)}
       </p>
+      {awaitingPayment && (
+        <div className="mt-2 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">
+          {underReview ? (
+            <>Payment of {formatInr(booking.amount ?? 0)} is being verified</>
+          ) : (
+            <>
+              {booking.paymentStatus === "REJECTED"
+                ? <>Payment rejected{booking.paymentRejectionReason ? `: ${booking.paymentRejectionReason}` : ""}. Please pay again.</>
+                : <>Awaiting payment of {formatInr(booking.amount ?? 0)}.</>}
+              {payByText(booking) && <span className="block">{payByText(booking)}</span>}
+            </>
+          )}
+        </div>
+      )}
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        {booking.meetLink ? (
+        {awaitingPayment ? (
+          !underReview && (
+            <button
+              onClick={onPay}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-emerald-500"
+            >
+              <QrCode className="h-3.5 w-3.5" /> Pay now
+            </button>
+          )
+        ) : booking.meetLink ? (
           <a
             href={booking.meetLink}
             target="_blank"
@@ -420,31 +567,180 @@ function UpcomingItem({ booking, onCancel }: { booking: ConsultationBooking; onC
         ) : (
           <span className="text-xs text-gray-500">Meet link coming by email</span>
         )}
-        {confirming ? (
-          <>
-            <button
-              disabled={busy}
-              onClick={async () => {
-                setBusy(true);
-                await onCancel();
-                setBusy(false);
-                setConfirming(false);
-              }}
-              className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-500 disabled:opacity-50"
-            >
-              {busy && <Loader2 className="h-3 w-3 animate-spin" />} Yes, cancel
-            </button>
-            <button onClick={() => setConfirming(false)} className="text-xs text-gray-500 hover:underline">
-              Keep
-            </button>
-          </>
-        ) : (
-          <button onClick={() => setConfirming(true)} className="ml-auto inline-flex items-center gap-1 text-xs text-red-500 hover:underline">
-            <X className="h-3.5 w-3.5" /> Cancel
-          </button>
-        )}
+        <button onClick={onManage} className="ml-auto inline-flex items-center gap-1 text-xs text-red-500 hover:underline">
+          <X className="h-3.5 w-3.5" /> {booking.reschedulesLeft > 0 ? "Cancel / reschedule" : "Cancel"}
+        </button>
       </div>
     </li>
+  );
+}
+
+/**
+ * Shown when the user wants to cancel: offers moving to another free slot first.
+ * A paid, confirmed consultation can still be cancelled, but the fee is not refunded.
+ */
+function CancelOrRescheduleModal({ booking, slots, onClose, onReschedule, onCancel }: {
+  booking: ConsultationBooking;
+  slots: ConsultationSlot[];
+  onClose: () => void;
+  onReschedule: (slotId: number) => Promise<boolean>;
+  onCancel: () => Promise<boolean>;
+}) {
+  const [busy, setBusy] = useState<"move" | "cancel" | null>(null);
+  const [slotId, setSlotId] = useState<number | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  const days = useMemo(() => {
+    const map = new Map<string, ConsultationSlot[]>();
+    slots.forEach((s) => map.set(dayKey(s.startsAt), [...(map.get(dayKey(s.startsAt)) ?? []), s]));
+    return Array.from(map.entries()).map(([key, list]) => ({ key, slots: list }));
+  }, [slots]);
+  const [pickedDay, setDay] = useState<string | null>(null);
+  // Slots refresh while the popup is open: fall back to the first day that still has times
+  const day = days.some((d) => d.key === pickedDay) ? pickedDay : (days[0]?.key ?? null);
+  const daySlots = days.find((d) => d.key === day)?.slots ?? [];
+  const chosen = slots.find((s) => s.id === slotId) ?? null;
+
+  const paid = booking.status === "CONFIRMED" && booking.amount != null;
+  const canReschedule = booking.reschedulesLeft > 0;
+  const underReview = booking.status === "PENDING_PAYMENT" && booking.paymentStatus === "PENDING";
+
+  const run = async (kind: "move" | "cancel") => {
+    setBusy(kind);
+    const ok = kind === "move" ? await onReschedule(slotId!) : await onCancel();
+    setBusy(null);
+    if (ok) onClose();
+    else if (kind === "move") setSlotId(null);
+  };
+
+  return (
+    <Modal isOpen onClose={busy ? () => {} : onClose} className="max-w-lg p-5 sm:p-6" showCloseButton={!busy}>
+      <h2 className="pr-10 text-lg font-bold text-gray-900 dark:text-white">{canReschedule ? "Can't make it?" : "Cancel consultation?"}</h2>
+      <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+        <b>{booking.topicName}</b> · {formatWhen(booking)}
+      </p>
+
+      {/* Reschedule */}
+      <section className="mt-5 rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-4">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+          <CalendarClock className="h-4 w-4 text-emerald-500" /> Reschedule to another time
+        </h3>
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {canReschedule
+            ? `${booking.amount != null ? "Your payment stays with the booking — nothing to pay again. " : ""}You can reschedule only once.`
+            : ""}
+        </p>
+        {!canReschedule ? (
+          <p className="mt-2 rounded-lg bg-gray-100 p-3 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+            This booking has already been rescheduled once and can't be moved again.
+          </p>
+        ) : days.length === 0 ? (
+          <p className="mt-3 text-sm text-gray-500">No other times are free right now. Please check back later.</p>
+        ) : (
+          <>
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {days.map((d) => {
+                const on = d.key === day;
+                const date = new Date(d.slots[0].startsAt);
+                return (
+                  <button
+                    key={d.key}
+                    onClick={() => {
+                      setDay(d.key);
+                      setSlotId(null);
+                    }}
+                    aria-pressed={on}
+                    className={`flex-shrink-0 w-14 rounded-lg border py-1.5 text-center text-xs transition ${
+                      on ? "border-emerald-500 bg-emerald-500 text-white" : "border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                    }`}
+                  >
+                    <span className="block uppercase opacity-80">{date.toLocaleDateString("en-IN", { weekday: "short" })}</span>
+                    <span className="block text-base font-bold leading-tight">{date.getDate()}</span>
+                    <span className="block opacity-80">{date.toLocaleDateString("en-IN", { month: "short" })}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {daySlots.map((s) => {
+                const on = s.id === slotId;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setSlotId(s.id)}
+                    aria-pressed={on}
+                    className={`rounded-lg border px-2 py-1.5 text-sm font-medium transition ${
+                      on
+                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        : "border-gray-300 text-gray-700 hover:border-emerald-500 dark:border-gray-600 dark:text-gray-200"
+                    }`}
+                  >
+                    {formatTime(s.startsAt)}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => run("move")}
+              disabled={!chosen || busy !== null}
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {busy === "move" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarCheck className="h-4 w-4" />}
+              {chosen ? `Move to ${formatWhen(chosen)}` : "Choose a new time"}
+            </button>
+          </>
+        )}
+      </section>
+
+      {/* Cancel */}
+      <section className="mt-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Cancel the consultation</h3>
+        {underReview ? (
+          <p className="mt-1 text-sm text-gray-500">
+            Your payment is being verified, so this booking can't be cancelled right now. You can still reschedule it above.
+          </p>
+        ) : (
+          <>
+            {paid ? (
+              <p className="mt-2 flex gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">
+                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <span>
+                  The consultation fee of <b>{formatInr(booking.amount!)}</b> is <b>non-refundable</b>. If you cancel, the money will not be
+                  returned.{canReschedule && " Reschedule instead to keep your payment."}
+                </span>
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-gray-500">The time will be released for others to book.</p>
+            )}
+            {paid && (
+              <label className="mt-3 flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={confirmCancel}
+                  onChange={(e) => setConfirmCancel(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                />
+                I understand my payment will not be refunded
+              </label>
+            )}
+            <button
+              onClick={() => run("cancel")}
+              disabled={busy !== null || (paid && !confirmCancel)}
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {busy === "cancel" && <Loader2 className="h-4 w-4 animate-spin" />}
+              {paid ? "Cancel without refund" : "Cancel booking"}
+            </button>
+          </>
+        )}
+      </section>
+
+      <div className="mt-4 flex justify-end">
+        <button onClick={onClose} disabled={busy !== null} className="text-sm text-gray-500 hover:underline disabled:opacity-50">
+          Keep my booking
+        </button>
+      </div>
+    </Modal>
   );
 }
 

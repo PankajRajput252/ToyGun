@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { Modal } from "../../components/ui/modal";
 import { useToast } from "../../context/ToastContext";
-import { PaymentApiError, errorMessage, formatDateTime } from "../../services/paymentApi";
+import { PaymentApiError, errorMessage, formatDateTime, formatInr } from "../../services/paymentApi";
 import {
   AdminSlot, ConsultationBooking, ConsultationTopic, GoogleStatus, consultationAdminApi, dayKey, formatDay, formatTime,
   formatWhen, isoDate,
@@ -54,7 +54,8 @@ export default function AdminConsultations() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Consultations</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Users pick a topic and a free slot; they get an email with a Google Meet link right away.
+            Users pick a topic and a free slot; they get an email with a Google Meet link right away. For topics with a fee,
+            the slot is held until you approve their payment in Payment approvals.
           </p>
         </div>
 
@@ -229,6 +230,7 @@ function BookingsTab({ googleConnected }: { googleConnected: boolean }) {
   };
 
   const confirmedCount = list.filter((b) => b.status === "CONFIRMED").length;
+  const awaitingCount = list.filter((b) => b.status === "PENDING_PAYMENT").length;
 
   return (
     <div className="space-y-4">
@@ -259,10 +261,15 @@ function BookingsTab({ googleConnected }: { googleConnected: boolean }) {
         <Empty icon={CalendarDays} title={range === "upcoming" ? "No upcoming bookings" : "No past bookings in the last 4 months"} text={range === "upcoming" ? "Make sure there are free time slots and active topics." : ""} />
       ) : (
         <>
-          {range === "upcoming" && <p className="text-sm text-gray-500">{confirmedCount} confirmed</p>}
+          {range === "upcoming" && (
+            <p className="text-sm text-gray-500">
+              {confirmedCount} confirmed{awaitingCount > 0 && ` · ${awaitingCount} awaiting payment`}
+            </p>
+          )}
           <div className="grid gap-4 md:grid-cols-2">
             {list.map((b) => {
               const cancelled = b.status === "CANCELLED";
+              const awaiting = b.status === "PENDING_PAYMENT";
               return (
                 <div key={b.id} className={`${cardCls} ${cancelled ? "opacity-60" : ""}`}>
                   <div className="flex items-start justify-between gap-3">
@@ -272,10 +279,18 @@ function BookingsTab({ googleConnected }: { googleConnected: boolean }) {
                     </div>
                     <span
                       className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        cancelled ? "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300" : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                        cancelled
+                          ? "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                          : awaiting
+                            ? "bg-amber-400/20 text-amber-700 dark:text-amber-300"
+                            : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
                       }`}
                     >
-                      {cancelled ? `Cancelled${b.cancelledBy === "USER" ? " by user" : ""}` : `#${b.id} Confirmed`}
+                      {cancelled
+                        ? `Cancelled${b.cancelledBy === "USER" ? " by user" : ""}`
+                        : awaiting
+                          ? `#${b.id} ${b.paymentStatus === "PENDING" ? "Payment to verify" : "Awaiting payment"}`
+                          : `#${b.id} Confirmed`}
                     </span>
                   </div>
 
@@ -285,10 +300,36 @@ function BookingsTab({ googleConnected }: { googleConnected: boolean }) {
                     {b.phone && <p className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-gray-400" /> {b.phone}</p>}
                     {b.notes && <p className="mt-2 whitespace-pre-line rounded-lg bg-gray-50 p-2 text-xs dark:bg-gray-900/60">{b.notes}</p>}
                     {cancelled && b.cancelReason && <p className="text-xs text-gray-500">Reason: {b.cancelReason}</p>}
-                    <p className="text-xs text-gray-400">Booked {formatDateTime(b.createdAt)}</p>
+                    {b.amount != null && (
+                      <p className="text-xs text-gray-500">
+                        Fee {formatInr(b.amount)}
+                        {b.paymentStatus && ` · payment ${b.paymentStatus.toLowerCase()}`}
+                        {b.paymentId && ` (#${b.paymentId})`}
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-400">
+                      Booked {formatDateTime(b.createdAt)}
+                      {b.reschedulesLeft === 0 && " · rescheduled by user"}
+                    </p>
                   </div>
 
-                  {!cancelled && (
+                  {awaiting && (
+                    <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3 dark:border-gray-700">
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        {b.paymentStatus === "PENDING"
+                          ? "Approve the payment in Payment approvals to confirm and send the Meet link."
+                          : b.paymentDueAt
+                            ? `Slot held until ${formatTime(b.paymentDueAt)} for the user to pay.`
+                            : "Waiting for the user to pay."}
+                      </span>
+                      {range === "upcoming" && (
+                        <button onClick={() => setCancelFor(b)} className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10">
+                          <X className="h-3.5 w-3.5" /> Cancel
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {!cancelled && !awaiting && (
                     <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3 dark:border-gray-700">
                       {b.meetLink ? (
                         <>
@@ -676,7 +717,7 @@ function TopicsTab() {
 
   const toggle = async (t: ConsultationTopic) => {
     try {
-      const u = await consultationAdminApi.updateTopic(t.id, { name: t.name, description: t.description, sortOrder: t.sortOrder, active: !t.active });
+      const u = await consultationAdminApi.updateTopic(t.id, { name: t.name, description: t.description, sortOrder: t.sortOrder, price: t.price, active: !t.active });
       setTopics((l) => l.map((x) => (x.id === u.id ? u : x)));
     } catch (err) {
       showToast(errorMessage(err), "error");
@@ -712,6 +753,12 @@ function TopicsTab() {
       ) : topics.length === 0 ? (
         <Empty icon={Tags} title="No topics yet" text="Add topics like Business, Guns and Accessories. Users choose one when booking." />
       ) : (
+        <>
+        {!topics.some((t) => t.price != null && t.price > 0) && (
+          <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">
+            All topics are free, so users aren't asked to pay. To charge for a consultation, click <b>Edit</b> on a topic and set its fee.
+          </p>
+        )}
         <div className="grid gap-3 sm:grid-cols-2">
           {topics.map((t) => (
             <div key={t.id} className={`${cardCls} ${t.active ? "" : "opacity-60"}`}>
@@ -719,6 +766,9 @@ function TopicsTab() {
                 <div className="min-w-0">
                   <p className="font-semibold text-gray-900 dark:text-white">{t.name}</p>
                   {t.description && <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">{t.description}</p>}
+                  <p className="mt-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    {t.price != null && t.price > 0 ? formatInr(t.price) : "Free"}
+                  </p>
                 </div>
                 <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${t.active ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"}`}>
                   {t.active ? "Shown" : "Hidden"}
@@ -734,6 +784,7 @@ function TopicsTab() {
             </div>
           ))}
         </div>
+        </>
       )}
 
       {editing && (
@@ -771,6 +822,7 @@ function TopicEditor({ topic, nextOrder, onClose, onSaved }: {
   const [description, setDescription] = useState(topic?.description ?? "");
   const [sortOrder, setSortOrder] = useState(String(topic?.sortOrder ?? nextOrder));
   const [active, setActive] = useState(topic?.active ?? true);
+  const [price, setPrice] = useState(topic?.price != null && topic.price > 0 ? String(topic.price) : "");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -779,9 +831,12 @@ function TopicEditor({ topic, nextOrder, onClose, onSaved }: {
     if (!name.trim()) return setErr("Enter a name.");
     const order = Number(sortOrder);
     if (!Number.isInteger(order) || order < 0) return setErr("Order must be a whole number, 0 or more.");
+    const priceText = price.trim();
+    if (priceText && !/^\d{1,7}(\.\d{1,2})?$/.test(priceText)) return setErr("Enter the fee in rupees, e.g. 499 or 499.50 (leave empty for free).");
+    const fee = priceText ? Number(priceText) : 0;
     setSaving(true);
     setErr(null);
-    const body = { name: name.trim(), description: description.trim() || null, sortOrder: order, active };
+    const body = { name: name.trim(), description: description.trim() || null, sortOrder: order, active, price: fee > 0 ? fee : null };
     try {
       const saved = topic ? await consultationAdminApi.updateTopic(topic.id, body) : await consultationAdminApi.createTopic(body);
       onSaved(saved, !topic);
@@ -800,6 +855,14 @@ function TopicEditor({ topic, nextOrder, onClose, onSaved }: {
           <label className="block">
             {label("Short description (shown to users, optional)")}
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={300} rows={2} placeholder="Help with paperwork, renewals and rules" className={inputCls} />
+          </label>
+          <label className="block">
+            {label("Consultation fee in ₹ (leave empty for free)")}
+            <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" placeholder="e.g. 499" className={inputCls} />
+            <span className="mt-1 block text-xs text-gray-500">
+              Users pay this by UPI QR / bank transfer when booking. The booking is confirmed when you approve the payment.
+              Changing the fee doesn't affect existing bookings.
+            </span>
           </label>
           <label className="block">{label("Order (lower shows first)")}<input value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} inputMode="numeric" className={inputCls} /></label>
           <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">

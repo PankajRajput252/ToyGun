@@ -37,6 +37,7 @@ export interface PaymentSubmission {
   paymentDate: string; // YYYY-MM-DD
   remarks: string | null;
   orderReference: string | null;
+  consultationBookingId: number | null;
   receiptUrl: string;
   receiptFileName: string;
   status: PaymentStatus;
@@ -70,6 +71,8 @@ export interface SubmitPaymentInput {
   paymentDate: string; // YYYY-MM-DD
   remarks?: string;
   orderReference?: string;
+  /** Consultation booking this payment is for (instead of an order). */
+  consultationBookingId?: number;
   productIds?: number[];
   receipt: File;
 }
@@ -172,6 +175,7 @@ export const paymentUserApi = {
     form.append("paymentDate", input.paymentDate);
     if (input.remarks?.trim()) form.append("remarks", input.remarks.trim());
     if (input.orderReference) form.append("orderReference", input.orderReference);
+    if (input.consultationBookingId) form.append("consultationBookingId", String(input.consultationBookingId));
     // Repeated field → binds to List<Long> productIds on the backend
     input.productIds?.forEach((id) => form.append("productIds", String(id)));
     form.append("receipt", input.receipt);

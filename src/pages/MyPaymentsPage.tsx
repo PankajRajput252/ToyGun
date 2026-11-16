@@ -113,6 +113,12 @@ export default function MyPaymentsPage() {
                         <dd className="break-all text-gray-900 dark:text-gray-100">{p.orderReference}</dd>
                       </div>
                     )}
+                    {p.consultationBookingId && (
+                      <div>
+                        <dt className="text-xs text-gray-500">For</dt>
+                        <dd className="text-gray-900 dark:text-gray-100">Consultation #{p.consultationBookingId}</dd>
+                      </div>
+                    )}
                   </dl>
 
                   {p.status === "REJECTED" && p.rejectionReason && (
@@ -174,6 +180,7 @@ export default function MyPaymentsPage() {
         onClose={() => setResubmitFor(null)}
         amount={resubmitFor?.amount}
         orderReference={resubmitFor?.orderReference ?? undefined}
+        consultationBookingId={resubmitFor?.consultationBookingId ?? undefined}
         onSubmitted={() => {
           setResubmitFor(null);
           showToast("Payment submitted for verification");
