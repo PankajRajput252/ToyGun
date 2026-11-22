@@ -1,7 +1,10 @@
-// Bandookwale Terms and Conditions shown in the sign-up preview modal.
-// Text in [square brackets] must be filled in before publishing.
+// Bandookwale Terms and Conditions — the single source of the text. Shown on the /terms page and in the
+// sign-up preview modal. Text in [square brackets] must be filled in before publishing.
 
-export const TERMS_LAST_UPDATED = "Oct 31, 2026";
+export const TERMS_LAST_UPDATED = "Nov 18, 2026";
+
+/** Public page with the full terms (link here from anywhere: footer, checkout, consultations…). */
+export const TERMS_PATH = "/terms";
 
 type Block =
   | { p: string }
@@ -79,38 +82,57 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    title: "6. Use of the website, intellectual property and privacy",
+    title: "6. Expert consultations",
     blocks: [
-      { p: "6.1 You must not use the website to break the law, upload false or harmful content, attempt to access other users' accounts or our systems, scrape data, or interfere with the website's security or operation." },
-      { p: "6.2 All content on the website, including the Bandookwale name and logo (a brand of Luthra Gun House Private Limited), text, images and software, belongs to us or our licensors. You may not copy or reuse it without our written permission. Product brand names belong to their respective owners." },
-      { p: "6.3 We collect and use your personal data, including identity, address, licence and payment documents, to process orders, verify legal eligibility, prevent fraud and meet legal obligations. We handle it under the Digital Personal Data Protection Act, 2023 and our Privacy Policy. We may share it with courier partners, payment verification staff and government or police authorities where the law requires. We do not sell your personal data." },
-      { p: "6.4 We keep transaction and licence records for as long as the Arms Rules, tax law and other laws require, even if you close your account." },
+      { p: "6.1 You can book an online consultation with our team on the topics shown on the website. Consultations take place on Google Meet; the meeting link is sent to your account email. You may hold up to three upcoming bookings at a time." },
+      { p: "6.2 Fees. Some topics are free. Others carry a fee, which is shown on the topic before you book. For a paid consultation, the time you pick is held for 30 minutes so that you can pay by one of the methods shown (such as UPI or bank transfer) and submit the payment details. If no payment is submitted within that time, the hold ends and the time is released to other users." },
+      { p: "6.3 Confirmation. A paid consultation is confirmed only after our team verifies your payment. Until then it is not confirmed and no meeting link is sent. If a payment is rejected, you are told the reason and may submit corrected details while the time is still held." },
+      { p: "6.4 Rescheduling. You may reschedule a booking once, to any available time, before the consultation starts. Any payment already made carries over to the new time. A booking that has been rescheduled cannot be moved again." },
+      { p: "6.5 Cancellation — fees are non-refundable. You may cancel a booking before the consultation starts. Consultation fees are non-refundable: if you cancel a paid, confirmed consultation, or do not attend it, the fee is not returned. This applies in place of the refund terms in Section 5. A booking cannot be cancelled while its payment is waiting for verification. If we cancel a paid consultation, we will offer you another time or refund the fee." },
+      { p: "6.6 Nature of advice. Consultations give general guidance based on the information you share. They are not legal advice, do not replace the decision of any licensing or government authority, and do not guarantee that any licence, permit or purchase will be approved." },
     ],
   },
   {
-    title: "7. Liability, disputes and contact",
+    title: "7. Use of the website, intellectual property and privacy",
     blocks: [
-      { p: "7.1 Safe use. You must use, store and transport every product safely, follow the manufacturer's instructions, and keep products away from children and unauthorised persons. We are not liable for injury, loss or damage caused by misuse, modification, negligent storage or unlawful use." },
-      { p: "7.2 Limitation of liability. To the extent the law allows, our total liability for any claim relating to an order is limited to the amount you paid for that order. We are not liable for indirect or consequential loss. Nothing in these Terms limits rights you have under the Consumer Protection Act, 2019." },
-      { p: "7.3 Indemnity. You will compensate us for losses, fines and claims arising from your breach of these Terms or of the law, including the use of false documents." },
-      { p: "7.4 Governing law. These Terms are governed by the laws of India. Subject to your rights as a consumer, courts at Gurdaspur, Punjab have exclusive jurisdiction over disputes." },
-      { p: "7.5 Grievance Officer. Under the Consumer Protection (E-Commerce) Rules, 2020, complaints can be sent to our Grievance Officer: [Name], [Designation], Luthra Gun House Private Limited, Amritsar Road, G.T. Road, Batala, District Gurdaspur, Punjab 143505. Email: [email]. We acknowledge complaints within 48 hours and aim to resolve them within one month." },
-      { p: "7.6 Changes. We may update these Terms. The version in force when you place an order applies to that order, and the date at the top shows when they were last updated." },
-      { p: "7.7 Contact. Luthra Gun House Private Limited (Bandookwale), Amritsar Road, G.T. Road, Batala, District Gurdaspur, Punjab 143505. Email: sourabhluthra001@gmail.com." },
+      { p: "7.1 You must not use the website to break the law, upload false or harmful content, attempt to access other users' accounts or our systems, scrape data, or interfere with the website's security or operation." },
+      { p: "7.2 All content on the website, including the Bandookwale name and logo (a brand of Luthra Gun House Private Limited), text, images and software, belongs to us or our licensors. You may not copy or reuse it without our written permission. Product brand names belong to their respective owners." },
+      { p: "7.3 We collect and use your personal data, including identity, address, licence and payment documents, to process orders, verify legal eligibility, prevent fraud and meet legal obligations. We handle it under the Digital Personal Data Protection Act, 2023 and our Privacy Policy. We may share it with courier partners, payment verification staff and government or police authorities where the law requires. We do not sell your personal data." },
+      { p: "7.4 We keep transaction and licence records for as long as the Arms Rules, tax law and other laws require, even if you close your account." },
+    ],
+  },
+  {
+    title: "8. Liability, disputes and contact",
+    blocks: [
+      { p: "8.1 Safe use. You must use, store and transport every product safely, follow the manufacturer's instructions, and keep products away from children and unauthorised persons. We are not liable for injury, loss or damage caused by misuse, modification, negligent storage or unlawful use." },
+      { p: "8.2 Limitation of liability. To the extent the law allows, our total liability for any claim relating to an order is limited to the amount you paid for that order. We are not liable for indirect or consequential loss. Nothing in these Terms limits rights you have under the Consumer Protection Act, 2019." },
+      { p: "8.3 Indemnity. You will compensate us for losses, fines and claims arising from your breach of these Terms or of the law, including the use of false documents." },
+      { p: "8.4 Governing law. These Terms are governed by the laws of India. Subject to your rights as a consumer, courts at Gurdaspur, Punjab have exclusive jurisdiction over disputes." },
+      { p: "8.5 Grievance Officer. Under the Consumer Protection (E-Commerce) Rules, 2020, complaints can be sent to our Grievance Officer: [Name], [Designation], Luthra Gun House Private Limited, Amritsar Road, G.T. Road, Batala, District Gurdaspur, Punjab 143505. Email: [email]. We acknowledge complaints within 48 hours and aim to resolve them within one month." },
+      { p: "8.6 Changes. We may update these Terms. The version in force when you place an order applies to that order, and the date at the top shows when they were last updated." },
+      { p: "8.7 Contact. Luthra Gun House Private Limited (Bandookwale), Amritsar Road, G.T. Road, Batala, District Gurdaspur, Punjab 143505. Email: sourabhluthra001@gmail.com." },
     ],
   },
 ];
 
-export default function TermsAndConditions() {
+/** Anchor id for a section, e.g. "6. Expert consultations" → "terms-6". */
+export const sectionId = (title: string) => `terms-${title.split(".")[0]}`;
+
+/** Section titles, for a table of contents. */
+export const TERMS_SECTIONS = SECTIONS.map((s) => ({ id: sectionId(s.title), title: s.title }));
+
+export default function TermsAndConditions({ showHeader = true }: { showHeader?: boolean }) {
   return (
     <article className="space-y-5 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-      <header>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Bandookwale Terms and Conditions</h2>
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Last updated: {TERMS_LAST_UPDATED}</p>
-        <p className="mt-3">These Terms govern your use of bandookwale.com and any purchase made through it.</p>
-      </header>
+      {showHeader && (
+        <header>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Bandookwale Terms and Conditions</h2>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Last updated: {TERMS_LAST_UPDATED}</p>
+          <p className="mt-3">These Terms govern your use of bandookwale.com and any purchase made through it.</p>
+        </header>
+      )}
       {SECTIONS.map((section) => (
-        <section key={section.title} className="space-y-2">
+        <section key={section.title} id={sectionId(section.title)} className="scroll-mt-28 space-y-2">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white">{section.title}</h3>
           {section.blocks.map((block, i) =>
             "p" in block ? (

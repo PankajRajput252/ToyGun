@@ -54,6 +54,8 @@ const CartPage = lazy(() => import("./pages/Cartpage"));
 const MyOrdersPage = lazy(() => import("./pages/Myorderspage"));
 const OrderDetailPage = lazy(() => import("./pages/Orderdetailpage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const AdminSellerStorePage = lazy(() => import("./pages/AdminSellerStorePage"));
 const AdminSellProductPage = lazy(() => import("./pages/AdminSellProductPage"));
 // Premium page no longer used
@@ -114,6 +116,10 @@ export default function AppRoutes() {
 
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+
+        {/* Terms and Conditions (public; /terms-and-conditions is an alias) */}
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/terms-and-conditions" element={<Navigate to="/terms" replace />} />
 
         {/* Secret one-time launch ceremony page (not linked anywhere) */}
         <Route path="/launch" element={<LaunchPage />} />
@@ -195,6 +201,7 @@ export default function AppRoutes() {
             <Route path="discounts" element={<AdminDiscounts />} />
             <Route path="vouchers" element={<AdminVouchers />} />
             <Route path="consultations" element={<AdminConsultations />} />
+            <Route path="notifications" element={<NotificationsPage />} />
           </Route>
         </Route>
 

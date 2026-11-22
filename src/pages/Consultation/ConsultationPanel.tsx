@@ -451,14 +451,14 @@ function Confirmation({ booking, onPay, onDone }: { booking: ConsultationBooking
           <Hourglass className="h-8 w-8 flex-shrink-0 text-amber-500" />
           <div className="min-w-0">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-              {underReview ? "Payment submitted — waiting for verification" : "Your time is held — complete the payment"}
+              {underReview ? "Payment submitted — waiting for admin approval" : "Your time is held — complete the payment"}
             </h3>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
               <b>{booking.topicName}</b> · {formatWhen(booking)} · <b>{formatInr(booking.amount ?? 0)}</b>
             </p>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
               {underReview
-                ? <>Once we verify your payment, we'll email the Google Meet link to <b>{booking.userEmail}</b>.</>
+                ? <>Your booking is not confirmed yet. Once an admin approves the payment, we'll confirm it and email the Google Meet link to <b>{booking.userEmail}</b>.</>
                 : payByText(booking) ?? "Pay to confirm this consultation."}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -534,7 +534,7 @@ function UpcomingItem({ booking, onPay, onManage }: {
       {awaitingPayment && (
         <div className="mt-2 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">
           {underReview ? (
-            <>Payment of {formatInr(booking.amount ?? 0)} is being verified</>
+            <>Payment of {formatInr(booking.amount ?? 0)} submitted — waiting for admin approval. Not confirmed yet.</>
           ) : (
             <>
               {booking.paymentStatus === "REJECTED"
@@ -694,10 +694,15 @@ function CancelOrRescheduleModal({ booking, slots, onClose, onReschedule, onCanc
 
       {/* Cancel */}
       <section className="mt-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Cancel the consultation</h3>
+        <h3 className="flex items-center justify-between gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+          Cancel the consultation
+          <a href="/terms#terms-6" target="_blank" rel="noopener noreferrer" className="text-xs font-normal text-gray-500 underline hover:text-gray-700 dark:hover:text-gray-300">
+            Consultation terms
+          </a>
+        </h3>
         {underReview ? (
           <p className="mt-1 text-sm text-gray-500">
-            Your payment is being verified, so this booking can't be cancelled right now. You can still reschedule it above.
+            Your payment is waiting for admin approval, so this booking can't be cancelled right now. You can still reschedule it above.
           </p>
         ) : (
           <>

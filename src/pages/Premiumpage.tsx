@@ -426,7 +426,7 @@ export default function PremiumPage() {
           <span>·</span>
           <a href="#" style={styles.footerLink}>Privacy</a>
           <span>·</span>
-          <a href="#" style={styles.footerLink}>Terms</a>
+          <a href="/terms" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>Terms</a>
           <span>·</span>
           <a href="mailto:support@bandookwale.com" style={styles.footerLink}>Support</a>
         </footer>

@@ -310,7 +310,7 @@ export default function SignUpForm() {
               <div className="font-semibold mb-2">Your Login Credentials:</div>
               <div className="space-y-1">
                 <div>
-                  <strong>Username:</strong>{" "}
+                  <strong>Email (username):</strong>{" "}
                   <span className="font-mono bg-white/50 px-2 py-1 rounded break-all">{generatedUsername}</span>
                 </div>
                 <div>
@@ -468,6 +468,10 @@ export default function SignUpForm() {
                     className="font-medium text-brand-500 underline hover:text-brand-600 dark:text-brand-400">
                     Terms and Conditions
                   </button>{" "}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer"
+                    className="text-xs text-gray-400 underline hover:text-gray-600 dark:hover:text-gray-300">
+                    (open full page)
+                  </a>{" "}
                   and our <span className="text-gray-800 dark:text-white">Privacy Policy</span>
                   <span className="text-error-500">*</span>
                 </p>

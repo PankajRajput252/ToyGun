@@ -3,6 +3,7 @@ import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import UserDropdown from "../components/header/UserDropdown";
 import ChatButton from "../components/header/ChatButton";
+import NotificationBell from "../components/notifications/NotificationBell";
 // import navbarLogo from "../components/images/navbar-Log-1.png";
 import { isUserAdmin } from "../context/AuthContext";
 import { useAuth } from "../context/AuthContext";
@@ -126,6 +127,9 @@ const AppHeader: React.FC = () => {
 
               {/* CHATS (buyers message the store) */}
               <ChatButton className="mx-1" />
+
+              {/* NOTIFICATIONS (payments to review, bookings, sign-ups, shipping issues) */}
+              <NotificationBell className="mx-1" />
 
               {/* SUPPORT */}
               <SupportSidebar />

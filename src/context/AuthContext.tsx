@@ -438,25 +438,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         typeof responseData.message === "string" && /^\S+$/.test(responseData.message.trim());
 
       if (response.ok && !bodyFailed && (looksLikeUsername || !responseData.message)) {
-        const generatedUsername = looksLikeUsername ? responseData.message.trim() : "";
+        // The API answers with the new account's nodeId, but users sign in with their email
+        // (the backend looks logins up by email), so hand the email to the sign-in form.
+        const loginId = email.trim();
+        localStorage.setItem("stylocoin_generated_username", loginId);
 
-        if (generatedUsername) {
-          localStorage.setItem(
-            "stylocoin_generated_username",
-            generatedUsername
-          );
-
-          return {
-            success: true,
-            username: generatedUsername,
-            message: `Registration successful! Your username is: ${generatedUsername}`,
-          };
-        } else {
-          return {
-            success: true,
-            message: apiMessage || `Registration successful (status ${response.status})`,
-          };
-        }
+        return {
+          success: true,
+          username: loginId,
+          message: `Registration successful! Sign in with your email: ${loginId}`,
+        };
       } else {
         return {
           success: false,

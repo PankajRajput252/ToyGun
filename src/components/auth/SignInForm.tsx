@@ -35,7 +35,7 @@ export default function SignInForm() {
 
     // Basic validation
     if (!username.trim() || !password.trim()) {
-      setError("Please enter both username and password.");
+      setError("Please enter both email and password.");
       setIsLoading(false);
       return;
     }
@@ -68,13 +68,13 @@ export default function SignInForm() {
             Sign In
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Access the product using your userId and passcode!
+            Sign in with your registered email and password.
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
-            
+
             {error && (
               <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
                 {error}
@@ -83,12 +83,13 @@ export default function SignInForm() {
 
             <div>
               <Label>
-                Username <span className="text-error-500">*</span>
+                Email <span className="text-error-500">*</span>
               </Label>
               <Input
-                placeholder="Enter your username"
+                type="email"
+                placeholder="Enter your email"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => setUsername(e.target.value.trim())}
               />
             </div>
 

@@ -5,6 +5,7 @@ import { WishlistProvider } from "./pages/Wishlistcontext";
 import { FilterProvider } from "./pages/Filtercontext";
 import { ToastProvider } from "./context/ToastContext";
 import { ChatNotificationProvider } from "./context/ChatNotificationContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import VisitTracker from "./components/common/VisitTracker";
 
 
@@ -19,8 +20,10 @@ export default function App() {
           <Router>
             {/* Inside the router: notifications link to /chat */}
             <ChatNotificationProvider>
-              <VisitTracker />
-              <AppRoutes />
+              <NotificationProvider>
+                <VisitTracker />
+                <AppRoutes />
+              </NotificationProvider>
             </ChatNotificationProvider>
           </Router>
         </WishlistProvider>
