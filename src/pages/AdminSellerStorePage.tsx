@@ -13,6 +13,8 @@ import storeLogo from "../components/images/storeLogo.png";
 import {
   SHOOTING_CATEGORY_COLUMNS, selectionIds, selectionLabel, selectionTerms, type CategorySelection,
 } from "./shootingCategories";
+import { TOY_GUN_CATEGORY_COLUMNS } from "./toyGunCategories";
+import { usesToyGunCategories } from "../config/userRestrictions";
 
 import { API_BASE_URL as API_URL } from "../services/apiBase";
 
@@ -41,6 +43,8 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
   const sellerId = sellerIdFromUrl || loggedInUserId;
   const isOwnStore = sellerId === loggedInUserId;
   const isAdmin = isUserAdmin(user);
+  // Toy gun sellers filter their products by the toy gun categories
+  const categoryColumns = usesToyGunCategories(user?.email) ? TOY_GUN_CATEGORY_COLUMNS : SHOOTING_CATEGORY_COLUMNS;
   const canPost = isOwnStore && allowPosting;
   const sellerName = isOwnStore
     ? user?.name || user?.fullName || "My Store"
@@ -325,7 +329,7 @@ export default function AdminSellerStorePage({ allowPosting = true }: Props) {
           <div className="mb-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl
                           px-5 py-6 sm:px-8 max-h-[70vh] overflow-y-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
-              {SHOOTING_CATEGORY_COLUMNS.map((column, colIndex) => (
+              {categoryColumns.map((column, colIndex) => (
                 <div key={colIndex} className="space-y-6">
                   {column.map((group) => (
                     <div key={group.name}>

@@ -8,6 +8,8 @@ import { mapProduct, lookupProductById, productUrl, effectivePrice } from "../pr
 import ProductCardSkeleton from "../ProductCardSkeleton";
 import { getRecentlyViewed, refreshRecentlyViewed, removeRecentlyViewed, clearRecentlyViewed, addRecentlyViewed } from "../recentlyViewed";
 import { sellProductApi } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
+import { hidesCategoryFilter } from "../../config/userRestrictions";
 import { useFilter } from "../Filtercontext";
 import {
   ShoppingCart, MessageCircle, Store, History, Loader2, ShieldCheck,
@@ -107,6 +109,8 @@ const TRUST_POINTS = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const showCategoryBar = !hidesCategoryFilter(user?.email);
   const [storeSlides, setStoreSlides] = useState<HeroSlide[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -320,12 +324,14 @@ export default function Home() {
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-gray-50 to-gray-100
                     dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white">
 
-      {/* Category Filter Bar */}
-      <CategoryFilterBar
-        mode={activeTab}
-        selected={categoryFilter}
-        onSelect={handleSelectCategory}
-      />
+      {/* Category Filter Bar (hidden for some users, see config/userRestrictions) */}
+      {showCategoryBar && (
+        <CategoryFilterBar
+          mode={activeTab}
+          selected={categoryFilter}
+          onSelect={handleSelectCategory}
+        />
+      )}
 
       <main>
         <div>

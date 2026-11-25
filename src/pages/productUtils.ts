@@ -2,6 +2,14 @@ import type { Product } from "./ProductCard";
 import PLACEHOLDER_IMAGE from "../components/images/BandookwaleLogo.jpeg";
 
 import { API_BASE_URL as API_URL } from "../services/apiBase";
+import { getAuthToken } from "../services/api";
+
+// Product lists depend on who is signed in (some customers only see one admin's store products),
+// so send the login token when there is one.
+const productFetch = (url: string) => {
+  const token = getAuthToken();
+  return fetch(url, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
+};
 
 // "5m ago", "3h ago", "2d ago" — easier to scan than a full date
 export const timeAgo = (iso?: string): string => {
@@ -86,7 +94,7 @@ export async function fetchProductsByCategory(
   size = 200,
   isStoreProduct: boolean | null = false
 ): Promise<Product[]> {
-  const res = await fetch(
+  const res = await productFetch(
     `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=${size}&inputPkId=null&inputFkId=null&searchValue=null&categoryId=${categoryId}&isStoreProduct=${isStoreProduct}`
   );
   return extractList(await res.json()).map(mapProduct);
@@ -99,7 +107,7 @@ export async function fetchProductsByWeaponCategory(
   size = 200,
   isStoreProduct: boolean | null = false
 ): Promise<Product[]> {
-  const res = await fetch(
+  const res = await productFetch(
     `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=${size}&inputPkId=null&inputFkId=null&searchValue=null&isStoreProduct=${isStoreProduct}`
   );
   return extractList(await res.json())
@@ -109,7 +117,7 @@ export async function fetchProductsByWeaponCategory(
 
 // Raw getProduct item — has the weapon fields and image ids that Product drops (used by edit).
 export async function fetchRawProductById(id: number): Promise<any | null> {
-  const res = await fetch(
+  const res = await productFetch(
     `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=1&inputPkId=${id}&inputFkId=null&searchValue=null`
   );
   return extractList(await res.json()).find((p) => p.productPkId === id) ?? null;
@@ -125,7 +133,7 @@ export async function fetchProductById(id: number): Promise<Product | null> {
 // "backend says this product doesn't exist" (null) apart from "couldn't reach the backend" (throws).
 // Pass the product's own isStoreProduct: without it the backend answers 500 instead of an empty list.
 export async function lookupProductById(id: number, isStoreProduct: boolean): Promise<Product | null> {
-  const res = await fetch(
+  const res = await productFetch(
     `${API_URL}/api/users/getProduct?filterBy=ACTIVE&page=0&size=1&inputPkId=${id}&inputFkId=null&searchValue=null&isStoreProduct=${isStoreProduct}`
   );
   if (!res.ok) throw new Error(`getProduct ${id} failed: HTTP ${res.status}`);

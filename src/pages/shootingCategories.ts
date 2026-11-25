@@ -1,3 +1,5 @@
+import { TOY_GUN_CATEGORIES } from "./toyGunCategories";
+
 // Store taxonomy: group (e.g. AIR GUNS) → category (Air Rifles) → subcategory (Match Rifles)
 // IDs are hardcoded and get saved on products, so never renumber an existing entry.
 // Scheme: group = n*1000, category = group + k*10, subcategory = category + j
@@ -185,6 +187,9 @@ export const SHOOTING_CATEGORY_COLUMNS: ShootingCategoryGroup[][] = [
   SHOOTING_CATEGORIES.filter((g) => ["Shooting Accessories", "Sights"].includes(g.name)),
 ];
 
+// Every group, shooting and toy, for matching a selection to product category IDs
+const ALL_GROUPS = (): ShootingCategoryGroup[] => [...SHOOTING_CATEGORIES, ...TOY_GUN_CATEGORIES];
+
 // Selected node in the tree; subcategory/category are optional for broader picks
 export type CategorySelection = {
   group: string;
@@ -198,7 +203,7 @@ export const selectionLabel = (s: CategorySelection) =>
 // Names that should count as a match for a selection: the node itself plus everything under it
 export const selectionTerms = (s: CategorySelection): string[] => {
   if (s.subcategory) return [s.subcategory];
-  const group = SHOOTING_CATEGORIES.find((g) => g.name === s.group);
+  const group = ALL_GROUPS().find((g) => g.name === s.group);
   if (!group) return [];
   if (s.category) {
     const cat = group.categories.find((c) => c.name === s.category);
@@ -212,7 +217,7 @@ export const selectionTerms = (s: CategorySelection): string[] => {
 
 // Hardcoded IDs covered by a selection: the node itself plus everything under it
 export const selectionIds = (s: CategorySelection): number[] => {
-  const group = SHOOTING_CATEGORIES.find((g) => g.name === s.group);
+  const group = ALL_GROUPS().find((g) => g.name === s.group);
   if (!group) return [];
   const cats = s.category ? group.categories.filter((c) => c.name === s.category) : group.categories;
   if (s.subcategory) {

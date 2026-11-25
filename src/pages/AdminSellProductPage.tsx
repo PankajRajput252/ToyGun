@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { imageUploadApi, sellProductApi, ProductReq } from "../services/api";
 import { AlertTriangle, Check } from "lucide-react";
 import { SHOOTING_CATEGORIES } from "./shootingCategories";
+import { TOY_GUN_CATEGORIES } from "./toyGunCategories";
+import { usesToyGunCategories } from "../config/userRestrictions";
 import { fetchProductById } from "./productUtils";
 import { refreshRecentlyViewed } from "./recentlyViewed";
 
@@ -25,6 +27,8 @@ type ProductForm = {
 export default function AdminSellProductPage() {
     const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
     const userNodeId = user?.nodeId;
+    // Toy gun sellers pick from the toy gun categories instead of the shooting ones
+    const categoryGroups = usesToyGunCategories(user?.email) ? TOY_GUN_CATEGORIES : SHOOTING_CATEGORIES;
 
     const navigate = useNavigate();
     const routerLocation = useLocation();
@@ -111,9 +115,9 @@ export default function AdminSellProductPage() {
         }
     }, [isEditMode]);
 
-    // ─── Hardcoded categories (see shootingCategories.ts) ─────────────────────────
+    // ─── Hardcoded categories (see shootingCategories.ts / toyGunCategories.ts) ───
     // "Category" is the top-level group; "Subcategory" lists its categories and their sub-items
-    const selectedGroup = SHOOTING_CATEGORIES.find((g) => g.id === Number(form.categoryId));
+    const selectedGroup = categoryGroups.find((g) => g.id === Number(form.categoryId));
     const subCategoryOptions = (selectedGroup?.categories ?? []).flatMap((cat) => [
         { id: cat.id, label: cat.name },
         ...(cat.subcategories ?? []).map((sub) => ({ id: sub.id, label: `    ${sub.name}` })),
@@ -565,7 +569,7 @@ export default function AdminSellProductPage() {
                                            focus:ring-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="">Select Category *</option>
-                                    {SHOOTING_CATEGORIES.map((group) => (
+                                    {categoryGroups.map((group) => (
                                         <option key={group.id} value={group.id}>
                                             {group.name}
                                         </option>
